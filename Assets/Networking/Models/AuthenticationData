@@ -1,0 +1,5 @@
+public class AuthenticationData{
+            public string pluginName;
+		    public string pluginDeveloper;
+            public string pluginIcon;
+}
