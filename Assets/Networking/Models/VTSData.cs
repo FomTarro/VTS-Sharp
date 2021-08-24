@@ -224,5 +224,186 @@ namespace VTS.Networking {
             public string hotkeyID;
         }
     }
+
+    [System.Serializable]
+    public class VTSArtMeshListData : VTSMessageData{
+        public VTSArtMeshListData(){
+            this.messageType = "ArtMeshListRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public bool modelLoaded;
+		    public int numberOfArtMeshNames;
+		    public int numberOfArtMeshTags;
+		    public string[] artMeshNames;
+		    public string [] artMeshTags;
+        }
+    }
+
+    // must be from 1-255
+    [System.Serializable]
+    public class ColorTint {
+        public int colorR;
+        public int colorG;
+        public int colorB;
+        public int colorA;
+    }
+
+    [System.Serializable]
+    public class ArtMeshMatcher {
+        public bool tintAll;
+        public int[] artMeshNumber;
+        public string[] nameExact;
+        public string[] nameContains;
+        public string[] tagExact;
+        public string[] tagContains;
+    }
+
+    [System.Serializable]
+    public class VTSColorTintData : VTSMessageData{
+        public VTSColorTintData(){
+            this.messageType = "ColorTintRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public ColorTint colorTint;
+            public ArtMeshMatcher artMeshMatcher;
+            public int matchedArtMeshes;
+        }
+    }
+
+    [System.Serializable]
+    public class VTSFaceFoundData : VTSMessageData{
+        public VTSFaceFoundData(){
+            this.messageType = "FaceFoundRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public bool found;
+        }
+    }
+
+    [System.Serializable]
+    public class VTSParameter {
+        public string name;
+        public string addedBy;
+        public float value;
+        public float min;
+        public float max;
+        public float defaultValue;
+    }
+
+    [System.Serializable]
+    public class VTSInputParameterListData : VTSMessageData{
+        public VTSInputParameterListData(){
+            this.messageType = "InputParameterListRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public bool modelLoaded;
+            public string modelName;
+            public string modelID;
+            public VTSParameter[] customParameters;
+            public VTSParameter[] defaultParameters;
+        }
+    }
+
+    [System.Serializable]
+    public class VTSParameterValueData : VTSMessageData{
+        public VTSParameterValueData(){
+            this.messageType = "ParameterValueResponse";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data : VTSParameter {}
+    }
+
+    [System.Serializable]
+    public class VTSLive2DParameterListData : VTSMessageData{
+        public VTSLive2DParameterListData(){
+            this.messageType = "Live2DParameterListRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public bool modelLoaded;
+            public string modelName;
+            public string modelID;
+            public VTSParameter[] parameters;
+        }
+    }
+
+    [System.Serializable]
+    public class VTSCustomParameter {
+        // 4-32 characters, alphanumeric
+        public string parameterName;
+        public string explanation;
+        public float min;
+        public float max;
+        public float defaultValue;
+    }
+
+    [System.Serializable]
+    public class VTSParameterCreationData : VTSMessageData{
+        public VTSParameterCreationData(){
+            this.messageType = "ParameterCreationRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data : VTSCustomParameter {}
+    }
+
+    [System.Serializable]
+    public class VTSParameterDeletionData : VTSMessageData{
+        public VTSParameterDeletionData(){
+            this.messageType = "ParameterDeletionRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public string parameterName;
+        }
+    }
+
+    [System.Serializable]
+    public class VTSParameterInjectionValue{
+        public string id;
+        public float value = float.MinValue;
+        public float weight = float.MinValue;
+    }
+
+    [System.Serializable]
+    public class VTSInjectParameterData : VTSMessageData{
+        public VTSInjectParameterData(){
+            this.messageType = "InjectParameterDataRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public VTSParameterInjectionValue[] parameterValues;
+        }
+    }
 }
 

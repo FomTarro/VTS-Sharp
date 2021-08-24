@@ -37,6 +37,42 @@ namespace VTS.Networking{
                             case "AvailableModelsResponse":
                                 _callbacks[response.requestID].onSuccess(JsonUtility.FromJson<VTSAvailableModelsData>(data));
                                 break;
+                            case "ModelLoadResponse":
+                                _callbacks[response.requestID].onSuccess(JsonUtility.FromJson<VTSModelLoadData>(data));
+                                break;
+                            case "MoveModelResponse":
+                                _callbacks[response.requestID].onSuccess(JsonUtility.FromJson<VTSMoveModelData>(data));
+                                break;
+                            case "HotkeysInCurrentModelResponse":
+                                _callbacks[response.requestID].onSuccess(JsonUtility.FromJson<VTSHotkeysInCurrentModelData>(data));
+                                break;
+                            case "HotkeyTriggerResponse":
+                                _callbacks[response.requestID].onSuccess(JsonUtility.FromJson<VTSHotkeysInCurrentModelData>(data));
+                                break;
+                            case "ArtMeshListResponse":
+                                _callbacks[response.requestID].onSuccess(JsonUtility.FromJson<VTSArtMeshListData>(data));
+                                break;
+                            case "ColorTintResponse":
+                                _callbacks[response.requestID].onSuccess(JsonUtility.FromJson<VTSColorTintData>(data));
+                                break;
+                            case "FaceFoundResponse":
+                                _callbacks[response.requestID].onSuccess(JsonUtility.FromJson<VTSFaceFoundData>(data));
+                                break;
+                            case "InputParameterListResponse":
+                                _callbacks[response.requestID].onSuccess(JsonUtility.FromJson<VTSInputParameterListData>(data));
+                                break;
+                            case "Live2DParameterListResponse":
+                                _callbacks[response.requestID].onSuccess(JsonUtility.FromJson<VTSLive2DParameterListData>(data));
+                                break;
+                            case "ParameterCreationResponse":
+                                _callbacks[response.requestID].onSuccess(JsonUtility.FromJson<VTSParameterCreationData>(data));
+                                break;
+                            case "ParameterDeletionResponse":
+                                _callbacks[response.requestID].onSuccess(JsonUtility.FromJson<VTSParameterDeletionData>(data));
+                                break;
+                            case "InjectParameterDataResponse":
+                                _callbacks[response.requestID].onSuccess(JsonUtility.FromJson<VTSInjectParameterData>(data));
+                                break;
                         }
                     }
                 }

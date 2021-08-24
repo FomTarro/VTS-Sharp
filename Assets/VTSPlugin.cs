@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using VTS.Networking;
 
@@ -95,5 +96,84 @@ namespace VTS {
             this._socket.Send<VTSMoveModelData>(request, onSuccess, onError);
         }
 
+        public void GetHotkeysInCurrentModel(Action<VTSHotkeysInCurrentModelData> onSuccess, Action<VTSErrorData> onError){
+            VTSHotkeysInCurrentModelData request = new VTSHotkeysInCurrentModelData();
+            this._socket.Send<VTSHotkeysInCurrentModelData>(request, onSuccess, onError);
+        }
+        
+        public void TriggerHotkey(string hotkeyID, Action<VTSHotkeyTriggerData> onSuccess, Action<VTSErrorData> onError){
+            VTSHotkeyTriggerData request = new VTSHotkeyTriggerData();
+            request.data.hotkeyID = hotkeyID;
+            this._socket.Send<VTSHotkeyTriggerData>(request, onSuccess, onError);
+        }
+
+        public void GetArtMeshList(Action<VTSArtMeshListData> onSuccess, Action<VTSErrorData> onError){
+            VTSArtMeshListData request = new VTSArtMeshListData();
+            this._socket.Send<VTSArtMeshListData>(request, onSuccess, onError);
+        }
+
+        public void TintArtMesh(ColorTint tint, ArtMeshMatcher matcher, Action<VTSColorTintData> onSuccess, Action<VTSErrorData> onError){
+            VTSColorTintData request = new VTSColorTintData();
+            request.data.colorTint = tint;
+            request.data.artMeshMatcher = matcher;
+            this._socket.Send<VTSColorTintData>(request, onSuccess, onError);
+        }
+
+        public void GetFaceFound(Action<VTSFaceFoundData> onSuccess, Action<VTSErrorData> onError){
+            VTSFaceFoundData request = new VTSFaceFoundData();
+            this._socket.Send<VTSFaceFoundData>(request, onSuccess, onError);
+        }
+
+        public void GetInputParameterList(Action<VTSInputParameterListData> onSuccess, Action<VTSErrorData> onError){
+            VTSInputParameterListData request = new VTSInputParameterListData();
+            this._socket.Send<VTSInputParameterListData>(request, onSuccess, onError);
+        }
+
+        public void GetParameterValue(string parameterName, Action<VTSParameterValueData> onSuccess, Action<VTSErrorData> onError){
+            VTSParameterValueData request = new VTSParameterValueData();
+            request.data.name = parameterName;
+            this._socket.Send<VTSParameterValueData>(request, onSuccess, onError);
+        }
+
+        public void GetLive2DParameterList(Action<VTSLive2DParameterListData> onSuccess, Action<VTSErrorData> onError){
+            VTSLive2DParameterListData request = new VTSLive2DParameterListData();
+            this._socket.Send<VTSLive2DParameterListData>(request, onSuccess, onError);
+        }
+
+        public void AddCustomParameter(VTSCustomParameter parameter, Action<VTSParameterCreationData> onSuccess, Action<VTSErrorData> onError){
+            VTSParameterCreationData request = new VTSParameterCreationData();
+            request.data.parameterName = SanatizeParameterName(parameter.parameterName);
+            request.data.explanation = parameter.explanation;
+            request.data.min = parameter.min;
+            request.data.max = parameter.max;
+            request.data.defaultValue = parameter.defaultValue;
+            this._socket.Send<VTSParameterCreationData>(request, onSuccess, onError);
+        }
+
+        public void RemoveCustomParameter(string parameterName, Action<VTSParameterDeletionData> onSuccess, Action<VTSErrorData> onError){
+            VTSParameterDeletionData request = new VTSParameterDeletionData();
+            request.data.parameterName = SanatizeParameterName(parameterName);
+            this._socket.Send<VTSParameterDeletionData>(request, onSuccess, onError);
+        }
+
+        public void InjectParameterValues(VTSParameterInjectionValue[] values, Action<VTSInjectParameterData> onSuccess, Action<VTSErrorData> onError){
+            VTSInjectParameterData request = new VTSInjectParameterData();
+            foreach(VTSParameterInjectionValue value in values){
+                value.id = SanatizeParameterName(value.id);
+            }
+            request.data.parameterValues = values;
+            this._socket.Send<VTSInjectParameterData>(request, onSuccess, onError);
+        }
+
+        private Regex ALPHANUMERIC = new Regex(@"\W|_");
+        private string SanatizeParameterName(string name){
+            // between 4 and 32 chars, alphanumeric
+            string output = name;
+            output = ALPHANUMERIC.Replace(output, "");
+            output.PadLeft(4, 'X');
+            output = output.Substring(0, Math.Min(output.Length, 31));
+            return output;
+        }
+        
     }
 }
