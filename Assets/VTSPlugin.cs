@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using VTS.Networking;
 
 namespace VTS {
@@ -6,32 +7,70 @@ namespace VTS {
     public abstract class VTSPlugin : MonoBehaviour
     {
         [SerializeField]
-        private string _pluginName = "ExamplePlugin";
+        protected string _pluginName = "ExamplePlugin";
         public string PluginName { get { return this._pluginName; } }
         [SerializeField]
-        private string _pluginAuthor ="ExampleAuthor";
+        protected string _pluginAuthor = "ExampleAuthor";
         public string PluginAuthor { get { return this._pluginAuthor; } }
 
-        protected VTSWebSocket _socket = null;
+        private VTSWebSocket _socket = null;
+        protected VTSWebSocket Socket { get { return _socket; } }
+
+        private string _token = null;
+        protected string AuthenticationToken { get { return _token; }}
 
         private void Awake(){
             this._socket = GetComponent<VTSWebSocket>();
             Setup();
-            this._socket.onRecieve.AddListener( (v) => { Debug.Log(v); });
             this._socket.Connect();
-            Authenticate();
+            Authenticate((r) => { Debug.Log(r); }, (r) => { Debug.LogError(r); });
+            GetAPIState((r) => { Debug.Log(r); }, (r) => { Debug.LogError(r); });
         }
 
-        private void Authenticate(){
-            VTSData request = new VTSData();
-            request.requestID = "authRequest";
-            request.messageType = "AuthenticationTokenRequest";
-            request.data.pluginName = this._pluginName;
-            request.data.pluginDeveloper = this._pluginAuthor;
-            _socket.Send(request);
+        // TODO: clean this way the hell up.
+        private void Authenticate(Action<VTSAuthData> onSuccess, Action<VTSErrorData> onError){
+            VTSAuthData tokenRequest = new VTSAuthData();
+            tokenRequest.data.pluginName = this._pluginName;
+            tokenRequest.data.pluginDeveloper = this._pluginAuthor;
+            this._socket.Send<VTSAuthData>(tokenRequest, (a) => { 
+                this._token = a.data.authenticationToken; 
+                VTSAuthData authRequest = new VTSAuthData();
+                authRequest.messageType = "AuthenticationRequest";
+                authRequest.data.pluginName = this._pluginName;
+                authRequest.data.pluginDeveloper = this._pluginAuthor;
+                authRequest.data.authenticationToken = this._token;
+                this._socket.Send<VTSAuthData>(authRequest, onSuccess, onError);
+            }, onError);
+        }
+
+        public void GetAPIState(Action<VTSStateData> onSuccess, Action<VTSErrorData> onError){
+            VTSStateData request = new VTSStateData();
+            this._socket.Send<VTSStateData>(request, onSuccess, onError);
+        }
+
+        public void GetStatistics(Action<VTSStatisticsData> onSuccess, Action<VTSErrorData> onError){
+            VTSStatisticsData request = new VTSStatisticsData();
+            this._socket.Send<VTSStatisticsData>(request, onSuccess, onError);
+        }
+
+        public void GetFolderInfo(Action<VTSFolderInfoData> onSuccess, Action<VTSErrorData> onError){
+            VTSFolderInfoData request = new VTSFolderInfoData();
+            this._socket.Send<VTSFolderInfoData>(request, onSuccess, onError);
+        }
+
+        public void GetCurrentModel(Action<VTSCurrentModelData> onSuccess, Action<VTSErrorData> onError){
+            VTSCurrentModelData request = new VTSCurrentModelData();
+            this._socket.Send<VTSCurrentModelData>(request, onSuccess, onError);
+        }
+
+        public void GetAvailableModels(Action<VTSAvailableModelsData> onSuccess, Action<VTSErrorData> onError){
+            VTSAvailableModelsData request = new VTSAvailableModelsData();
+            this._socket.Send<VTSAvailableModelsData>(request, onSuccess, onError);
         }
 
         protected abstract void Setup();
+
+
 
     }
 }

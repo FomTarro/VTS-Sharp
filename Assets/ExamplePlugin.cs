@@ -4,7 +4,7 @@
     {
         protected override void Setup()
         {
-            this._socket.onRecieve.AddListener((v) => { UnityEngine.Debug.Log(v); });
+            
         }
     }
 }
