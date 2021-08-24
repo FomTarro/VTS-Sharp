@@ -22,12 +22,26 @@ namespace VTS {
         private void Awake(){
             this._socket = GetComponent<VTSWebSocket>();
             Setup();
-            this._socket.Connect();
-            Authenticate((r) => { Debug.Log(r); }, (r) => { Debug.LogError(r); });
+            // TODO: clean this way the hell up.
+            this._socket.Connect(() => {
+                Authenticate((r) => { 
+                Debug.Log(r); 
+                GetCurrentModel((m) => {
+                    Debug.Log(m);
+                },
+                (m) => {
+                    Debug.LogError(m);
+                });
+                }, (r) => { Debug.LogError(r); });
             GetAPIState((r) => { Debug.Log(r); }, (r) => { Debug.LogError(r); });
+            },
+            () => { 
+                Debug.LogError("Unable to connect ");
+            });
         }
 
-        // TODO: clean this way the hell up.
+        protected abstract void Setup();
+
         private void Authenticate(Action<VTSAuthData> onSuccess, Action<VTSErrorData> onError){
             VTSAuthData tokenRequest = new VTSAuthData();
             tokenRequest.data.pluginName = this._pluginName;
@@ -60,6 +74,7 @@ namespace VTS {
 
         public void GetCurrentModel(Action<VTSCurrentModelData> onSuccess, Action<VTSErrorData> onError){
             VTSCurrentModelData request = new VTSCurrentModelData();
+            Debug.Log(request);
             this._socket.Send<VTSCurrentModelData>(request, onSuccess, onError);
         }
 
@@ -68,9 +83,17 @@ namespace VTS {
             this._socket.Send<VTSAvailableModelsData>(request, onSuccess, onError);
         }
 
-        protected abstract void Setup();
+        public void LoadModel(string modelID, Action<VTSModelLoadData> onSuccess, Action<VTSErrorData> onError){
+            VTSModelLoadData request = new VTSModelLoadData();
+            request.data.modelID = modelID;
+            this._socket.Send<VTSModelLoadData>(request, onSuccess, onError);
+        }
 
-
+        public void MoveModel(VTSMoveModelData.Data position, Action<VTSMoveModelData> onSuccess, Action<VTSErrorData> onError){
+            VTSMoveModelData request = new VTSMoveModelData();
+            request.data = position;
+            this._socket.Send<VTSMoveModelData>(request, onSuccess, onError);
+        }
 
     }
 }

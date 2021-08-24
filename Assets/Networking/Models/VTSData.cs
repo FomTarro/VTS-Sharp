@@ -112,6 +112,15 @@ namespace VTS.Networking {
     }
 
     [System.Serializable]
+    public class ModelPosition{
+        public float positionX = float.MinValue;
+        public float positionY = float.MinValue;
+        public float rotation = float.MinValue;
+        public float size = float.MinValue;
+
+    }
+
+    [System.Serializable]
     public class VTSCurrentModelData : VTSMessageData{
          public VTSCurrentModelData(){
             this.messageType = "CurrentModelRequest";
@@ -131,14 +140,6 @@ namespace VTS.Networking {
 		    public int textureResolution;
             public ModelPosition modelPosition;
 
-            [System.Serializable]
-            public class ModelPosition{
-                public float positionX;
-                public float positionY;
-                public float rotation;
-                public float size;
-
-            }
         }
     }
 
@@ -152,9 +153,75 @@ namespace VTS.Networking {
 
         [System.Serializable]
         public class Data {
-            
             public int numberOfModels;
             public VTSModelData[] availableModels;
+        }
+    }
+
+    [System.Serializable]
+    public class VTSModelLoadData : VTSMessageData{
+        public VTSModelLoadData(){
+            this.messageType = "ModelLoadRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public string modelID;
+        }
+    }
+
+    [System.Serializable]
+    public class VTSMoveModelData : VTSMessageData{
+        public VTSMoveModelData(){
+            this.messageType = "MoveModelRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data : ModelPosition {
+            public float timeInSeconds;
+            public bool valuesAreRelativeToModel;
+        }
+    }
+
+    public class HotkeyData {
+        public string name;
+		public string type;
+		public string file;
+		public string hotkeyID;
+    }
+
+    [System.Serializable]
+    public class VTSHotkeysInCurrentModelData : VTSMessageData{
+        public VTSHotkeysInCurrentModelData(){
+            this.messageType = "HotkeysInCurrentModelResponse";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public bool modelLoaded;
+            public string modelName;
+            public string modelID;
+            public HotkeyData[] availableHotkeys;
+        }
+    }
+
+    [System.Serializable]
+    public class VTSHotkeyTriggerData : VTSMessageData{
+        public VTSHotkeyTriggerData(){
+            this.messageType = "HotkeyTriggerResponse";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public string hotkeyID;
         }
     }
 }

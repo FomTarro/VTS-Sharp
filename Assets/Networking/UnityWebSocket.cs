@@ -38,16 +38,21 @@ namespace VTS.Networking.Impl{
             _sendThread.Start();
         }
 
-        public async Task Connect()
+        public async Task Connect(System.Action onConnect, System.Action onError)
         {
             Debug.Log("Connecting to: " + _serverUri);
             await _ws.ConnectAsync(_serverUri, CancellationToken.None);
-            while (IsConnecting())
+            while(IsConnecting())
             {
                 Debug.Log("Waiting to connect...");
                 Task.Delay(50).Wait();
             }
             Debug.Log("Connect status: " + _ws.State);
+            if(_ws.State == WebSocketState.Open){
+                onConnect();
+            }else{
+                onError();
+            }
         }
 
         #region [Status]

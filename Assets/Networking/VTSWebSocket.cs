@@ -43,18 +43,40 @@ namespace VTS.Networking{
             }
         }
 
-        public void Connect(){
+        public void Connect(System.Action onConnect, System.Action onError){
             this._ws = new UnityWebSocket(VTS_WS_URL);
             #pragma warning disable 
-            this._ws.Connect();
+            this._ws.Connect(onConnect, onError);
             #pragma warning restore
         }
 
         public void Send<T>(T request, Action<T> onSuccess, Action<VTSErrorData> onError) where T : VTSMessageData{
             if(this._ws != null){
                 _callbacks.Add(request.requestID, new VTSCallbacks((t) => { onSuccess((T)t); } , onError));
-                this._ws.Send(request.ToString());
+                string output = RemoveNullProps(request.ToString());
+                this._ws.Send(output);
             }
+        }
+
+        private string RemoveNullProps(string input){
+            string[] props = input.Split(',', '{', '}');
+            string output = input;
+            foreach(string prop in props){
+                // We're doing direct string manipulation on a serialized JSON, which is incredibly frail.
+                // Please forgive my sins, as Unity's builtin JSON tool uses default field values instead of nulls,
+                // and sometimes that is unacceptable behavior.
+                // I'd use a more robust JSON library if I wasn't publishing this as a plugin.
+                string[] pair = prop.Split(':');
+                if(pair.Length > 1){
+                    float nullable = 0.0f;
+                    float.TryParse(pair[1], out nullable);
+                    if(float.MinValue.Equals(nullable)){
+                        output = output.Replace(prop+",", "");
+                        output = output.Replace(prop, "");
+                    }
+                }
+            }
+            return output;
         }
 
         private struct VTSCallbacks{
