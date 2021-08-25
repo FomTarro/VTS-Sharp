@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using VTS.Networking.Impl;
 
-namespace VTS.Networking{
+namespace VTS.Networking {
     public class VTSWebSocket : MonoBehaviour
     {
         private string VTS_WS_URL = "ws://localhost:8001";
@@ -107,6 +107,9 @@ namespace VTS.Networking{
                     float nullable = 0.0f;
                     float.TryParse(pair[1], out nullable);
                     if(float.MinValue.Equals(nullable)){
+                        output = output.Replace(prop+",", "");
+                        output = output.Replace(prop, "");
+                    }else if("".Equals(pair[1])){
                         output = output.Replace(prop+",", "");
                         output = output.Replace(prop, "");
                     }

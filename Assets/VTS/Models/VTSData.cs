@@ -1,5 +1,5 @@
 ﻿using System;
-namespace VTS.Networking {
+namespace VTS {
     public class VTSMessageData
     {
         public string apiName = "VTubeStudioPublicAPI";
