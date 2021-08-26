@@ -16,7 +16,18 @@ namespace VTS{
         }
 
         public void PrintAPIStats(){
-            GetAPIState((r) => { Debug.Log(r); _text.text = new JsonUtilityImpl().ToJson(r); }, (r) => { Debug.LogError(r.data.message); });
+            GetStatistics(
+                (r) => { Debug.Log(r); _text.text = new JsonUtilityImpl().ToJson(r); }, 
+                (e) => { _text.text = e.data.message; }
+            );
+        }
+
+        public void PrintCurentModelHotkeys(){
+            GetHotkeysInCurrentModel(
+                null,
+                (r) => { Debug.Log(r); _text.text = new JsonUtilityImpl().ToJson(r); }, 
+                (e) => { _text.text = e.data.message; }
+            );
         }
     }
 }

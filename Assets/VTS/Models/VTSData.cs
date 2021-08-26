@@ -20,7 +20,7 @@ namespace VTS.Models {
 
         [System.Serializable]
         public class Data {
-            public int errorID;
+            public ErrorID errorID;
             public string message;
         }
     }
@@ -183,9 +183,10 @@ namespace VTS.Models {
         }
     }
 
+    [System.Serializable]
     public class HotkeyData {
         public string name;
-		public string type;
+		public HotkeyAction type;
 		public string file;
 		public string hotkeyID;
     }
@@ -193,7 +194,7 @@ namespace VTS.Models {
     [System.Serializable]
     public class VTSHotkeysInCurrentModelData : VTSMessageData{
         public VTSHotkeysInCurrentModelData(){
-            this.messageType = "HotkeysInCurrentModelResponse";
+            this.messageType = "HotkeysInCurrentModelRequest";
             this.data = new Data();
         }
         public Data data;
@@ -210,7 +211,7 @@ namespace VTS.Models {
     [System.Serializable]
     public class VTSHotkeyTriggerData : VTSMessageData{
         public VTSHotkeyTriggerData(){
-            this.messageType = "HotkeyTriggerResponse";
+            this.messageType = "HotkeyTriggerRequest";
             this.data = new Data();
         }
         public Data data;
@@ -319,7 +320,7 @@ namespace VTS.Models {
     [System.Serializable]
     public class VTSParameterValueData : VTSMessageData{
         public VTSParameterValueData(){
-            this.messageType = "ParameterValueResponse";
+            this.messageType = "ParameterValueRequest";
             this.data = new Data();
         }
         public Data data;
