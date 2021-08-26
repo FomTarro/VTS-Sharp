@@ -1,5 +1,5 @@
 # VTS-Sharp
-A Unity C# client interface for creating VTube Studio Plugins with the [official Vtube Studio API](https://github.com/DenchiSoft/VTubeStudio)..
+A Unity C# client interface for creating VTube Studio Plugins with the [official Vtube Studio API](https://github.com/DenchiSoft/VTubeStudio)!
 
 ## About
 This library is maintained by Tom "Skeletom" Farro. If you need to contact him, the best way to do so is via [Twitter](https://www.twitter.com/fomtarro) or by leaving an issue ticket on this repo. Currently, this library is still in beta, but should be fully functional.

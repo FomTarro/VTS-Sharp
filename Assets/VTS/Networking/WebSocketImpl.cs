@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Collections.Concurrent;
 
 namespace VTS.Networking.Impl{
-    public class UnityWebSocket
+    public class WebSocketImpl : IWebSocket
     {
         private static UTF8Encoding ENCODER = new UTF8Encoding();
         private const UInt64 MAX_READ_SIZE = 1 * 1024 * 1024;
@@ -16,20 +16,16 @@ namespace VTS.Networking.Impl{
         // WebSocket
         private ClientWebSocket _ws = new ClientWebSocket();
 
-        // Server address
-        private Uri _serverUri;
-
         // Queues
-        public ConcurrentQueue<String> RecieveQueue { get; }
-        public BlockingCollection<ArraySegment<byte>> SendQueue { get; }
+        public ConcurrentQueue<string> RecieveQueue { get; }
+        private BlockingCollection<ArraySegment<byte>> SendQueue { get; }
         
         // Threads
         private Thread _receiveThread { get; set; }
         private Thread _sendThread { get; set; }
 
-        public UnityWebSocket(string serverURL){
+        public WebSocketImpl(){
             _ws = new ClientWebSocket();
-            _serverUri = new Uri(serverURL);
             RecieveQueue = new ConcurrentQueue<string>();
             _receiveThread = new Thread(RunReceive);
             _receiveThread.Start();
@@ -38,10 +34,11 @@ namespace VTS.Networking.Impl{
             _sendThread.Start();
         }
 
-        public async Task Connect(System.Action onConnect, System.Action onError)
+        public async Task Connect(string URL, System.Action onConnect, System.Action onError)
         {
-            Debug.Log("Connecting to: " + _serverUri);
-            await _ws.ConnectAsync(_serverUri, CancellationToken.None);
+            Uri serverUri = new Uri(URL);
+            Debug.Log("Connecting to: " + serverUri);
+            await _ws.ConnectAsync(serverUri, CancellationToken.None);
             while(IsConnecting())
             {
                 Debug.Log("Waiting to connect...");

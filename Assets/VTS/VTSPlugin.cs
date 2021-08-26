@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using UnityEngine;
 using VTS.Networking;
+using VTS.Models;
 
 namespace VTS {
     /// <summary>
@@ -41,32 +42,25 @@ namespace VTS {
         /// <value></value>
         protected string AuthenticationToken { get { return _token; }}
 
-        private void Awake(){
+        /// <summary>
+        /// Authenticates the plugin as well as selects the Websocket and JSON utility implementations.
+        /// </summary>
+        /// <param name="webSocket">The websocket implementation.</param>
+        /// <param name="jsonUtility">Thge JSON serializer/deserializer implementation.</param>
+        public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility){
             this._socket = GetComponent<VTSWebSocket>();
-            Setup();
+            this._socket.Initialize(webSocket, jsonUtility);
             // TODO: clean this way the hell up.
             this._socket.Connect(() => {
-                Authenticate((r) => { 
-                Debug.Log(r); 
-                GetCurrentModel((m) => {
-                    Debug.Log(m);
-                },
-                (m) => {
-                    Debug.LogError(m);
-                });
-                }, (r) => { Debug.LogError(r); });
+                Authenticate(
+                    (r) => { Debug.Log(r); }, 
+                    (r) => { Debug.LogError(r); }
+                );
             },
             () => { 
                 Debug.LogError("Unable to connect ");
             });
         }
-
-        /// <summary>
-        /// The method for doing any prerequisite initialization for your plugin. 
-        /// 
-        /// Called after acquiring the WebSocket reference, but before attempting to Authenticate.
-        /// </summary>
-        protected abstract void Setup();
 
         private void Authenticate(Action<VTSAuthData> onSuccess, Action<VTSErrorData> onError){
             VTSAuthData tokenRequest = new VTSAuthData();

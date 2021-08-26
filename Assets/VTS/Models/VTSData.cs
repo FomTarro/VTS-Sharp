@@ -1,16 +1,12 @@
 ﻿using System;
-namespace VTS {
+
+namespace VTS.Models {
     public class VTSMessageData
     {
         public string apiName = "VTubeStudioPublicAPI";
         public string apiVersion = "1.0";
         public string requestID = Guid.NewGuid().ToString();
         public string messageType;
-
-        public override string ToString()
-        {
-            return UnityEngine.JsonUtility.ToJson(this);
-        }
     }
 
     
