@@ -6,7 +6,7 @@ using VTS.Models;
 namespace VTS.Networking {
     public class VTSWebSocket : MonoBehaviour
     {
-        private string VTS_WS_URL = "ws://localhost:8001";
+        private const string VTS_WS_URL = "ws://localhost:8001";
         private IWebSocket _ws = null;
         private IJsonUtility _json = null;
         private Dictionary<string, VTSCallbacks> _callbacks = new Dictionary<string, VTSCallbacks>();
@@ -17,6 +17,10 @@ namespace VTS.Networking {
         }
 
         private void Update(){
+            ProcessResponses();
+        }
+
+        private void ProcessResponses(){
             if(this._ws != null && _ws.RecieveQueue.Count > 0){
                 string data;
                 this._ws.RecieveQueue.TryDequeue(out data);
@@ -29,6 +33,9 @@ namespace VTS.Networking {
                                 break;
                             case "APIStateResponse":
                                 this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSStateData>(data));
+                                break;
+                            case "StatisticsResponse":
+                                this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSStatisticsData>(data));
                                 break;
                             case "AuthenticationResponse":
                             case "AuthenticationTokenResponse":

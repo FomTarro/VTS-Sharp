@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using System;
 using System.IO;
-using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Net.WebSockets;
 using System.Collections.Concurrent;
 
 namespace VTS.Networking.Impl{
@@ -52,7 +52,7 @@ namespace VTS.Networking.Impl{
             }
         }
 
-        #region [Status]
+        #region Status
         public bool IsConnecting()
         {
             return _ws.State == WebSocketState.Connecting;
@@ -64,7 +64,7 @@ namespace VTS.Networking.Impl{
         }
         #endregion
 
-        #region [Send]
+        #region Send
         public void Send(string message)
         {
             byte[] buffer = ENCODER.GetBytes(message);
@@ -89,12 +89,12 @@ namespace VTS.Networking.Impl{
         }
         #endregion
 
-        #region [Receive]
+        #region Receive
         private async Task<string> Receive(UInt64 maxSize = MAX_READ_SIZE)
         {
             // A read buffer, and a memory stream to stuff unknown number of chunks into:
             byte[] buf = new byte[4 * 1024];
-            var ms = new MemoryStream();
+            MemoryStream ms = new MemoryStream();
             ArraySegment<byte> arrayBuf = new ArraySegment<byte>(buf);
             WebSocketReceiveResult chunkResult = null;
             if (IsConnectionOpen())

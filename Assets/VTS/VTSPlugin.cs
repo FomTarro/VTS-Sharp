@@ -223,17 +223,18 @@ namespace VTS {
         /// For more info, see 
         /// <a href="https://github.com/DenchiSoft/VTubeStudio#tint-artmeshes-with-color">https://github.com/DenchiSoft/VTubeStudio#tint-artmeshes-with-color</a>
         /// </summary>
-        /// <param name="tint">The tint to be applied. Values must be 0-255.</param>
+        /// <param name="tint">The tint to be applied.</param>
         /// <param name="matcher">The ArtMesh matcher search parameters.</param>
         /// <param name="onSuccess">Callback executed upon receiving a response.</param>
         /// <param name="onError">Callback executed upon receiving an error.</param>
-        public void TintArtMesh(ColorTint tint, ArtMeshMatcher matcher, Action<VTSColorTintData> onSuccess, Action<VTSErrorData> onError){
+        public void TintArtMesh(Color32 tint, ArtMeshMatcher matcher, Action<VTSColorTintData> onSuccess, Action<VTSErrorData> onError){
             VTSColorTintData request = new VTSColorTintData();
-            tint.colorR = Mathf.Clamp(tint.colorR, 0, 255);
-            tint.colorG = Mathf.Clamp(tint.colorG, 0, 255);
-            tint.colorB = Mathf.Clamp(tint.colorB, 0, 255);
-            tint.colorA = Mathf.Clamp(tint.colorA, 0, 255);
-            request.data.colorTint = tint;
+            ColorTint colorTint = new ColorTint();
+            colorTint.colorA = tint.a;
+            colorTint.colorB = tint.b;
+            colorTint.colorG = tint.g;
+            colorTint.colorR = tint.r;
+            request.data.colorTint = colorTint;
             request.data.artMeshMatcher = matcher;
             this._socket.Send<VTSColorTintData>(request, onSuccess, onError);
         }
@@ -344,7 +345,7 @@ namespace VTS {
             this._socket.Send<VTSInjectParameterData>(request, onSuccess, onError);
         }
 
-        private Regex ALPHANUMERIC = new Regex(@"\W|_");
+        private static Regex ALPHANUMERIC = new Regex(@"\W|_");
         private string SanatizeParameterName(string name){
             // between 4 and 32 chars, alphanumeric
             string output = name;

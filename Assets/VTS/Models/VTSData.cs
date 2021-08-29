@@ -243,10 +243,10 @@ namespace VTS.Models {
     // must be from 1-255
     [System.Serializable]
     public class ColorTint {
-        public int colorR;
-        public int colorG;
-        public int colorB;
-        public int colorA;
+        public byte colorR;
+        public byte colorG;
+        public byte colorB;
+        public byte colorA;
     }
 
     [System.Serializable]
