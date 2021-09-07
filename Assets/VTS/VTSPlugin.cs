@@ -42,19 +42,28 @@ namespace VTS {
         /// <value></value>
         protected string AuthenticationToken { get { return _token; }}
 
+        protected ITokenStorage _tokenStorage = null;
+
         /// <summary>
-        /// Authenticates the plugin as well as selects the Websocket and JSON utility implementations.
+        /// Authenticates the plugin as well as selects the Websocket, JSON utility, and Token Storage implementations.
         /// </summary>
         /// <param name="webSocket">The websocket implementation.</param>
-        /// <param name="jsonUtility">Thge JSON serializer/deserializer implementation.</param>
-        public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility){
+        /// <param name="jsonUtility">The JSON serializer/deserializer implementation.</param>
+        /// <param name="tokenStorage">The Token Storage implementation.</param>
+        /// <param name="onInitialize">Callback executed upon successful initialization.</param>
+        /// <param name="onError">The Callback exexuted upon failed initialization.</param>
+        public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onInitialize, Action onError){
+            this._tokenStorage = tokenStorage;
             this._socket = GetComponent<VTSWebSocket>();
             this._socket.Initialize(webSocket, jsonUtility);
-            // TODO: clean this way the hell up.
             this._socket.Connect(() => {
                 Authenticate(
-                    (r) => { Debug.Log(r); }, 
-                    (r) => { Debug.LogError(r); }
+                    (r) => { 
+                        onInitialize();
+                    }, 
+                    (r) => { 
+                        onError();
+                    }
                 );
             },
             () => { 
@@ -63,18 +72,40 @@ namespace VTS {
         }
 
         private void Authenticate(Action<VTSAuthData> onSuccess, Action<VTSErrorData> onError){
+            if(this._tokenStorage != null){
+                this._token = this._tokenStorage.LoadToken();
+                if(String.IsNullOrEmpty(this._token)){
+                    GetToken(onSuccess, onError);
+                }else{
+                    UseToken(onSuccess, onError);
+                }
+            }else{
+                GetToken(onSuccess, onError);
+            }
+        }
+
+        private void GetToken(Action<VTSAuthData> onSuccess, Action<VTSErrorData> onError){
             VTSAuthData tokenRequest = new VTSAuthData();
             tokenRequest.data.pluginName = this._pluginName;
             tokenRequest.data.pluginDeveloper = this._pluginAuthor;
-            this._socket.Send<VTSAuthData>(tokenRequest, (a) => { 
+            this._socket.Send<VTSAuthData>(tokenRequest,
+            (a) => {
                 this._token = a.data.authenticationToken; 
-                VTSAuthData authRequest = new VTSAuthData();
-                authRequest.messageType = "AuthenticationRequest";
-                authRequest.data.pluginName = this._pluginName;
-                authRequest.data.pluginDeveloper = this._pluginAuthor;
-                authRequest.data.authenticationToken = this._token;
-                this._socket.Send<VTSAuthData>(authRequest, onSuccess, onError);
-            }, onError);
+                if(this._tokenStorage != null){
+                    this._tokenStorage.SaveToken(this._token);
+                }
+                UseToken(onSuccess, onError);
+            },
+            onError);
+        }
+
+        private void UseToken(Action<VTSAuthData> onSuccess, Action<VTSErrorData> onError){
+            VTSAuthData authRequest = new VTSAuthData();
+            authRequest.messageType = "AuthenticationRequest";
+            authRequest.data.pluginName = this._pluginName;
+            authRequest.data.pluginDeveloper = this._pluginAuthor;
+            authRequest.data.authenticationToken = this._token;
+            this._socket.Send<VTSAuthData>(authRequest, onSuccess, onError);
         }
 
         /// <summary>
