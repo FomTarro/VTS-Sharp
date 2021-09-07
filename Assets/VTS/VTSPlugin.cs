@@ -66,9 +66,7 @@ namespace VTS {
                     }
                 );
             },
-            () => { 
-                Debug.LogError("Unable to connect ");
-            });
+            onError);
         }
 
         private void Authenticate(Action<VTSAuthData> onSuccess, Action<VTSErrorData> onError){
