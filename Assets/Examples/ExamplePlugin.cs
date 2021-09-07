@@ -15,7 +15,9 @@ namespace VTS.Examples {
         private Color _color = Color.black;
 
         private void Awake(){
-            Initialize(new WebSocketImpl(), new JsonUtilityImpl());
+            Initialize(new WebSocketImpl(), new JsonUtilityImpl(), new TokenStorageImpl(), 
+            () => {}, 
+            () => {});
         }
 
         public void PrintAPIStats(){
