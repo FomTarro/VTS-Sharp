@@ -52,6 +52,12 @@ namespace VTS.Networking.Impl{
             }
         }
 
+        public void Abort(){
+            if(this._ws != null){
+                this._ws.Abort();
+            }
+        }
+
         #region Status
         public bool IsConnecting()
         {
@@ -81,9 +87,15 @@ namespace VTS.Networking.Impl{
             {
                 while (!SendQueue.IsCompleted && this.IsConnectionOpen())
                 {
-                    msg = SendQueue.Take();
-                    // Debug.Log("Dequeued this message to send: " + msg);
-                    await _ws.SendAsync(msg, WebSocketMessageType.Text, true /* is last part of message */, CancellationToken.None);
+                    try{
+                        msg = SendQueue.Take();
+                        // Debug.Log("Dequeued this message to send: " + msg);
+                        await _ws.SendAsync(msg, WebSocketMessageType.Text, true /* is last part of message */, CancellationToken.None);
+                    }catch(Exception e){
+                        Debug.LogError(e);
+                        // put unsent messages back on the queue
+                        SendQueue.Add(msg);
+                    }
                 }
             }
         }

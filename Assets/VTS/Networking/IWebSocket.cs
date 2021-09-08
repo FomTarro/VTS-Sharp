@@ -22,6 +22,7 @@ namespace VTS.Networking{
         /// <param name="onError">Callback executed upon receiving an error.</param>
         /// <returns></returns>
         Task Connect(string URL, System.Action onConnect, System.Action onError);
+        void Abort();
         /// <summary>
         /// Is the socket in the process of connecting?
         /// </summary>

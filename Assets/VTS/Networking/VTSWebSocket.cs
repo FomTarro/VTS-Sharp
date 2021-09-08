@@ -16,6 +16,12 @@ namespace VTS.Networking {
             this._json = jsonUtility;
         }
 
+        public void Abort(){
+            if(this._ws != null){
+                this._ws.Abort();
+            }
+        }
+
         private void Update(){
             ProcessResponses();
         }
@@ -111,9 +117,13 @@ namespace VTS.Networking {
 
         public void Send<T>(T request, Action<T> onSuccess, Action<VTSErrorData> onError) where T : VTSMessageData{
             if(this._ws != null){
-                _callbacks.Add(request.requestID, new VTSCallbacks((t) => { onSuccess((T)t); } , onError));
-                string output = RemoveNullProps(_json.ToJson(request));
-                this._ws.Send(output);
+                try{
+                    _callbacks.Add(request.requestID, new VTSCallbacks((t) => { onSuccess((T)t); } , onError));
+                    string output = RemoveNullProps(_json.ToJson(request));
+                    this._ws.Send(output);
+                }catch(Exception e){
+                    Debug.Log(e);
+                }
             }else{
                 VTSErrorData error = new VTSErrorData();
                 error.data.errorID = ErrorID.InternalServerError;
