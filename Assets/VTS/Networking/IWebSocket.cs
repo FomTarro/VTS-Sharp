@@ -7,13 +7,13 @@ namespace VTS.Networking{
     /// </summary>
     public interface IWebSocket {
         /// <summary>
-        /// The queue of recieved payloads. 
+        /// Fetches the next response to process.
         /// 
         /// Because Unity can only do most tasks on the main thread, 
-        /// response payloads will need to be placed into this queue, as they will be dequeued via a poller in the Update lifecycle method.
+        /// response payloads will be fetched with this method via a poller in the Update lifecycle method.
         /// </summary>
         /// <value></value>
-        ConcurrentQueue<string> RecieveQueue { get; }
+        string GetNextResponse();
         /// <summary>
         /// Connects to the given URL and executes the relevant callback on completion.
         /// </summary>
@@ -22,7 +22,10 @@ namespace VTS.Networking{
         /// <param name="onError">Callback executed upon receiving an error.</param>
         /// <returns></returns>
         Task Connect(string URL, System.Action onConnect, System.Action onError);
-        void Abort();
+        /// <summary>
+        /// 
+        /// </summary>
+        void Dispose();
         /// <summary>
         /// Is the socket in the process of connecting?
         /// </summary>

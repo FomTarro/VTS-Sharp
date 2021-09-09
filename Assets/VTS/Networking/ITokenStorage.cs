@@ -2,5 +2,6 @@
     public interface ITokenStorage{
         string LoadToken();
         void SaveToken(string token);
+        void DeleteToken();
     }
 }

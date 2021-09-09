@@ -10,6 +10,7 @@ using System.Collections.Concurrent;
 namespace VTS.Networking.Impl{
     public class WebSocketImpl : IWebSocket
     {
+        private string _url = null;
         private static UTF8Encoding ENCODER = new UTF8Encoding();
         private const UInt64 MAX_READ_SIZE = 1 * 1024 * 1024;
 
@@ -17,25 +18,37 @@ namespace VTS.Networking.Impl{
         private ClientWebSocket _ws = new ClientWebSocket();
 
         // Queues
-        public ConcurrentQueue<string> RecieveQueue { get; }
-        private BlockingCollection<ArraySegment<byte>> SendQueue { get; }
+        private ConcurrentQueue<string> recieveQueue { get; }
+        private BlockingCollection<ArraySegment<byte>> _sendQueue { get; }
         
         // Threads
         private Thread _receiveThread { get; set; }
         private Thread _sendThread { get; set; }
 
+        private bool _reconnecting = true;
+        private bool _disposed = false;
+        private object _connectionLock = new object();
+
         public WebSocketImpl(){
             _ws = new ClientWebSocket();
-            RecieveQueue = new ConcurrentQueue<string>();
+            recieveQueue = new ConcurrentQueue<string>();
             _receiveThread = new Thread(RunReceive);
             _receiveThread.Start();
-            SendQueue = new BlockingCollection<ArraySegment<byte>>();
+            _sendQueue = new BlockingCollection<ArraySegment<byte>>();
             _sendThread = new Thread(RunSend);
             _sendThread.Start();
         }
 
+        ~WebSocketImpl(){
+            this.Dispose();
+        }
+
         public async Task Connect(string URL, System.Action onConnect, System.Action onError)
         {
+            this._url = URL;
+            lock(this._connectionLock){
+                this._reconnecting = true;
+            }
             Uri serverUri = new Uri(URL);
             Debug.Log("Connecting to: " + serverUri);
             await _ws.ConnectAsync(serverUri, CancellationToken.None);
@@ -46,27 +59,37 @@ namespace VTS.Networking.Impl{
             }
             Debug.Log("Connect status: " + _ws.State);
             if(_ws.State == WebSocketState.Open){
+                lock(this._connectionLock){
+                    this._reconnecting = false;
+                }
                 onConnect();
             }else{
                 onError();
             }
         }
 
-        public void Abort(){
-            if(this._ws != null){
-                this._ws.Abort();
+        private async Task Reconnect(){
+            lock(this._ws){
+                this._ws = new ClientWebSocket();
             }
+            await Connect(this._url, () => { Debug.Log("Reconnected!"); }, async () => { await Reconnect() ;} );
+        }
+
+        public void Dispose(){
+            Debug.LogWarning("Disposing of socket...");
+            this._disposed = true;
+            this._ws.Dispose();
         }
 
         #region Status
         public bool IsConnecting()
-        {
+        {   
             return _ws.State == WebSocketState.Connecting;
         }
 
         public bool IsConnectionOpen()
         {
-            return _ws.State == WebSocketState.Open;
+            return _ws.State == WebSocketState.Open && !this.IsConnecting();
         }
         #endregion
 
@@ -76,32 +99,63 @@ namespace VTS.Networking.Impl{
             byte[] buffer = ENCODER.GetBytes(message);
             // Debug.Log("Message to queue for send: " + buffer.Length + ", message: " + message);
             ArraySegment<byte> sendBuf = new ArraySegment<byte>(buffer);
-            SendQueue.Add(sendBuf);
+            _sendQueue.Add(sendBuf);
         }
 
         private async void RunSend()
         {
             Debug.Log("WebSocket Message Sender looping.");
             ArraySegment<byte> msg;
-            while (true)
+            bool proceed = true;
+            int counter = 0;
+            while (!this._disposed)
             {
-                while (!SendQueue.IsCompleted && this.IsConnectionOpen())
+                while (!_sendQueue.IsCompleted && this.IsConnectionOpen() && !this._disposed)
                 {
+                    lock(this._connectionLock){
+                        proceed = !this._reconnecting;
+                    }
+                    if(!proceed){
+                        continue;
+                    }
                     try{
-                        msg = SendQueue.Take();
+                        counter++;
+                        if(counter >= 1000){
+                            //throw new WebSocketException("CHAOS MONKEY");
+                        }
+                        msg = _sendQueue.Take();
                         // Debug.Log("Dequeued this message to send: " + msg);
                         await _ws.SendAsync(msg, WebSocketMessageType.Text, true /* is last part of message */, CancellationToken.None);
                     }catch(Exception e){
                         Debug.LogError(e);
                         // put unsent messages back on the queue
-                        SendQueue.Add(msg);
+                        _sendQueue.Add(msg);
+                        if(e is WebSocketException 
+                        || e is System.IO.IOException 
+                        || e is System.Net.Sockets.SocketException){
+                            counter = 0;
+                            lock(this._connectionLock){
+                                this._reconnecting = true;
+                            }
+                            Debug.LogWarning("Socket exception occured, reconnecting...");
+                            await Reconnect();
+                        }
                     }
                 }
             }
+            Debug.Log("WebSocket Message Sender ending.");
         }
         #endregion
 
         #region Receive
+
+        public string GetNextResponse()
+        {
+            string data = null;
+            this.recieveQueue.TryDequeue(out data);
+            return data;
+        }
+
         private async Task<string> Receive(UInt64 maxSize = MAX_READ_SIZE)
         {
             // A read buffer, and a memory stream to stuff unknown number of chunks into:
@@ -135,18 +189,19 @@ namespace VTS.Networking.Impl{
         {
             Debug.Log("WebSocket Message Receiver looping.");
             string result;
-            while (true)
+            while (!this._disposed)
             {
                 result = await Receive();
                 if (result != null && result.Length > 0)
                 {
-                    RecieveQueue.Enqueue(result);
+                    recieveQueue.Enqueue(result);
                 }
                 else
                 {
                     Task.Delay(50).Wait();
                 }
             }
+            Debug.Log("WebSocket Message Receiver thread ending.");
         }
         #endregion
 

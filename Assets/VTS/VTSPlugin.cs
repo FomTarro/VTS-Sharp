@@ -116,7 +116,6 @@ namespace VTS {
         /// <param name="onError">Callback executed upon receiving an error.</param>
         public void GetAPIState(Action<VTSStateData> onSuccess, Action<VTSErrorData> onError){
             VTSStateData request = new VTSStateData();
-            request.messageType = "nonsense";
             this._socket.Send<VTSStateData>(request, onSuccess, onError);
         }
 

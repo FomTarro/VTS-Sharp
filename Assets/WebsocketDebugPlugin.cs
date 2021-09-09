@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using VTS;
 using VTS.Models;
 using VTS.Networking.Impl;
@@ -10,8 +8,13 @@ public class WebsocketDebugPlugin : VTSPlugin
 {
     private bool _authenticated = false;
     private void Awake(){
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = 60;
         Initialize(new WebSocketImpl(), new JsonUtilityImpl(), new TokenStorageImpl(), 
-        () => { this._authenticated = true; }, 
+        () => { 
+            this._authenticated = true; 
+            GetAPIState((a) => Debug.Log(a), (a) => {});
+        }, 
         () => {});
     }
     public void SyncValues(VTSParameterInjectionValue[] values)
