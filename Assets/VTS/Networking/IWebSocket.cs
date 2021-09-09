@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace VTS.Networking{
     /// <summary>
@@ -23,7 +22,7 @@ namespace VTS.Networking{
         /// <returns></returns>
         Task Connect(string URL, System.Action onConnect, System.Action onError);
         /// <summary>
-        /// 
+        /// Disposes of and closes the websocket.
         /// </summary>
         void Dispose();
         /// <summary>

@@ -51,7 +51,7 @@ namespace VTS {
         /// <param name="jsonUtility">The JSON serializer/deserializer implementation.</param>
         /// <param name="tokenStorage">The Token Storage implementation.</param>
         /// <param name="onInitialize">Callback executed upon successful initialization.</param>
-        /// <param name="onError">The Callback exexuted upon failed initialization.</param>
+        /// <param name="onError">The Callback executed upon failed initialization.</param>
         public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onInitialize, Action onError){
             this._tokenStorage = tokenStorage;
             this._socket = GetComponent<VTSWebSocket>();
@@ -294,7 +294,7 @@ namespace VTS {
         }
 
         /// <summary>
-        /// Gets the value fr the specified parameter.
+        /// Gets the value for the specified parameter.
         /// 
         /// For more info, see 
         /// <a href="https://github.com/DenchiSoft/VTubeStudio#requesting-list-of-available-tracking-parameters">https://github.com/DenchiSoft/VTubeStudio#requesting-list-of-available-tracking-parameters</a>
@@ -332,7 +332,7 @@ namespace VTS {
         /// <param name="onError">Callback executed upon receiving an error.</param>
         public void AddCustomParameter(VTSCustomParameter parameter, Action<VTSParameterCreationData> onSuccess, Action<VTSErrorData> onError){
             VTSParameterCreationData request = new VTSParameterCreationData();
-            request.data.parameterName = SanatizeParameterName(parameter.parameterName);
+            request.data.parameterName = SanitizeParameterName(parameter.parameterName);
             request.data.explanation = parameter.explanation;
             request.data.min = parameter.min;
             request.data.max = parameter.max;
@@ -351,7 +351,7 @@ namespace VTS {
         /// <param name="onError">Callback executed upon receiving an error.</param>
         public void RemoveCustomParameter(string parameterName, Action<VTSParameterDeletionData> onSuccess, Action<VTSErrorData> onError){
             VTSParameterDeletionData request = new VTSParameterDeletionData();
-            request.data.parameterName = SanatizeParameterName(parameterName);
+            request.data.parameterName = SanitizeParameterName(parameterName);
             this._socket.Send<VTSParameterDeletionData>(request, onSuccess, onError);
         }
 
@@ -361,20 +361,20 @@ namespace VTS {
         /// For more info, see 
         /// <a href="https://github.com/DenchiSoft/VTubeStudio#feeding-in-data-for-default-or-custom-parameters">https://github.com/DenchiSoft/VTubeStudio#feeding-in-data-for-default-or-custom-parameters</a>
         /// </summary>
-        /// <param name="values">A listo of parameters and the values to assign to them.</param>
+        /// <param name="values">A list of parameters and the values to assign to them.</param>
         /// <param name="onSuccess">Callback executed upon receiving a response.</param>
         /// <param name="onError">Callback executed upon receiving an error.</param>
         public void InjectParameterValues(VTSParameterInjectionValue[] values, Action<VTSInjectParameterData> onSuccess, Action<VTSErrorData> onError){
             VTSInjectParameterData request = new VTSInjectParameterData();
             foreach(VTSParameterInjectionValue value in values){
-                value.id = SanatizeParameterName(value.id);
+                value.id = SanitizeParameterName(value.id);
             }
             request.data.parameterValues = values;
             this._socket.Send<VTSInjectParameterData>(request, onSuccess, onError);
         }
 
         private static Regex ALPHANUMERIC = new Regex(@"\W|_");
-        private string SanatizeParameterName(string name){
+        private string SanitizeParameterName(string name){
             // between 4 and 32 chars, alphanumeric
             string output = name;
             output = ALPHANUMERIC.Replace(output, "");

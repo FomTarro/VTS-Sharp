@@ -8,6 +8,11 @@ using System.Net.WebSockets;
 using System.Collections.Concurrent;
 
 namespace VTS.Networking.Impl{
+    /// <summary>
+    /// Basic Websocket implementation. 
+    /// 
+    /// It is strongly recommended that you replace this with a more robust solution, such as WebsocketSharp.
+    /// </summary>
     public class WebSocketImpl : IWebSocket
     {
         private string _url = null;
@@ -29,8 +34,12 @@ namespace VTS.Networking.Impl{
         private bool _disposed = false;
         private object _connectionLock = new object();
 
+        private System.Action _onReconnect = () => {};
+
+        #region  Lifecycle
         public WebSocketImpl(){
             _ws = new ClientWebSocket();
+            _ws.Options.KeepAliveInterval = new TimeSpan(0, 0, 10);
             recieveQueue = new ConcurrentQueue<string>();
             _receiveThread = new Thread(RunReceive);
             _receiveThread.Start();
@@ -45,10 +54,11 @@ namespace VTS.Networking.Impl{
 
         public async Task Connect(string URL, System.Action onConnect, System.Action onError)
         {
-            this._url = URL;
+            this._onReconnect = onConnect;
             lock(this._connectionLock){
                 this._reconnecting = true;
             }
+            this._url = URL;
             Uri serverUri = new Uri(URL);
             Debug.Log("Connecting to: " + serverUri);
             await _ws.ConnectAsync(serverUri, CancellationToken.None);
@@ -71,8 +81,12 @@ namespace VTS.Networking.Impl{
         private async Task Reconnect(){
             lock(this._ws){
                 this._ws = new ClientWebSocket();
+                this._ws.Options.KeepAliveInterval = new TimeSpan(0, 0, 10);
             }
-            await Connect(this._url, () => { Debug.Log("Reconnected!"); }, async () => { await Reconnect() ;} );
+            await Connect(this._url, this._onReconnect, async () => { 
+                // keep retrying 
+                await Reconnect() ;
+            } );
         }
 
         public void Dispose(){
@@ -80,6 +94,7 @@ namespace VTS.Networking.Impl{
             this._disposed = true;
             this._ws.Dispose();
         }
+        #endregion
 
         #region Status
         public bool IsConnecting()
@@ -106,25 +121,17 @@ namespace VTS.Networking.Impl{
         {
             Debug.Log("WebSocket Message Sender looping.");
             ArraySegment<byte> msg;
-            bool proceed = true;
-            int counter = 0;
             while (!this._disposed)
             {
-                while (!_sendQueue.IsCompleted && this.IsConnectionOpen() && !this._disposed)
+                if(!_sendQueue.IsCompleted && this.IsConnectionOpen() && !this._disposed)
                 {
                     lock(this._connectionLock){
-                        proceed = !this._reconnecting;
-                    }
-                    if(!proceed){
-                        continue;
+                        if(this._reconnecting){
+                            continue;
+                        }
                     }
                     try{
-                        counter++;
-                        if(counter >= 1000){
-                            //throw new WebSocketException("CHAOS MONKEY");
-                        }
                         msg = _sendQueue.Take();
-                        // Debug.Log("Dequeued this message to send: " + msg);
                         await _ws.SendAsync(msg, WebSocketMessageType.Text, true /* is last part of message */, CancellationToken.None);
                     }catch(Exception e){
                         Debug.LogError(e);
@@ -133,7 +140,6 @@ namespace VTS.Networking.Impl{
                         if(e is WebSocketException 
                         || e is System.IO.IOException 
                         || e is System.Net.Sockets.SocketException){
-                            counter = 0;
                             lock(this._connectionLock){
                                 this._reconnecting = true;
                             }
@@ -169,7 +175,6 @@ namespace VTS.Networking.Impl{
                 {
                     chunkResult = await _ws.ReceiveAsync(arrayBuf, CancellationToken.None);
                     ms.Write(arrayBuf.Array, arrayBuf.Offset, chunkResult.Count);
-                    //Debug.Log("Size of Chunk message: " + chunkResult.Count);
                     if ((UInt64)(chunkResult.Count) > MAX_READ_SIZE)
                     {
                         Console.Error.WriteLine("Warning: Message is bigger than expected!");

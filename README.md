@@ -14,7 +14,7 @@ Because this library simply acts as an client interface for the official API, pl
  
 ## Design Pattern and Considerations
  
-In order to afford the most flexibility (and to be as decoupled from Unity as possible), the `VTSPlugin` class requires that implementations of a JSON utility, of a websocket, and of a token storage mechanism be provided. There are bare-bones examples provided by default, but the design pattern makes it easy for you to swap them out for better/more robust/more platform compliant alternatives, via the following method:
+In order to afford the most flexibility (and to be as decoupled from Unity as possible), the `VTSPlugin` class requires that implementations of a JSON utility, of a websocket, and of a token storage mechanism be provided. There are bare-bones examples provided by default, but the design pattern makes it easy for you to swap them out for better/more robust/more platform compliant alternatives. In fact, it is highly encouraged that you do so! Simply use the following method:
  
 ```
     public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onInitialize, Action onError)
