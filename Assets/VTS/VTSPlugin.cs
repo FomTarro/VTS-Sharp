@@ -60,6 +60,7 @@ namespace VTS {
                 Authenticate(
                     (r) => { 
                         onInitialize();
+                        Debug.Log("Authenticated!");
                     }, 
                     (r) => { 
                         onError();
