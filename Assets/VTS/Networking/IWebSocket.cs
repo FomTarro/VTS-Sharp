@@ -18,14 +18,16 @@ namespace VTS.Networking{
         /// </summary>
         /// <param name="URL"></param>
         /// <param name="onConnect">Callback executed upon conencting to the URL.</param>
-        /// <param name="onConnect">Callback executed upon disconnecting from the URL.</param>
+        /// <param name="onDisconnect">Callback executed upon disconnecting from the URL.</param>
         /// <param name="onError">Callback executed upon receiving an error.</param>
         /// <returns></returns>
-        Task Connect(string URL, System.Action onConnect, System.Action onDisconnect, System.Action onError);
+        Task Start(string URL, System.Action onConnect, System.Action onDisconnect, System.Action onError);
         /// <summary>
-        /// Disposes of and closes the websocket.
+        /// Closes the websocket.
+        /// 
+        /// Executes the onDisconnect callback as specified in the Start method call.
         /// </summary>
-        void Dispose();
+        void Stop();
         /// <summary>
         /// Is the socket in the process of connecting?
         /// </summary>

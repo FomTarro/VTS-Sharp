@@ -39,7 +39,7 @@ namespace VTS.Networking.Impl{
             this.Dispose();
         }
 
-        public async Task Connect(string URL, System.Action onConnect, System.Action onDisconnect, System.Action onError)
+        public async Task Start(string URL, System.Action onConnect, System.Action onDisconnect, System.Action onError)
         {
             try{
                 // Cancel all existing tasks
@@ -85,7 +85,7 @@ namespace VTS.Networking.Impl{
 
         private async Task Reconnect(){
             this._onDisconnect();
-            await Connect(this._url, this._onReconnect, this._onDisconnect, async () => { 
+            await Start(this._url, this._onReconnect, this._onDisconnect, async () => { 
                 // keep retrying 
                 Debug.LogError("Reconnect failed, trying again!");
                 await Task.Delay(2);
@@ -93,7 +93,12 @@ namespace VTS.Networking.Impl{
             } );
         }
 
-        public void Dispose(){
+        public void Stop(){
+            this.Dispose();
+            this._onDisconnect();
+        }
+
+        private void Dispose(){
             Debug.LogWarning("Disposing of socket...");
             this._tokenSource.Cancel();
         }

@@ -16,8 +16,8 @@ namespace VTS.Networking {
             this._json = jsonUtility;
         }
 
-        public void OnDestroy(){
-            this._ws.Dispose();
+        private void OnDestroy(){
+            this._ws.Stop();
         }
 
         private void FixedUpdate(){
@@ -103,7 +103,7 @@ namespace VTS.Networking {
         public void Connect(System.Action onConnect, System.Action onDisconnect, System.Action onError){
             if(this._ws != null){
                 #pragma warning disable 
-                this._ws.Connect(VTS_WS_URL, onConnect, onDisconnect, onError);
+                this._ws.Start(VTS_WS_URL, onConnect, onDisconnect, onError);
                 #pragma warning restore
             }else{
                 onError();
