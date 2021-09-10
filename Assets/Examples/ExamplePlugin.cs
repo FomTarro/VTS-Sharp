@@ -16,6 +16,7 @@ namespace VTS.Examples {
 
         private void Awake(){
             Initialize(new WebSocketImpl(), new JsonUtilityImpl(), new TokenStorageImpl(), 
+            () => {},
             () => {}, 
             () => {});
         }

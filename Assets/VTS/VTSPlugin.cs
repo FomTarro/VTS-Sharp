@@ -50,23 +50,24 @@ namespace VTS {
         /// <param name="webSocket">The websocket implementation.</param>
         /// <param name="jsonUtility">The JSON serializer/deserializer implementation.</param>
         /// <param name="tokenStorage">The Token Storage implementation.</param>
-        /// <param name="onInitialize">Callback executed upon successful initialization.</param>
+        /// <param name="onConnect">Callback executed upon successful initialization.</param>
+        /// <param name="onDisconnect">Callback executed upon disconnecting from VTS.</param>
         /// <param name="onError">The Callback executed upon failed initialization.</param>
-        public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onInitialize, Action onError){
+        public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onConnect, Action onDisconnect, Action onError){
             this._tokenStorage = tokenStorage;
             this._socket = GetComponent<VTSWebSocket>();
             this._socket.Initialize(webSocket, jsonUtility);
             this._socket.Connect(() => {
                 Authenticate(
                     (r) => { 
-                        onInitialize();
-                        Debug.Log("Authenticated!");
+                        onConnect();
                     }, 
                     (r) => { 
                         onError();
                     }
                 );
             },
+            onDisconnect,
             onError);
         }
 

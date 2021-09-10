@@ -17,10 +17,11 @@ namespace VTS.Networking{
         /// Connects to the given URL and executes the relevant callback on completion.
         /// </summary>
         /// <param name="URL"></param>
-        /// <param name="onConnect">Callback executed upon conencting to the URL/</param>
+        /// <param name="onConnect">Callback executed upon conencting to the URL.</param>
+        /// <param name="onConnect">Callback executed upon disconnecting from the URL.</param>
         /// <param name="onError">Callback executed upon receiving an error.</param>
         /// <returns></returns>
-        Task Connect(string URL, System.Action onConnect, System.Action onError);
+        Task Connect(string URL, System.Action onConnect, System.Action onDisconnect, System.Action onError);
         /// <summary>
         /// Disposes of and closes the websocket.
         /// </summary>

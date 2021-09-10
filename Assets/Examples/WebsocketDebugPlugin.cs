@@ -13,8 +13,10 @@ public class WebsocketDebugPlugin : VTSPlugin
         Initialize(new WebSocketImpl(), new JsonUtilityImpl(), new TokenStorageImpl(), 
         () => { 
             this._authenticated = true; 
-            GetAPIState((a) => Debug.Log(a), (a) => {});
         }, 
+        () => {
+            this._authenticated = false; 
+        },
         () => {});
     }
     public void SyncValues(VTSParameterInjectionValue[] values)

@@ -15,20 +15,19 @@ namespace VTS.Networking.Impl{
     /// </summary>
     public class WebSocketImpl : IWebSocket
     {
-        private string _url = null;
         private static UTF8Encoding ENCODER = new UTF8Encoding();
         private const UInt64 MAX_READ_SIZE = 1 * 1024 * 1024;
 
         // WebSocket
         private ClientWebSocket _ws = new ClientWebSocket();
+        private string _url = null;
 
         // Queues
         private ConcurrentQueue<string> _receiveQueue { get; }
         private BlockingCollection<ArraySegment<byte>> _sendQueue { get; }
-        private object _connectionLock = new object();
         private CancellationTokenSource _tokenSource;
-        private CancellationToken _token;
         private System.Action _onReconnect = () => {};
+        private System.Action _onDisconnect = () => {};
 
         #region  Lifecycle
         public WebSocketImpl(){
@@ -40,31 +39,34 @@ namespace VTS.Networking.Impl{
             this.Dispose();
         }
 
-        public async Task Connect(string URL, System.Action onConnect, System.Action onError)
+        public async Task Connect(string URL, System.Action onConnect, System.Action onDisconnect, System.Action onError)
         {
             try{
-                // Tasks
+                // Cancel all existing tasks
                 if(this._tokenSource != null){
                     _tokenSource.Cancel();
                 }
-                // if(this._ws != null && this.IsConnectionOpen()){
-                //     await this._ws.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Reconnecting...", CancellationToken.None);
-                // }
-                this._ws = new ClientWebSocket();
-                // _ws.Options.KeepAliveInterval = new TimeSpan(0, 0, 10);
 
+                // Make fresh socket
+                this._url = URL;
+                Uri serverUri = new Uri(URL);
+                this._ws = new ClientWebSocket();
+                this._ws.Options.KeepAliveInterval = new TimeSpan(0, 0, 10);
+
+                // Make new Cancellation token
                 this._tokenSource = new CancellationTokenSource();
-                this._token = _tokenSource.Token;
-                Task send = new Task(() => RunSend(this._ws, this._token), this._token);
+                CancellationToken token = _tokenSource.Token;
+
+                // Start new tasks
+                Task send = new Task(() => RunSend(this._ws, token), token);
                 send.Start();
-                Task receive = new Task(() => RunReceive(this._ws, this._token), this._token);
+                Task receive = new Task(() => RunReceive(this._ws, token), token);
                 receive.Start();
 
                 this._onReconnect = onConnect;
-                this._url = URL;
-                Uri serverUri = new Uri(URL);
+                this._onDisconnect = onDisconnect;
                 Debug.Log("Connecting to: " + serverUri);
-                await this._ws.ConnectAsync(serverUri, this._token);
+                await this._ws.ConnectAsync(serverUri, token);
                 while(IsConnecting())
                 {
                     Debug.Log("Waiting to connect...");
@@ -73,7 +75,6 @@ namespace VTS.Networking.Impl{
                 Debug.Log("Connect status: " + this._ws.State);
                 if(this._ws.State == WebSocketState.Open){
                     onConnect();
-                    // start routines
                 }else{
                     onError();
                 }
@@ -83,9 +84,11 @@ namespace VTS.Networking.Impl{
         }
 
         private async Task Reconnect(){
-            await Connect(this._url, this._onReconnect, async () => { 
+            this._onDisconnect();
+            await Connect(this._url, this._onReconnect, this._onDisconnect, async () => { 
                 // keep retrying 
                 Debug.LogError("Reconnect failed, trying again!");
+                await Task.Delay(2);
                 await Reconnect();
             } );
         }
@@ -132,7 +135,6 @@ namespace VTS.Networking.Impl{
                             counter = 0;
                             throw new WebSocketException("CHAOS MONKEY");
                         }
-                        Debug.Log("sending");
                         msg = _sendQueue.Take();
                         await socket.SendAsync(msg, WebSocketMessageType.Text, true /* is last part of message */, token);
                     }catch(Exception e){

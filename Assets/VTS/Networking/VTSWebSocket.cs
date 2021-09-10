@@ -100,10 +100,10 @@ namespace VTS.Networking {
             }
         }
 
-        public void Connect(System.Action onConnect, System.Action onError){
+        public void Connect(System.Action onConnect, System.Action onDisconnect, System.Action onError){
             if(this._ws != null){
                 #pragma warning disable 
-                this._ws.Connect(VTS_WS_URL, onConnect, onError);
+                this._ws.Connect(VTS_WS_URL, onConnect, onDisconnect, onError);
                 #pragma warning restore
             }else{
                 onError();
