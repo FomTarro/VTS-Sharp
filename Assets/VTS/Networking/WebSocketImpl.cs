@@ -124,17 +124,17 @@ namespace VTS.Networking.Impl{
         {
             Debug.Log("WebSocket Message Sender looping.");
             ArraySegment<byte> msg;
-            int counter = 0;
+            // int counter = 0;
             while(!token.IsCancellationRequested)
             {
                 if(!this._sendQueue.IsCompleted && this.IsConnectionOpen())
                 {
                     try{
-                        counter++;
-                        if(counter >= 1000){
-                            counter = 0;
-                            throw new WebSocketException("CHAOS MONKEY");
-                        }
+                        // counter++;
+                        // if(counter >= 1000){
+                        //     counter = 0;
+                        //     throw new WebSocketException("CHAOS MONKEY");
+                        // }
                         msg = _sendQueue.Take();
                         await socket.SendAsync(msg, WebSocketMessageType.Text, true /* is last part of message */, token);
                     }catch(Exception e){
