@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace VTS.Networking{
     /// <summary>
@@ -7,21 +6,28 @@ namespace VTS.Networking{
     /// </summary>
     public interface IWebSocket {
         /// <summary>
-        /// The queue of recieved payloads. 
+        /// Fetches the next response to process.
         /// 
         /// Because Unity can only do most tasks on the main thread, 
-        /// response payloads will need to be placed into this queue, as they will be dequeued via a poller in the Update lifecycle method.
+        /// response payloads will be fetched with this method via a poller in the Update lifecycle method.
         /// </summary>
         /// <value></value>
-        ConcurrentQueue<string> RecieveQueue { get; }
+        string GetNextResponse();
         /// <summary>
         /// Connects to the given URL and executes the relevant callback on completion.
         /// </summary>
-        /// <param name="URL"></param>
-        /// <param name="onConnect">Callback executed upon conencting to the URL/</param>
+        /// <param name="URL">URL to connect to.</param>
+        /// <param name="onConnect">Callback executed upon conencting to the URL.</param>
+        /// <param name="onDisconnect">Callback executed upon disconnecting from the URL.</param>
         /// <param name="onError">Callback executed upon receiving an error.</param>
         /// <returns></returns>
-        Task Connect(string URL, System.Action onConnect, System.Action onError);
+        Task Start(string URL, System.Action onConnect, System.Action onDisconnect, System.Action onError);
+        /// <summary>
+        /// Closes the websocket.
+        /// 
+        /// Executes the onDisconnect callback as specified in the Start method call.
+        /// </summary>
+        void Stop();
         /// <summary>
         /// Is the socket in the process of connecting?
         /// </summary>

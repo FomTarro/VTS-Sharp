@@ -25,5 +25,12 @@ namespace VTS.Networking.Impl{
         {
             File.WriteAllText(this._path, token, ENCODER);
         }
+
+        public void DeleteToken()
+        {
+            if(File.Exists(this._path)){
+                File.Delete(this._path);
+            }
+        }
     }
 }

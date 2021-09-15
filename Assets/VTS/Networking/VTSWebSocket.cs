@@ -16,93 +16,94 @@ namespace VTS.Networking {
             this._json = jsonUtility;
         }
 
-        private void Update(){
+        private void OnDestroy(){
+            this._ws.Stop();
+        }
+
+        private void FixedUpdate(){
             ProcessResponses();
         }
 
         private void ProcessResponses(){
-            if(this._ws != null && _ws.RecieveQueue.Count > 0){
-                string data;
-                this._ws.RecieveQueue.TryDequeue(out data);
-                if(data != null){
-                    VTSMessageData response = _json.FromJson<VTSMessageData>(data);
-                    if(this._callbacks.ContainsKey(response.requestID)){
-                        switch(response.messageType){
-                            case "APIError":
-                                this._callbacks[response.requestID].onError(_json.FromJson<VTSErrorData>(data));
-                                break;
-                            case "APIStateResponse":
-                                this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSStateData>(data));
-                                break;
-                            case "StatisticsResponse":
-                                this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSStatisticsData>(data));
-                                break;
-                            case "AuthenticationResponse":
-                            case "AuthenticationTokenResponse":
-                                this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSAuthData>(data));
-                                break;
-                            case "VTSFolderInfoResponse":
-                                this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSFolderInfoData>(data));
-                                break;
-                            case "CurrentModelResponse":
-                                this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSCurrentModelData>(data));
-                                break;
-                            case "AvailableModelsResponse":
-                                this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSAvailableModelsData>(data));
-                                break;
-                            case "ModelLoadResponse":
-                                this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSModelLoadData>(data));
-                                break;
-                            case "MoveModelResponse":
-                                this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSMoveModelData>(data));
-                                break;
-                            case "HotkeysInCurrentModelResponse":
-                                this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSHotkeysInCurrentModelData>(data));
-                                break;
-                            case "HotkeyTriggerResponse":
-                                this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSHotkeysInCurrentModelData>(data));
-                                break;
-                            case "ArtMeshListResponse":
-                                this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSArtMeshListData>(data));
-                                break;
-                            case "ColorTintResponse":
-                                this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSColorTintData>(data));
-                                break;
-                            case "FaceFoundResponse":
-                                this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSFaceFoundData>(data));
-                                break;
-                            case "InputParameterListResponse":
-                                this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSInputParameterListData>(data));
-                                break;
-                            case "Live2DParameterListResponse":
-                                this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSLive2DParameterListData>(data));
-                                break;
-                            case "ParameterCreationResponse":
-                                this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSParameterCreationData>(data));
-                                break;
-                            case "ParameterDeletionResponse":
-                                this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSParameterDeletionData>(data));
-                                break;
-                            case "InjectParameterDataResponse":
-                                this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSInjectParameterData>(data));
-                                break;
-                            default:
-                                VTSErrorData error = new VTSErrorData();
-                                error.data.message = "Unable to parse response as valid response type: " + data;
-                                this._callbacks[response.requestID].onError(error);
-                                break;
+            string data = this._ws.GetNextResponse();
+            if(this._ws != null && data != null){
+                VTSMessageData response = _json.FromJson<VTSMessageData>(data);
+                if(this._callbacks.ContainsKey(response.requestID)){
+                    switch(response.messageType){
+                        case "APIError":
+                            this._callbacks[response.requestID].onError(_json.FromJson<VTSErrorData>(data));
+                            break;
+                        case "APIStateResponse":
+                            this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSStateData>(data));
+                            break;
+                        case "StatisticsResponse":
+                            this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSStatisticsData>(data));
+                            break;
+                        case "AuthenticationResponse":
+                        case "AuthenticationTokenResponse":
+                            this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSAuthData>(data));
+                            break;
+                        case "VTSFolderInfoResponse":
+                            this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSFolderInfoData>(data));
+                            break;
+                        case "CurrentModelResponse":
+                            this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSCurrentModelData>(data));
+                            break;
+                        case "AvailableModelsResponse":
+                            this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSAvailableModelsData>(data));
+                            break;
+                        case "ModelLoadResponse":
+                            this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSModelLoadData>(data));
+                            break;
+                        case "MoveModelResponse":
+                            this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSMoveModelData>(data));
+                            break;
+                        case "HotkeysInCurrentModelResponse":
+                            this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSHotkeysInCurrentModelData>(data));
+                            break;
+                        case "HotkeyTriggerResponse":
+                            this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSHotkeysInCurrentModelData>(data));
+                            break;
+                        case "ArtMeshListResponse":
+                            this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSArtMeshListData>(data));
+                            break;
+                        case "ColorTintResponse":
+                            this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSColorTintData>(data));
+                            break;
+                        case "FaceFoundResponse":
+                            this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSFaceFoundData>(data));
+                            break;
+                        case "InputParameterListResponse":
+                            this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSInputParameterListData>(data));
+                            break;
+                        case "Live2DParameterListResponse":
+                            this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSLive2DParameterListData>(data));
+                            break;
+                        case "ParameterCreationResponse":
+                            this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSParameterCreationData>(data));
+                            break;
+                        case "ParameterDeletionResponse":
+                            this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSParameterDeletionData>(data));
+                            break;
+                        case "InjectParameterDataResponse":
+                            this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSInjectParameterData>(data));
+                            break;
+                        default:
+                            VTSErrorData error = new VTSErrorData();
+                            error.data.message = "Unable to parse response as valid response type: " + data;
+                            this._callbacks[response.requestID].onError(error);
+                            break;
 
-                        }
-                        this._callbacks.Remove(response.requestID);
                     }
+                    this._callbacks.Remove(response.requestID);
                 }
             }
         }
 
-        public void Connect(System.Action onConnect, System.Action onError){
+        public void Connect(System.Action onConnect, System.Action onDisconnect, System.Action onError){
             if(this._ws != null){
                 #pragma warning disable 
-                this._ws.Connect(VTS_WS_URL, onConnect, onError);
+                this._ws.Start(VTS_WS_URL, onConnect, onDisconnect, onError);
                 #pragma warning restore
             }else{
                 onError();
@@ -111,9 +112,13 @@ namespace VTS.Networking {
 
         public void Send<T>(T request, Action<T> onSuccess, Action<VTSErrorData> onError) where T : VTSMessageData{
             if(this._ws != null){
-                _callbacks.Add(request.requestID, new VTSCallbacks((t) => { onSuccess((T)t); } , onError));
-                string output = RemoveNullProps(_json.ToJson(request));
-                this._ws.Send(output);
+                try{
+                    _callbacks.Add(request.requestID, new VTSCallbacks((t) => { onSuccess((T)t); } , onError));
+                    string output = RemoveNullProps(_json.ToJson(request));
+                    this._ws.Send(output);
+                }catch(Exception e){
+                    Debug.Log(e);
+                }
             }else{
                 VTSErrorData error = new VTSErrorData();
                 error.data.errorID = ErrorID.InternalServerError;

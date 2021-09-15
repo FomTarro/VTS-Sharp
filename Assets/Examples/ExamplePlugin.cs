@@ -1,5 +1,6 @@
 ﻿using VTS.Networking.Impl;
 using VTS.Models.Impl;
+using VTS.Models;
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,8 +15,12 @@ namespace VTS.Examples {
         [SerializeField]
         private Color _color = Color.black;
 
+        [SerializeField]
+        private bool _headRolling = false;
+
         private void Awake(){
             Initialize(new WebSocketImpl(), new JsonUtilityImpl(), new TokenStorageImpl(), 
+            () => {},
             () => {}, 
             () => {});
         }
@@ -44,6 +49,34 @@ namespace VTS.Examples {
                 (r) => { _text.text = new JsonUtilityImpl().ToJson(r); }, 
                 (e) => { _text.text = e.data.message; }
             );
+        }
+
+        public void ToggleHeadRoll(){
+            this._headRolling = !this._headRolling;
+        }
+
+        private void SyncValues(VTSParameterInjectionValue[] values){
+            InjectParameterValues(
+                values,
+                (r) => { },
+                (e) => { print(e.data.message); }
+            );
+	    }
+
+        private void FixedUpdate(){
+            if(this.IsAuthenticated && this._headRolling){
+                float x = Mathf.Sin(Time.realtimeSinceStartup);
+                float y = Mathf.Cos(Time.realtimeSinceStartup);
+                SyncValues(new VTSParameterInjectionValue[] {
+                    new VTSParameterInjectionValue { id = "FaceAngleX", value = x*20, weight = 1 },
+                    new VTSParameterInjectionValue { id = "FaceAngleY", value = y*20, weight = 1 },
+                    new VTSParameterInjectionValue { id = "FaceAngleZ", value = x*20, weight = 1 },
+                    new VTSParameterInjectionValue { id = "EyeLeftX", value = x/2, weight = 1 },
+                    new VTSParameterInjectionValue { id = "EyeLeftY", value = y/2, weight = 1 },
+                    new VTSParameterInjectionValue { id = "EyeRightX", value = x/2, weight = 1 },
+                    new VTSParameterInjectionValue { id = "EyeRightY", value = y/2, weight = 1 },
+                });
+            }
         }
     }
 }

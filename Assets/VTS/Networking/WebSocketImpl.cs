@@ -8,6 +8,11 @@ using System.Net.WebSockets;
 using System.Collections.Concurrent;
 
 namespace VTS.Networking.Impl{
+    /// <summary>
+    /// Basic Websocket implementation. 
+    /// 
+    /// It is strongly recommended that you replace this with a more robust solution, such as WebsocketSharp.
+    /// </summary>
     public class WebSocketImpl : IWebSocket
     {
         private static UTF8Encoding ENCODER = new UTF8Encoding();
@@ -15,52 +20,99 @@ namespace VTS.Networking.Impl{
 
         // WebSocket
         private ClientWebSocket _ws = new ClientWebSocket();
+        private string _url = null;
 
         // Queues
-        public ConcurrentQueue<string> RecieveQueue { get; }
-        private BlockingCollection<ArraySegment<byte>> SendQueue { get; }
-        
-        // Threads
-        private Thread _receiveThread { get; set; }
-        private Thread _sendThread { get; set; }
+        private ConcurrentQueue<string> _receiveQueue { get; }
+        private BlockingCollection<ArraySegment<byte>> _sendQueue { get; }
+        private CancellationTokenSource _tokenSource;
+        private System.Action _onReconnect = () => {};
+        private System.Action _onDisconnect = () => {};
 
+        #region  Lifecycle
         public WebSocketImpl(){
-            _ws = new ClientWebSocket();
-            RecieveQueue = new ConcurrentQueue<string>();
-            _receiveThread = new Thread(RunReceive);
-            _receiveThread.Start();
-            SendQueue = new BlockingCollection<ArraySegment<byte>>();
-            _sendThread = new Thread(RunSend);
-            _sendThread.Start();
+            _receiveQueue = new ConcurrentQueue<string>();
+            _sendQueue = new BlockingCollection<ArraySegment<byte>>();
         }
 
-        public async Task Connect(string URL, System.Action onConnect, System.Action onError)
+        ~WebSocketImpl(){
+            this.Dispose();
+        }
+
+        public async Task Start(string URL, System.Action onConnect, System.Action onDisconnect, System.Action onError)
         {
-            Uri serverUri = new Uri(URL);
-            Debug.Log("Connecting to: " + serverUri);
-            await _ws.ConnectAsync(serverUri, CancellationToken.None);
-            while(IsConnecting())
-            {
-                Debug.Log("Waiting to connect...");
-                Task.Delay(50).Wait();
-            }
-            Debug.Log("Connect status: " + _ws.State);
-            if(_ws.State == WebSocketState.Open){
-                onConnect();
-            }else{
-                onError();
+            try{
+                // Cancel all existing tasks
+                if(this._tokenSource != null){
+                    _tokenSource.Cancel();
+                }
+
+                // Make fresh socket
+                this._url = URL;
+                Uri serverUri = new Uri(URL);
+                this._ws = new ClientWebSocket();
+                this._ws.Options.KeepAliveInterval = new TimeSpan(0, 0, 10);
+
+                // Make new Cancellation token
+                this._tokenSource = new CancellationTokenSource();
+                CancellationToken token = _tokenSource.Token;
+
+                // Start new tasks
+                Task send = new Task(() => RunSend(this._ws, token), token);
+                send.Start();
+                Task receive = new Task(() => RunReceive(this._ws, token), token);
+                receive.Start();
+
+                this._onReconnect = onConnect;
+                this._onDisconnect = onDisconnect;
+                Debug.Log("Connecting to: " + serverUri);
+                await this._ws.ConnectAsync(serverUri, token);
+                while(IsConnecting())
+                {
+                    Debug.Log("Waiting to connect...");
+                    await Task.Delay(10);
+                }
+                Debug.Log("Connect status: " + this._ws.State);
+                if(this._ws.State == WebSocketState.Open){
+                    onConnect();
+                }else{
+                    onError();
+                }
+            }catch(Exception e){
+                Debug.LogError(e);
             }
         }
+
+        private async Task Reconnect(){
+            this._onDisconnect();
+            await Start(this._url, this._onReconnect, this._onDisconnect, async () => { 
+                // keep retrying 
+                Debug.LogError("Reconnect failed, trying again!");
+                await Task.Delay(2);
+                await Reconnect();
+            } );
+        }
+
+        public void Stop(){
+            this.Dispose();
+            this._onDisconnect();
+        }
+
+        private void Dispose(){
+            Debug.LogWarning("Disposing of socket...");
+            this._tokenSource.Cancel();
+        }
+        #endregion
 
         #region Status
         public bool IsConnecting()
-        {
-            return _ws.State == WebSocketState.Connecting;
+        {   
+            return this._ws != null && this._ws.State == WebSocketState.Connecting;
         }
 
         public bool IsConnectionOpen()
         {
-            return _ws.State == WebSocketState.Open;
+            return this._ws != null && this._ws.State == WebSocketState.Open && !this.IsConnecting();
         }
         #endregion
 
@@ -70,27 +122,53 @@ namespace VTS.Networking.Impl{
             byte[] buffer = ENCODER.GetBytes(message);
             // Debug.Log("Message to queue for send: " + buffer.Length + ", message: " + message);
             ArraySegment<byte> sendBuf = new ArraySegment<byte>(buffer);
-            SendQueue.Add(sendBuf);
+            _sendQueue.Add(sendBuf);
         }
 
-        private async void RunSend()
+        private async void RunSend(ClientWebSocket socket, CancellationToken token)
         {
             Debug.Log("WebSocket Message Sender looping.");
             ArraySegment<byte> msg;
-            while (true)
+            // int counter = 0;
+            while(!token.IsCancellationRequested)
             {
-                while (!SendQueue.IsCompleted && this.IsConnectionOpen())
+                if(!this._sendQueue.IsCompleted && this.IsConnectionOpen())
                 {
-                    msg = SendQueue.Take();
-                    // Debug.Log("Dequeued this message to send: " + msg);
-                    await _ws.SendAsync(msg, WebSocketMessageType.Text, true /* is last part of message */, CancellationToken.None);
+                    try{
+                        // counter++;
+                        // if(counter >= 1000){
+                        //     counter = 0;
+                        //     throw new WebSocketException("CHAOS MONKEY");
+                        // }
+                        msg = _sendQueue.Take();
+                        await socket.SendAsync(msg, WebSocketMessageType.Text, true /* is last part of message */, token);
+                    }catch(Exception e){
+                        Debug.LogError(e);
+                        // put unsent messages back on the queue
+                        _sendQueue.Add(msg);
+                        if(e is WebSocketException 
+                        || e is System.IO.IOException 
+                        || e is System.Net.Sockets.SocketException){
+                            Debug.LogWarning("Socket exception occured, reconnecting...");
+                            await Reconnect();
+                        }
+                    }
                 }
+                await Task.Delay(2);
             }
         }
         #endregion
 
         #region Receive
-        private async Task<string> Receive(UInt64 maxSize = MAX_READ_SIZE)
+
+        public string GetNextResponse()
+        {
+            string data = null;
+            this._receiveQueue.TryDequeue(out data);
+            return data;
+        }
+
+        private async Task<string> Receive(ClientWebSocket socket, CancellationToken token, UInt64 maxSize = MAX_READ_SIZE)
         {
             // A read buffer, and a memory stream to stuff unknown number of chunks into:
             byte[] buf = new byte[4 * 1024];
@@ -101,9 +179,8 @@ namespace VTS.Networking.Impl{
             {
                 do
                 {
-                    chunkResult = await _ws.ReceiveAsync(arrayBuf, CancellationToken.None);
+                    chunkResult = await socket.ReceiveAsync(arrayBuf, token);
                     ms.Write(arrayBuf.Array, arrayBuf.Offset, chunkResult.Count);
-                    //Debug.Log("Size of Chunk message: " + chunkResult.Count);
                     if ((UInt64)(chunkResult.Count) > MAX_READ_SIZE)
                     {
                         Console.Error.WriteLine("Warning: Message is bigger than expected!");
@@ -119,20 +196,20 @@ namespace VTS.Networking.Impl{
             return "";
         }
 
-        private async void RunReceive()
+        private async void RunReceive(ClientWebSocket socket, CancellationToken token)
         {
             Debug.Log("WebSocket Message Receiver looping.");
             string result;
-            while (true)
+            while(!token.IsCancellationRequested)
             {
-                result = await Receive();
+                result = await Receive(socket, token);
                 if (result != null && result.Length > 0)
                 {
-                    RecieveQueue.Enqueue(result);
+                    _receiveQueue.Enqueue(result);
                 }
                 else
                 {
-                    Task.Delay(50).Wait();
+                    await Task.Delay(50);
                 }
             }
         }

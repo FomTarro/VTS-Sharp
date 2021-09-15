@@ -7,8 +7,6 @@ using VTS.Models;
 namespace VTS {
     /// <summary>
     /// The base class for VTS plugin creation.
-    /// 
-    /// This implementation will attempt to Authenticate on Awake.
     /// </summary>
     [RequireComponent(typeof(VTSWebSocket))]
     public abstract class VTSPlugin : MonoBehaviour
@@ -16,14 +14,14 @@ namespace VTS {
         [SerializeField]
         protected string _pluginName = "ExamplePlugin";
         /// <summary>
-        /// The name of this plugin.
+        /// The name of this plugin. Required for authorization purposes..
         /// </summary>
         /// <value></value>
         public string PluginName { get { return this._pluginName; } }
         [SerializeField]
         protected string _pluginAuthor = "ExampleAuthor";
         /// <summary>
-        /// The name of this plugin's author. 
+        /// The name of this plugin's author. Required for authorization purposes.
         /// </summary>
         /// <value></value>
         public string PluginAuthor { get { return this._pluginAuthor; } }
@@ -33,16 +31,23 @@ namespace VTS {
         /// The underlying WebSocket for connecting to VTS.
         /// </summary>
         /// <value></value>
-        protected VTSWebSocket Socket { get { return _socket; } }
+        protected VTSWebSocket Socket { get { return this._socket; } }
 
         private string _token = null;
+
+        private ITokenStorage _tokenStorage = null;
         /// <summary>
-        /// The stored Authentication Token.
+        /// The underlying Token Storage mechanism for connecting to VTS.
         /// </summary>
         /// <value></value>
-        protected string AuthenticationToken { get { return _token; }}
+        protected ITokenStorage TokenStorage { get { return this._tokenStorage; } }
 
-        protected ITokenStorage _tokenStorage = null;
+        private bool _isAuthenticated = false;
+        /// <summary>
+        /// Is the plugin currently authenticated?
+        /// </summary>
+        /// <value></value>
+        public bool IsAuthenticated { get { return this._isAuthenticated; } }
 
         /// <summary>
         /// Authenticates the plugin as well as selects the Websocket, JSON utility, and Token Storage implementations.
@@ -50,24 +55,44 @@ namespace VTS {
         /// <param name="webSocket">The websocket implementation.</param>
         /// <param name="jsonUtility">The JSON serializer/deserializer implementation.</param>
         /// <param name="tokenStorage">The Token Storage implementation.</param>
-        /// <param name="onInitialize">Callback executed upon successful initialization.</param>
-        /// <param name="onError">The Callback exexuted upon failed initialization.</param>
-        public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onInitialize, Action onError){
+        /// <param name="onConnect">Callback executed upon successful initialization.</param>
+        /// <param name="onDisconnect">Callback executed upon disconnecting from VTS.</param>
+        /// <param name="onError">The Callback executed upon failed initialization.</param>
+        public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onConnect, Action onDisconnect, Action onError){
             this._tokenStorage = tokenStorage;
             this._socket = GetComponent<VTSWebSocket>();
             this._socket.Initialize(webSocket, jsonUtility);
             this._socket.Connect(() => {
                 Authenticate(
                     (r) => { 
-                        onInitialize();
+                        this._isAuthenticated = true;
+                        onConnect();
                     }, 
                     (r) => { 
-                        onError();
+                        Debug.Log("Token expired, acquiring new token...");
+                        this._isAuthenticated = false;
+                        tokenStorage.DeleteToken();
+                        Authenticate( 
+                            (t) => { 
+                                this._isAuthenticated = true;
+                                onConnect();
+                            }, 
+                            (t) => {
+                                this._isAuthenticated = false;
+                                onError();
+                            }
+                        );
                     }
                 );
             },
+            () => {
+                this._isAuthenticated = false;
+                onDisconnect();
+            },
             onError);
         }
+
+        #region Authentication
 
         private void Authenticate(Action<VTSAuthData> onSuccess, Action<VTSErrorData> onError){
             if(this._tokenStorage != null){
@@ -106,6 +131,10 @@ namespace VTS {
             this._socket.Send<VTSAuthData>(authRequest, onSuccess, onError);
         }
 
+        #endregion
+
+        #region VTS API Wrapper
+
         /// <summary>
         /// Gets the current state of the VTS API.
         /// 
@@ -116,7 +145,6 @@ namespace VTS {
         /// <param name="onError">Callback executed upon receiving an error.</param>
         public void GetAPIState(Action<VTSStateData> onSuccess, Action<VTSErrorData> onError){
             VTSStateData request = new VTSStateData();
-            request.messageType = "nonsense";
             this._socket.Send<VTSStateData>(request, onSuccess, onError);
         }
 
@@ -295,7 +323,7 @@ namespace VTS {
         }
 
         /// <summary>
-        /// Gets the value fr the specified parameter.
+        /// Gets the value for the specified parameter.
         /// 
         /// For more info, see 
         /// <a href="https://github.com/DenchiSoft/VTubeStudio#requesting-list-of-available-tracking-parameters">https://github.com/DenchiSoft/VTubeStudio#requesting-list-of-available-tracking-parameters</a>
@@ -333,7 +361,7 @@ namespace VTS {
         /// <param name="onError">Callback executed upon receiving an error.</param>
         public void AddCustomParameter(VTSCustomParameter parameter, Action<VTSParameterCreationData> onSuccess, Action<VTSErrorData> onError){
             VTSParameterCreationData request = new VTSParameterCreationData();
-            request.data.parameterName = SanatizeParameterName(parameter.parameterName);
+            request.data.parameterName = SanitizeParameterName(parameter.parameterName);
             request.data.explanation = parameter.explanation;
             request.data.min = parameter.min;
             request.data.max = parameter.max;
@@ -352,7 +380,7 @@ namespace VTS {
         /// <param name="onError">Callback executed upon receiving an error.</param>
         public void RemoveCustomParameter(string parameterName, Action<VTSParameterDeletionData> onSuccess, Action<VTSErrorData> onError){
             VTSParameterDeletionData request = new VTSParameterDeletionData();
-            request.data.parameterName = SanatizeParameterName(parameterName);
+            request.data.parameterName = SanitizeParameterName(parameterName);
             this._socket.Send<VTSParameterDeletionData>(request, onSuccess, onError);
         }
 
@@ -362,27 +390,34 @@ namespace VTS {
         /// For more info, see 
         /// <a href="https://github.com/DenchiSoft/VTubeStudio#feeding-in-data-for-default-or-custom-parameters">https://github.com/DenchiSoft/VTubeStudio#feeding-in-data-for-default-or-custom-parameters</a>
         /// </summary>
-        /// <param name="values">A listo of parameters and the values to assign to them.</param>
+        /// <param name="values">A list of parameters and the values to assign to them.</param>
         /// <param name="onSuccess">Callback executed upon receiving a response.</param>
         /// <param name="onError">Callback executed upon receiving an error.</param>
         public void InjectParameterValues(VTSParameterInjectionValue[] values, Action<VTSInjectParameterData> onSuccess, Action<VTSErrorData> onError){
             VTSInjectParameterData request = new VTSInjectParameterData();
             foreach(VTSParameterInjectionValue value in values){
-                value.id = SanatizeParameterName(value.id);
+                value.id = SanitizeParameterName(value.id);
             }
             request.data.parameterValues = values;
             this._socket.Send<VTSInjectParameterData>(request, onSuccess, onError);
         }
 
+        #endregion
+
+        #region Helper Methods
+
         private static Regex ALPHANUMERIC = new Regex(@"\W|_");
-        private string SanatizeParameterName(string name){
+        private string SanitizeParameterName(string name){
             // between 4 and 32 chars, alphanumeric
             string output = name;
             output = ALPHANUMERIC.Replace(output, "");
             output.PadLeft(4, 'X');
             output = output.Substring(0, Math.Min(output.Length, 31));
             return output;
+
         }
+
+        #endregion
         
     }
 }
