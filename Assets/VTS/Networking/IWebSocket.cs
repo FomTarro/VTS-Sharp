@@ -16,7 +16,7 @@ namespace VTS.Networking{
         /// <summary>
         /// Connects to the given URL and executes the relevant callback on completion.
         /// </summary>
-        /// <param name="URL"></param>
+        /// <param name="URL">URL to connect to.</param>
         /// <param name="onConnect">Callback executed upon conencting to the URL.</param>
         /// <param name="onDisconnect">Callback executed upon disconnecting from the URL.</param>
         /// <param name="onError">Callback executed upon receiving an error.</param>

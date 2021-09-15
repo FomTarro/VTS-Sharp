@@ -7,8 +7,6 @@ using VTS.Models;
 namespace VTS {
     /// <summary>
     /// The base class for VTS plugin creation.
-    /// 
-    /// This implementation will attempt to Authenticate on Awake.
     /// </summary>
     [RequireComponent(typeof(VTSWebSocket))]
     public abstract class VTSPlugin : MonoBehaviour
@@ -16,14 +14,14 @@ namespace VTS {
         [SerializeField]
         protected string _pluginName = "ExamplePlugin";
         /// <summary>
-        /// The name of this plugin.
+        /// The name of this plugin. Required for authorization purposes..
         /// </summary>
         /// <value></value>
         public string PluginName { get { return this._pluginName; } }
         [SerializeField]
         protected string _pluginAuthor = "ExampleAuthor";
         /// <summary>
-        /// The name of this plugin's author. 
+        /// The name of this plugin's author. Required for authorization purposes.
         /// </summary>
         /// <value></value>
         public string PluginAuthor { get { return this._pluginAuthor; } }
@@ -33,16 +31,23 @@ namespace VTS {
         /// The underlying WebSocket for connecting to VTS.
         /// </summary>
         /// <value></value>
-        protected VTSWebSocket Socket { get { return _socket; } }
+        protected VTSWebSocket Socket { get { return this._socket; } }
 
         private string _token = null;
+
+        private ITokenStorage _tokenStorage = null;
         /// <summary>
-        /// The stored Authentication Token.
+        /// The underlying Token Storage mechanism for connecting to VTS.
         /// </summary>
         /// <value></value>
-        protected string AuthenticationToken { get { return _token; }}
+        protected ITokenStorage TokenStorage { get { return this._tokenStorage; } }
 
-        protected ITokenStorage _tokenStorage = null;
+        private bool _isAuthenticated = false;
+        /// <summary>
+        /// Is the plugin currently authenticated?
+        /// </summary>
+        /// <value></value>
+        public bool IsAuthenticated { get { return this._isAuthenticated; } }
 
         /// <summary>
         /// Authenticates the plugin as well as selects the Websocket, JSON utility, and Token Storage implementations.
@@ -60,16 +65,34 @@ namespace VTS {
             this._socket.Connect(() => {
                 Authenticate(
                     (r) => { 
+                        this._isAuthenticated = true;
                         onConnect();
                     }, 
                     (r) => { 
-                        onError();
+                        Debug.Log("Token expired, acquiring new token...");
+                        this._isAuthenticated = false;
+                        tokenStorage.DeleteToken();
+                        Authenticate( 
+                            (t) => { 
+                                this._isAuthenticated = true;
+                                onConnect();
+                            }, 
+                            (t) => {
+                                this._isAuthenticated = false;
+                                onError();
+                            }
+                        );
                     }
                 );
             },
-            onDisconnect,
+            () => {
+                this._isAuthenticated = false;
+                onDisconnect();
+            },
             onError);
         }
+
+        #region Authentication
 
         private void Authenticate(Action<VTSAuthData> onSuccess, Action<VTSErrorData> onError){
             if(this._tokenStorage != null){
@@ -107,6 +130,10 @@ namespace VTS {
             authRequest.data.authenticationToken = this._token;
             this._socket.Send<VTSAuthData>(authRequest, onSuccess, onError);
         }
+
+        #endregion
+
+        #region VTS API Wrapper
 
         /// <summary>
         /// Gets the current state of the VTS API.
@@ -375,6 +402,10 @@ namespace VTS {
             this._socket.Send<VTSInjectParameterData>(request, onSuccess, onError);
         }
 
+        #endregion
+
+        #region Helper Methods
+
         private static Regex ALPHANUMERIC = new Regex(@"\W|_");
         private string SanitizeParameterName(string name){
             // between 4 and 32 chars, alphanumeric
@@ -383,7 +414,10 @@ namespace VTS {
             output.PadLeft(4, 'X');
             output = output.Substring(0, Math.Min(output.Length, 31));
             return output;
+
         }
+
+        #endregion
         
     }
 }
