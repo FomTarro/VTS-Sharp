@@ -40,11 +40,19 @@ namespace VTS.Examples {
             );
         }
 
+        public void PrintScreenColorData(){
+            GetSceneColorOverlayInfo(
+                (r) => { _text.text = new JsonUtilityImpl().ToJson(r); }, 
+                (e) => { _text.text = e.data.message; }
+            );
+        }
+
         public void TintColor(){
             Models.ArtMeshMatcher matcher = new Models.ArtMeshMatcher();
             matcher.tintAll = true;
             TintArtMesh(
                 _color,
+                0.0f,
                 matcher,
                 (r) => { _text.text = new JsonUtilityImpl().ToJson(r); }, 
                 (e) => { _text.text = e.data.message; }

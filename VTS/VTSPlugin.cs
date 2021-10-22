@@ -281,19 +281,31 @@ namespace VTS {
         /// <a href="https://github.com/DenchiSoft/VTubeStudio#tint-artmeshes-with-color">https://github.com/DenchiSoft/VTubeStudio#tint-artmeshes-with-color</a>
         /// </summary>
         /// <param name="tint">The tint to be applied.</param>
+        /// <param name="mixWithSceneLightingColor"> The amount to mix the color with scene lighting, from 0 to 1. Default is 1.0, which will have the color override scene lighting completely.
         /// <param name="matcher">The ArtMesh matcher search parameters.</param>
         /// <param name="onSuccess">Callback executed upon receiving a response.</param>
         /// <param name="onError">Callback executed upon receiving an error.</param>
-        public void TintArtMesh(Color32 tint, ArtMeshMatcher matcher, Action<VTSColorTintData> onSuccess, Action<VTSErrorData> onError){
+        public void TintArtMesh(Color32 tint, float mixWithSceneLightingColor,  ArtMeshMatcher matcher, Action<VTSColorTintData> onSuccess, Action<VTSErrorData> onError){
             VTSColorTintData request = new VTSColorTintData();
-            ColorTint colorTint = new ColorTint();
-            colorTint.colorA = tint.a;
-            colorTint.colorB = tint.b;
-            colorTint.colorG = tint.g;
-            colorTint.colorR = tint.r;
+            ArtMeshColorTint colorTint = new ArtMeshColorTint();
+            colorTint.fromColor32(tint);
+            colorTint.mixWithSceneLightingColor = System.Math.Min(1, System.Math.Max(mixWithSceneLightingColor, 0));
             request.data.colorTint = colorTint;
             request.data.artMeshMatcher = matcher;
             this._socket.Send<VTSColorTintData>(request, onSuccess, onError);
+        }
+
+        /// <summary>
+        /// Gets color information about the scene lighting overlay, if it is enabled.
+        /// 
+        /// For more info, see
+        /// <a href="https://github.com/DenchiSoft/VTubeStudio#getting-scene-lighting-overlay-color">https://github.com/DenchiSoft/VTubeStudio#getting-scene-lighting-overlay-color</a>
+        /// </summary>
+        /// <param name="onSuccess"></param>
+        /// <param name="onError"></param>
+        public void GetSceneColorOverlayInfo(Action<VTSSceneColorOverlayData> onSuccess, Action<VTSErrorData> onError){
+            VTSSceneColorOverlayData request = new VTSSceneColorOverlayData();
+            this._socket.Send<VTSSceneColorOverlayData>(request, onSuccess, onError);
         }
 
         /// <summary>
