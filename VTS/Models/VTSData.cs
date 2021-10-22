@@ -247,6 +247,30 @@ namespace VTS.Models {
         public byte colorG;
         public byte colorB;
         public byte colorA;
+
+        /// <summary>
+        /// Converts the color into a Unity color struct.
+        /// </summary>
+        /// <returns></returns>
+        public UnityEngine.Color32 toColor32(){
+            return new UnityEngine.Color32(colorR, colorG, colorB, colorA);
+        }
+
+        /// <summary>
+        /// Loads color data from a Unity color struct
+        /// </summary>
+        /// <param name="color"></param>
+        public void fromColor32(UnityEngine.Color32 color){
+            this.colorA = color.a;
+            this.colorB = color.b;
+            this.colorG = color.g;
+            this.colorR = color.r;
+        }
+    }
+
+    [System.Serializable]
+    public class ArtMeshColorTint : ColorTint{
+        public float mixWithSceneLightingColor = 1.0f;
     }
 
     [System.Serializable]
@@ -269,9 +293,39 @@ namespace VTS.Models {
 
         [System.Serializable]
         public class Data {
-            public ColorTint colorTint;
+            public ArtMeshColorTint colorTint;
             public ArtMeshMatcher artMeshMatcher;
             public int matchedArtMeshes;
+        }
+    }
+
+    [System.Serializable]
+    public class ColorCapturePart : ColorTint {
+        public bool active;
+    }
+
+    [System.Serializable]
+    public class VTSSceneColorOverlayData : VTSMessageData{
+        public VTSSceneColorOverlayData(){
+            this.messageType = "SceneColorOverlayInfoRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public bool active;
+            public bool itemsIncluded;
+            public bool isWindowCapture;
+            public int baseBrightness;
+            public int colorBoost;
+            public int smoothing;
+            public int colorOverlayR;
+            public int colorOverlayG;
+            public int colorOverlayB;
+            public ColorCapturePart leftCapturePart;
+            public ColorCapturePart middleCapturePart;
+            public ColorCapturePart rightCapturePart;
         }
     }
 
