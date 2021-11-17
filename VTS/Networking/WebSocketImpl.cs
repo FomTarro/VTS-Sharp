@@ -80,6 +80,7 @@ namespace VTS.Networking.Impl{
                 }
             }catch(Exception e){
                 Debug.LogError(e);
+                onError();
             }
         }
 
