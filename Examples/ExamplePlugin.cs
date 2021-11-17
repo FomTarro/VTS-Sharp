@@ -20,9 +20,9 @@ namespace VTS.Examples {
 
         private void Awake(){
             Initialize(new WebSocketImpl(), new JsonUtilityImpl(), new TokenStorageImpl(), 
-            () => {},
-            () => {}, 
-            () => {});
+            () => {Debug.Log("Connected!");},
+            () => {Debug.LogWarning("Disconnected!");},
+            () => {Debug.LogError("Error!");});
         }
 
         public void PrintAPIStats(){

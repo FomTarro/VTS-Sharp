@@ -2,13 +2,16 @@
 A Unity C# client interface for creating VTube Studio Plugins with the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio)!
  
 ## About
-This library is maintained by Tom "Skeletom" Farro. If you need to contact him, the best way to do so is via [Twitter](https://www.twitter.com/fomtarro) or by leaving an issue ticket on this repo. Currently, this library is still in beta, but should be fully functional.
+This library is maintained by Tom "Skeletom" Farro. If you need to contact him, the best way to do so is via [Twitter](https://www.twitter.com/fomtarro) or by leaving an issue ticket on this repo.
+
+If you're more of an email-oriented person, you can contact his support email: [tom@skeletom.net](mailto:tom@skeletom.net).
  
 ## Usage
- 
 In order to start making a plugin, simply make a class which extends `VTSPlugin`. In your class, call the [`Initialize`](#void-initialize) method. Pass in your preferred implementations of a [JSON utility](#interface-ijsonutility), of a [websocket](#interface-iwebsocket), and of a [mechanism to store the authorization token](#interface-itokenstorage). Specify what happens on a successful or unsuccessful initialization. That's it. From there, you can call any method found in the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio).
  
-You can find an example of custom plugin creation in the `Examples` folder, which also includes default implementations of the aforementioned initialization dependencies.
+You can find an example of custom plugin creation in the `Examples` folder, which also includes default implementations of the aforementioned initialization dependencies. 
+
+You can find a video tutorial that demonstrates [how to get started in under 90 seconds here](https://www.youtube.com/watch?v=lUGeMEVzjAU).
  
 Because this library simply acts as an client interface for the official API, please check out the official API's readme for in-depth explanations about the API functionality.
  
@@ -26,7 +29,7 @@ Take, for example, the following method signature, found in the [`VTSPlugin`](#c
 ```
 The method accepts two callbacks, `onSuccess` and `onError`, but does not return a value. 
 
-Upon the request being processed by Vtube Studio, 
+Upon the request being processed by VTube Studio, 
 one of these two callbacks will be invoked, depending on if the request was successful or not. The callback accepts in a single, strongly-typed argument reflecting the payload. You can find what to expect in each payload class in the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio).
 
 
@@ -56,7 +59,7 @@ Authenticates the plugin as well as selects the Websocket, JSON utility, and Tok
 * `Action onDisconnect`: Callback executed upon disconnecting from VTS (accidental or otherwise).
 * `Action onError`: The Callback executed upon failed initialization.
 
-All other methods can be inferred from the [official Vtube Studio API](https://github.com/DenchiSoft/VTubeStudio).
+All other methods can be inferred from the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio).
 
 ## `interface IWebSocket`
 

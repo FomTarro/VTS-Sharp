@@ -11,6 +11,8 @@ namespace VTS {
     [RequireComponent(typeof(VTSWebSocket))]
     public abstract class VTSPlugin : MonoBehaviour
     {
+        #region Properties
+
         [SerializeField]
         protected string _pluginName = "ExamplePlugin";
         /// <summary>
@@ -25,6 +27,13 @@ namespace VTS {
         /// </summary>
         /// <value></value>
         public string PluginAuthor { get { return this._pluginAuthor; } }
+        [SerializeField]
+        protected Texture2D _pluginIcon = null;
+        /// <summary>
+        /// The icon for this plugin.
+        /// </summary>
+        /// <value></value>
+        public Texture2D PluginIcon { get { return this._pluginIcon; } }
 
         private VTSWebSocket _socket = null;
         /// <summary>
@@ -49,6 +58,10 @@ namespace VTS {
         /// <value></value>
         public bool IsAuthenticated { get { return this._isAuthenticated; } }
 
+        #endregion
+
+        #region Initialization
+
         /// <summary>
         /// Authenticates the plugin as well as selects the Websocket, JSON utility, and Token Storage implementations.
         /// </summary>
@@ -63,38 +76,48 @@ namespace VTS {
             this._socket = GetComponent<VTSWebSocket>();
             this._socket.Initialize(webSocket, jsonUtility);
             this._socket.Connect(() => {
-                Authenticate(
-                    (r) => { 
-                        this._isAuthenticated = true;
-                        onConnect();
-                    }, 
-                    (r) => { 
-                        Debug.Log("Token expired, acquiring new token...");
-                        this._isAuthenticated = false;
-                        tokenStorage.DeleteToken();
-                        Authenticate( 
-                            (t) => { 
-                                this._isAuthenticated = true;
-                                onConnect();
+                // get API State
+                GetAPIState(
+                    (s) => {
+                        // If API enabled, authenticate
+                        Authenticate(
+                            (r) => { 
+                                if(!r.data.authenticated){
+                                    Reauthenticate(onConnect, onError);
+                                }else{
+                                    this._isAuthenticated = true;
+                                    onConnect();
+                                }
                             }, 
-                            (t) => {
-                                this._isAuthenticated = false;
-                                onError();
+                            (r) => { 
+                                // If initial authentication fails, try again
+                                // (Likely just needs fresh token)
+                                Reauthenticate(onConnect, onError); 
                             }
                         );
-                    }
-                );
+                    },
+                (s) => {
+                    // If API is not enabled, invoke Error handler
+                    this._isAuthenticated = false;
+                    onError();
+                });
             },
             () => {
                 this._isAuthenticated = false;
                 onDisconnect();
             },
-            onError);
+            () => {
+                this._isAuthenticated = false;
+                onError();
+            });
         }
+
+        #endregion
 
         #region Authentication
 
         private void Authenticate(Action<VTSAuthData> onSuccess, Action<VTSErrorData> onError){
+            this._isAuthenticated = false;
             if(this._tokenStorage != null){
                 this._token = this._tokenStorage.LoadToken();
                 if(String.IsNullOrEmpty(this._token)){
@@ -107,10 +130,27 @@ namespace VTS {
             }
         }
 
+        private void Reauthenticate(Action onConnect, Action onError){
+            Debug.LogWarning("Token expired, acquiring new token...");
+            this._isAuthenticated = false;
+            this._tokenStorage.DeleteToken();
+            Authenticate( 
+                (t) => { 
+                    this._isAuthenticated = true;
+                    onConnect();
+                }, 
+                (t) => {
+                    this._isAuthenticated = false;
+                    onError();
+                }
+            );
+        }
+
         private void GetToken(Action<VTSAuthData> onSuccess, Action<VTSErrorData> onError){
             VTSAuthData tokenRequest = new VTSAuthData();
             tokenRequest.data.pluginName = this._pluginName;
             tokenRequest.data.pluginDeveloper = this._pluginAuthor;
+            tokenRequest.data.pluginIcon = EncodeIcon(this._pluginIcon);
             this._socket.Send<VTSAuthData>(tokenRequest,
             (a) => {
                 this._token = a.data.authenticationToken; 
@@ -427,6 +467,19 @@ namespace VTS {
             output = output.Substring(0, Math.Min(output.Length, 31));
             return output;
 
+        }
+
+        private string EncodeIcon(Texture2D icon){
+            try{
+                if(icon.width != 128 && icon.height != 128){
+                    Debug.LogWarning("Icon resolution must be exactly 128*128 pixels!");
+                    return null;
+                }
+                return Convert.ToBase64String(icon.EncodeToPNG());
+            }catch(Exception e){
+                Debug.LogError(e);
+            }
+            return null;
         }
 
         #endregion
