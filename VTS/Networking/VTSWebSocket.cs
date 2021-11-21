@@ -62,7 +62,7 @@ namespace VTS.Networking {
                             this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSHotkeysInCurrentModelData>(data));
                             break;
                         case "HotkeyTriggerResponse":
-                            this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSHotkeysInCurrentModelData>(data));
+                            this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSHotkeyTriggerData>(data));
                             break;
                         case "ArtMeshListResponse":
                             this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSArtMeshListData>(data));
@@ -78,6 +78,9 @@ namespace VTS.Networking {
                             break;
                         case "InputParameterListResponse":
                             this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSInputParameterListData>(data));
+                            break;
+                        case "ParameterValueResponse":
+                            this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSParameterValueData>(data));
                             break;
                         case "Live2DParameterListResponse":
                             this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSLive2DParameterListData>(data));
@@ -117,7 +120,8 @@ namespace VTS.Networking {
             if(this._ws != null){
                 try{
                     _callbacks.Add(request.requestID, new VTSCallbacks((t) => { onSuccess((T)t); } , onError));
-                    string output = RemoveNullProps(_json.ToJson(request));
+                    // make sure to remove null properties
+                    string output = _json.ToJson(request);
                     this._ws.Send(output);
                 }catch(Exception e){
                     Debug.Log(e);
@@ -127,32 +131,6 @@ namespace VTS.Networking {
                 error.data.errorID = ErrorID.InternalServerError;
                 error.data.message = "No websocket data";
             }
-        }
-
-        private string RemoveNullProps(string input){
-            string[] props = input.Split(',', '{', '}');
-            string output = input;
-            foreach(string prop in props){
-                // We're doing direct string manipulation on a serialized JSON, which is incredibly frail.
-                // Please forgive my sins, as Unity's builtin JSON tool uses default field values instead of nulls,
-                // and sometimes that is unacceptable behavior.
-                // I'd use a more robust JSON library if I wasn't publishing this as a plugin.
-                string[] pair = prop.Split(':');
-                if(pair.Length > 1){
-                    float nullable = 0.0f;
-                    float.TryParse(pair[1], out nullable);
-                    if(float.MinValue.Equals(nullable)){
-                        output = output.Replace(prop+",", "");
-                        output = output.Replace(prop, "");
-                    }
-                    else if("\"\"".Equals(pair[1])){
-                        output = output.Replace(prop+",", "");
-                        output = output.Replace(prop, "");
-                    }
-                }
-            }
-            output = output.Replace(",}", "}");
-            return output;
         }
 
         private struct VTSCallbacks{
