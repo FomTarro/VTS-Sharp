@@ -834,6 +834,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _pluginName: ExamplePlugin
   _pluginAuthor: Skeletom
+  _pluginIcon: {fileID: 2800000, guid: 774c2806a6e98e74e93c0f98f34d9aa4, type: 3}
   _text: {fileID: 1652142700}
   _color: {r: 1, g: 0.6556604, b: 0.87041146, a: 1}
   _headRolling: 0
