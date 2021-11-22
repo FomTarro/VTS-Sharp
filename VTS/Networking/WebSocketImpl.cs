@@ -24,7 +24,7 @@ namespace VTS.Networking.Impl{
 
         // Queues
         private ConcurrentQueue<string> _receiveQueue { get; }
-        private BlockingCollection<ArraySegment<byte>> _sendQueue { get; }
+        private ConcurrentQueue<ArraySegment<byte>> _sendQueue { get; }
         private CancellationTokenSource _tokenSource;
         private System.Action _onReconnect = () => {};
         private System.Action _onDisconnect = () => {};
@@ -32,7 +32,7 @@ namespace VTS.Networking.Impl{
         #region  Lifecycle
         public WebSocketImpl(){
             _receiveQueue = new ConcurrentQueue<string>();
-            _sendQueue = new BlockingCollection<ArraySegment<byte>>();
+            _sendQueue = new ConcurrentQueue<ArraySegment<byte>>();
         }
 
         ~WebSocketImpl(){
@@ -123,7 +123,7 @@ namespace VTS.Networking.Impl{
             byte[] buffer = ENCODER.GetBytes(message);
             // Debug.Log("Message to queue for send: " + buffer.Length + ", message: " + message);
             ArraySegment<byte> sendBuf = new ArraySegment<byte>(buffer);
-            _sendQueue.Add(sendBuf);
+            _sendQueue.Enqueue(sendBuf);
         }
 
         private async void RunSend(ClientWebSocket socket, CancellationToken token)
@@ -133,7 +133,7 @@ namespace VTS.Networking.Impl{
             // int counter = 0;
             while(!token.IsCancellationRequested)
             {
-                if(!this._sendQueue.IsCompleted && this.IsConnectionOpen())
+                if(!this._sendQueue.IsEmpty && this.IsConnectionOpen() && _sendQueue.TryDequeue(out msg))
                 {
                     try{
                         // counter++;
@@ -141,12 +141,13 @@ namespace VTS.Networking.Impl{
                         //     counter = 0;
                         //     throw new WebSocketException("CHAOS MONKEY");
                         // }
-                        msg = _sendQueue.Take();
                         await socket.SendAsync(msg, WebSocketMessageType.Text, true /* is last part of message */, token);
                     }catch(Exception e){
                         Debug.LogError(e);
                         // put unsent messages back on the queue
-                        _sendQueue.Add(msg);
+                        if(msg != null){
+                            _sendQueue.Enqueue(msg);
+                        }
                         if(e is WebSocketException 
                         || e is System.IO.IOException 
                         || e is System.Net.Sockets.SocketException){
