@@ -5,6 +5,8 @@ A Unity C# client interface for creating VTube Studio Plugins with the [official
 This library is maintained by Tom "Skeletom" Farro. If you need to contact him, the best way to do so is via [Twitter](https://www.twitter.com/fomtarro) or by leaving an issue ticket on this repo.
 
 If you're more of an email-oriented person, you can contact his support email: [tom@skeletom.net](mailto:tom@skeletom.net).
+
+This library can also be found on the [Unity Asset Store](https://assetstore.unity.com/packages/tools/integration/vts-sharp-203218), but this repo will always be the most up-to-date version.
  
 ## Usage
 In order to start making a plugin, simply make a class which extends `VTSPlugin`. In your class, call the [`Initialize`](#void-initialize) method. Pass in your preferred implementations of a [JSON utility](#interface-ijsonutility), of a [websocket](#interface-iwebsocket), and of a [mechanism to store the authorization token](#interface-itokenstorage). Specify what happens on a successful or unsuccessful initialization. That's it. From there, you can call any method found in the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio).
@@ -42,6 +44,8 @@ one of these two callbacks will be invoked, depending on if the request was succ
 The name of this plugin. Required for authorization purposes.
 #### `string PluginAuthor`
 The name of this plugin's author. Required for authorization purposes.
+#### `Texture2D PluginIcon`
+The icon of this for this plugin. Optional, must be exactly 128*128 pixels in size.
 #### `VTSWebSocket Socket`
 The underlying WebSocket for connecting to VTS.
 #### `ITokenStorage TokenStorage`
