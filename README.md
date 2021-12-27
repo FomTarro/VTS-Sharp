@@ -20,14 +20,14 @@ Because this library simply acts as an client interface for the official API, pl
 ## Design Pattern and Considerations
  
 ### Swappable Components
-In order to afford the most flexibility (and to be as decoupled from Unity as possible), the underlying components of the [`VTSPlugin`](#class-vtsplugin) are all defined as interfaces. This allows you to swap out the built-in implementations with more robust or platform-compliant ones. For instance, due to .NET limitations, the builtin websocket implementation may not be compatible with macOS! Pass in your own implementations via the [`Initialize`](#void-initialize) method.
+In order to afford the most flexibility (and to be as decoupled from Unity as possible), the underlying components of the [`VTSPlugin`](#class-vtsplugin) are all defined as interfaces. This allows you to swap out the built-in implementations with more robust or platform-compliant ones, if you want. You can pass in your own implementations via the [`Initialize`](#void-initialize) method.
 
 ### Asynchronous Design
 Because the VTube Studio API is websocket-based, all calls to it are inherently asynchronous. Therefore, this library follows a callback-based design pattern.
 Take, for example, the following method signature, found in the [`VTSPlugin`](#class-vtsplugin) class:
  
 ```
-    void GetAPIState(Action<VTSStateData> onSuccess, Action<VTSErrorData> onError)
+void GetAPIState(Action<VTSStateData> onSuccess, Action<VTSErrorData> onError)
 ```
 The method accepts two callbacks, `onSuccess` and `onError`, but does not return a value. 
 
@@ -70,7 +70,7 @@ All other methods can be inferred from the [official VTube Studio API](https://g
 ### Methods
 #### `string GetNextResponse` 
 Fetches the next response to process.
-#### `Task Start`
+#### `void Start`
 Connects to the given URL and executes the relevant callback on completion. Takes the following args:
 * `string URL`: URL to connect to.
 * `Action onConnect`: Callback executed upon connecting to the URL.
@@ -107,3 +107,11 @@ Deserializes a JSON string into an object of the specified type. Takes the follo
 #### `string ToJson`
 Converts an object into a JSON string. Takes the following args:
 * `object obj`: The object to serialized.
+
+# Acknowledgements
+
+## [WebSocketSharp](https://github.com/sta/websocket-sharp)
+An implementation of Websocket using WebSocketSharp has been included for use, adhering to the [library's MIT license](https://github.com/sta/websocket-sharp/blob/master/LICENSE.txt).
+
+## [DenchiSoft](https://github.com/DenchiSoft/VTubeStudio)
+None of this would be possible without Denchi's tireless work on VTube Studio itself. 

@@ -39,7 +39,7 @@ namespace VTS.Networking.Impl{
             this.Dispose();
         }
 
-        public async Task Start(string URL, System.Action onConnect, System.Action onDisconnect, System.Action onError)
+        public async void Start(string URL, System.Action onConnect, System.Action onDisconnect, System.Action onError)
         {
             try{
                 // Cancel all existing tasks
@@ -84,13 +84,13 @@ namespace VTS.Networking.Impl{
             }
         }
 
-        private async Task Reconnect(){
+        private void Reconnect(){
             this._onDisconnect();
-            await Start(this._url, this._onReconnect, this._onDisconnect, async () => { 
+            Start(this._url, this._onReconnect, this._onDisconnect, async () => { 
                 // keep retrying 
                 Debug.LogError("Reconnect failed, trying again!");
                 await Task.Delay(2);
-                await Reconnect();
+                Reconnect();
             } );
         }
 
@@ -152,7 +152,7 @@ namespace VTS.Networking.Impl{
                         || e is System.IO.IOException 
                         || e is System.Net.Sockets.SocketException){
                             Debug.LogWarning("Socket exception occured, reconnecting...");
-                            await Reconnect();
+                            Reconnect();
                         }
                     }
                 }

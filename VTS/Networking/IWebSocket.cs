@@ -21,7 +21,7 @@ namespace VTS.Networking{
         /// <param name="onDisconnect">Callback executed upon disconnecting from the URL.</param>
         /// <param name="onError">Callback executed upon receiving an error.</param>
         /// <returns></returns>
-        Task Start(string URL, System.Action onConnect, System.Action onDisconnect, System.Action onError);
+        void Start(string URL, System.Action onConnect, System.Action onDisconnect, System.Action onError);
         /// <summary>
         /// Closes the websocket.
         /// 
