@@ -19,7 +19,7 @@ namespace VTS.Examples {
         private bool _headRolling = false;
 
         private void Awake(){
-            Initialize(new WebSocketImpl(), new JsonUtilityImpl(), new TokenStorageImpl(), 
+            Initialize(new WebSocketSharpImpl(), new JsonUtilityImpl(), new TokenStorageImpl(), 
             () => {Debug.Log("Connected!");},
             () => {Debug.LogWarning("Disconnected!");},
             () => {Debug.LogError("Error!");});

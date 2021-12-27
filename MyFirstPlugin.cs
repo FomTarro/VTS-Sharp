@@ -11,7 +11,7 @@ public class MyFirstPlugin : VTSPlugin
     {
         // Everything you need to get started!
         Initialize(
-            new WebSocketImpl(),
+            new WebSocketSharpImpl(),
             new JsonUtilityImpl(),
             new TokenStorageImpl(),
             () => {Debug.Log("Connected!");},
