@@ -12,6 +12,9 @@ namespace VTS.Networking {
         private Dictionary<string, VTSCallbacks> _callbacks = new Dictionary<string, VTSCallbacks>();
 
         public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility){
+            if(this._ws != null){
+                this._ws.Stop();
+            }
             this._ws = webSocket;
             this._json = jsonUtility;
         }
@@ -113,9 +116,7 @@ namespace VTS.Networking {
 
         public void Connect(System.Action onConnect, System.Action onDisconnect, System.Action onError){
             if(this._ws != null){
-                #pragma warning disable 
                 this._ws.Start(VTS_WS_URL, onConnect, onDisconnect, onError);
-                #pragma warning restore
             }else{
                 onError();
             }
