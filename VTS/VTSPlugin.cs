@@ -76,31 +76,22 @@ namespace VTS {
             this._socket = GetComponent<VTSWebSocket>();
             this._socket.Initialize(webSocket, jsonUtility);
             this._socket.Connect(() => {
-                // get API State
-                GetAPIState(
-                    (s) => {
-                        // If API enabled, authenticate
-                        Authenticate(
-                            (r) => { 
-                                if(!r.data.authenticated){
-                                    Reauthenticate(onConnect, onError);
-                                }else{
-                                    this._isAuthenticated = true;
-                                    onConnect();
-                                }
-                            }, 
-                            (r) => { 
-                                // If initial authentication fails, try again
-                                // (Likely just needs fresh token)
-                                Reauthenticate(onConnect, onError); 
-                            }
-                        );
-                    },
-                (s) => {
-                    // If API is not enabled, invoke Error handler
-                    this._isAuthenticated = false;
-                    onError();
-                });
+                // If API enabled, authenticate
+                Authenticate(
+                    (r) => { 
+                        if(!r.data.authenticated){
+                            Reauthenticate(onConnect, onError);
+                        }else{
+                            this._isAuthenticated = true;
+                            onConnect();
+                        }
+                    }, 
+                    (r) => { 
+                        // If initial authentication fails, try again
+                        // (Likely just needs fresh token)
+                        Reauthenticate(onConnect, onError); 
+                    }
+                );
             },
             () => {
                 this._isAuthenticated = false;
