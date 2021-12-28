@@ -25,26 +25,27 @@ namespace VTS.Networking.Impl{
 
         public bool IsConnecting()
         {
-            return this._socket.ReadyState == WebSocketState.CONNECTING;
+            return this._socket != null && this._socket.ReadyState == WebSocketState.CONNECTING;
         }
 
         public bool IsConnectionOpen()
         {
-            return this._socket.ReadyState == WebSocketState.OPEN;
+            return this._socket != null && this._socket.ReadyState == WebSocketState.OPEN;
         }
 
         public void Send(string message)
         {
             byte[] buffer = ENCODER.GetBytes(message);
-            // Debug.Log("Message to queue for send: " + buffer.Length + ", message: " + message);
-            ArraySegment<byte> sendBuf = new ArraySegment<byte>(buffer);;
             this._socket.Send(buffer);
         }
 
         public void Start(string URL, Action onConnect, Action onDisconnect, Action onError)
         {
             this._socket = new WebSocket(URL);
-            this._socket.OnMessage += (sender, e) => { this._intakeQueue.Enqueue(e.Data); };
+            
+            this._socket.OnMessage += (sender, e) => { 
+                this._intakeQueue.Enqueue(e.Data); 
+            };
             this._socket.OnOpen += (sender, e) => { 
                 MainThreadUtil.Run(() => {
                     onConnect(); 
@@ -61,6 +62,7 @@ namespace VTS.Networking.Impl{
                     onDisconnect(); 
                 });
             };
+
             this._socket.ConnectAsync();
         }
 
