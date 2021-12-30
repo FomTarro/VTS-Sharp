@@ -66,6 +66,8 @@ Authenticates the plugin as well as selects the Websocket, JSON utility, and Tok
 #### `Dictionary<int, VTSStateBroadcastData> GetPorts`
 Generates a dictionary indexed by port number containing information about all available VTube Studio ports.
 
+For more info, see [API Server Discovery (UDP) on the official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio#api-server-discovery-udp).
+
 #### `bool SetPort`
 Sets the connection port to the given number. Returns true if the number is a valid VTube Studio port, returns false otherwise. 
 

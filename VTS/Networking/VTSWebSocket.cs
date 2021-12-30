@@ -163,7 +163,11 @@ namespace VTS.Networking {
                     string output = _json.ToJson(request);
                     this._ws.Send(output);
                 }catch(Exception e){
-                    Debug.Log(e);
+                    Debug.LogError(e);
+                    VTSErrorData error = new VTSErrorData();
+                    error.data.errorID = ErrorID.InternalServerError;
+                    error.data.message = e.Message;
+                    onError(error);
                 }
             }else{
                 VTSErrorData error = new VTSErrorData();

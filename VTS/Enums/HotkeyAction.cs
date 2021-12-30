@@ -16,6 +16,9 @@
         ReloadTextures = 7,          // Reload the model texture.
         CalibrateCam = 8,            // Calibrate Camera.
         ChangeVTSModel = 9,          // Change VTS Model.
-        TakeScreenshot = 10          // Takes a screenshot with the screenshot settings previously set in the UI.
+        TakeScreenshot = 10,         // Takes a screenshot with the screenshot settings previously set in the UI.
+        ScreenColorOverlay = 11,     // Activates/Deactivates model screen color overlay.
+        RemoveAllItems = 12,         // Removes items from the scene.
+        ToggleItemScene = 13         // Toggles an item scene.
     }
 }
