@@ -1,15 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+
+using System.Text;
+using System.Net.Sockets;
+using System.Threading.Tasks;
+
 using UnityEngine;
 using VTS.Models;
 
 namespace VTS.Networking {
     public class VTSWebSocket : MonoBehaviour
     {
-        private const string VTS_WS_URL = "ws://localhost:8001";
+        private const string VTS_WS_URL = "ws://localhost:{0}";
+        private int _port = 8001;
         private IWebSocket _ws = null;
         private IJsonUtility _json = null;
         private Dictionary<string, VTSCallbacks> _callbacks = new Dictionary<string, VTSCallbacks>();
+
+        // UDP 
+        private static UdpClient UDP_CLIENT = null;
+        private static Task<UdpReceiveResult> UDP_RESULT = null;
+        private static Dictionary<int, VTSStateBroadcastData> PORTS = new Dictionary<int, VTSStateBroadcastData>();
 
         public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility){
             if(this._ws != null){
@@ -17,6 +28,9 @@ namespace VTS.Networking {
             }
             this._ws = webSocket;
             this._json = jsonUtility;
+            if(UDP_CLIENT == null){
+                UDP_CLIENT = new UdpClient(47779);
+            }
         }
 
         private void OnDestroy(){
@@ -24,7 +38,26 @@ namespace VTS.Networking {
         }
 
         private void FixedUpdate(){
+            CheckPorts();
             ProcessResponses();
+        }
+
+        private void CheckPorts(){
+            if(UDP_CLIENT != null && this._json != null){
+                if(UDP_RESULT != null && UDP_RESULT.IsCompleted){
+                    string text = Encoding.UTF8.GetString(UDP_RESULT.Result.Buffer);
+                    UDP_RESULT.Dispose();
+                    UDP_RESULT = null;
+                    VTSStateBroadcastData data = this._json.FromJson<VTSStateBroadcastData>(text);
+                    if(PORTS.ContainsKey(data.data.port)){
+                        PORTS.Remove(data.data.port);
+                    }
+                    PORTS.Add(data.data.port, data);
+                }
+                if(UDP_RESULT == null){
+                    UDP_RESULT = UDP_CLIENT.ReceiveAsync();
+                }
+            }
         }
 
         private void ProcessResponses(){
@@ -116,7 +149,7 @@ namespace VTS.Networking {
 
         public void Connect(System.Action onConnect, System.Action onDisconnect, System.Action onError){
             if(this._ws != null){
-                this._ws.Start(VTS_WS_URL, onConnect, onDisconnect, onError);
+                this._ws.Start(string.Format(VTS_WS_URL, this._port), onConnect, onDisconnect, onError);
             }else{
                 onError();
             }
@@ -136,7 +169,20 @@ namespace VTS.Networking {
                 VTSErrorData error = new VTSErrorData();
                 error.data.errorID = ErrorID.InternalServerError;
                 error.data.message = "No websocket data";
+                onError(error);
             }
+        }
+
+        public Dictionary<int, VTSStateBroadcastData> GetPorts(){
+            return new Dictionary<int, VTSStateBroadcastData>(PORTS);
+        }
+
+        public bool SetPort(int port){
+            if(PORTS.ContainsKey(port)){
+                this._port = port;
+                return true;
+            }
+            return false;
         }
 
         private struct VTSCallbacks{

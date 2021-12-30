@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 using UnityEngine;
 using VTS.Networking;
 using VTS.Models;
@@ -160,6 +161,28 @@ namespace VTS {
             authRequest.data.pluginDeveloper = this._pluginAuthor;
             authRequest.data.authenticationToken = this._token;
             this._socket.Send<VTSAuthData>(authRequest, onSuccess, onError);
+        }
+
+        #endregion
+
+        #region Port Discovery
+
+        /// <summary>
+        /// Generates a dictionary indexed by port number containing information about all available VTube Studio ports.
+        /// </summary>
+        /// <returns>Dictionary indexed by port number.</returns>
+        public Dictionary<int, VTSStateBroadcastData> GetPorts(){
+            return this._socket.GetPorts();
+        }
+
+        /// <summary>
+        /// Sets the connection port to the given number. Returns true if the port is a valid VTube Studio port, returns false otherwise. 
+        /// If the port number is changed while an active connection exists, you will need to reconnect.
+        /// </summary>
+        /// <param name="port">The port to connect to.</param>
+        /// <returns>True if the port is a valid VTube Studio port, False otherwise.</returns>
+        public bool SetPort(int port){
+            return this._socket.SetPort(port);
         }
 
         #endregion
