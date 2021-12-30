@@ -1,4 +1,6 @@
-﻿using VTS.Networking.Impl;
+﻿using System.Collections.Generic;
+
+using VTS.Networking.Impl;
 using VTS.Models.Impl;
 using VTS.Models;
 
@@ -18,11 +20,40 @@ namespace VTS.Examples {
         [SerializeField]
         private bool _headRolling = false;
 
+        [SerializeField]
+        private Button _portConnectButtonPrefab = null;
+
+        [SerializeField]
+        private RectTransform _portConnectButtonParent = null;
+
+        [SerializeField]
+        private Image _connectionLight = null;
+        [SerializeField]
+        private Text _connectionText = null;
+
         private void Awake(){
+            Connect();
+        }
+
+        private void Connect(){
+            this._connectionLight.color = Color.yellow;
+            this._connectionText.text = "Connecting...";
             Initialize(new WebSocketSharpImpl(), new JsonUtilityImpl(), new TokenStorageImpl(), 
-            () => {Debug.Log("Connected!");},
-            () => {Debug.LogWarning("Disconnected!");},
-            () => {Debug.LogError("Error!");});
+            () => {
+                Debug.Log("Connected!");
+                this._connectionLight.color = Color.green;
+                this._connectionText.text = "Connected!";
+            },
+            () => {
+                Debug.LogWarning("Disconnected!");
+                this._connectionLight.color = Color.gray;
+                this._connectionText.text = "Disconnected.";
+            },
+            () => {
+                Debug.LogError("Error!");
+                this._connectionLight.color = Color.red;
+                this._connectionText.text = "Error!";
+            });
         }
 
         public void PrintAPIStats(){
@@ -71,7 +102,25 @@ namespace VTS.Examples {
             );
 	    }
 
+        public void RefreshPortList(){
+            List<int> ports = new List<int>(GetPorts().Keys);
+            foreach(Transform child in this._portConnectButtonParent){
+                Destroy(child.gameObject);
+            }
+            foreach(int port in ports){
+                Button button = Instantiate<Button>(this._portConnectButtonPrefab, Vector3.zero, Quaternion.identity, this._portConnectButtonParent);
+                button.name = port.ToString();
+                button.GetComponentInChildren<Text>().text = button.name;
+                button.onClick.AddListener(() => {
+                    if(SetPort(int.Parse(button.name))){
+                        Connect();
+                    }
+                });
+            }
+        }
+
         private void FixedUpdate(){
+
             if(this.IsAuthenticated && this._headRolling){
                 float x = Mathf.Sin(Time.realtimeSinceStartup);
                 float y = Mathf.Cos(Time.realtimeSinceStartup);
