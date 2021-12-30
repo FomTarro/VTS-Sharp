@@ -4,12 +4,12 @@ namespace VTS.Models {
     public class VTSMessageData
     {
         public string apiName = "VTubeStudioPublicAPI";
+        public long timestamp;
         public string apiVersion = "1.0";
         public string requestID = Guid.NewGuid().ToString();
         public string messageType;
     }
 
-    
     [System.Serializable]
     public class VTSErrorData : VTSMessageData{
          public VTSErrorData(){
@@ -456,6 +456,23 @@ namespace VTS.Models {
         [System.Serializable]
         public class Data {
             public VTSParameterInjectionValue[] parameterValues;
+        }
+    }
+
+    [System.Serializable]
+    public class VTSStateBroadcastData : VTSMessageData{
+        public VTSStateBroadcastData(){
+            this.messageType = "VTubeStudioAPIStateBroadcast";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public bool active;
+            public int port;
+            public string instanceID;
+            public string windowTitle;
         }
     }
 }
