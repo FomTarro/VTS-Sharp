@@ -20,7 +20,7 @@ namespace VTS.Networking {
         // UDP 
         private static UdpClient UDP_CLIENT = null;
         private static Task<UdpReceiveResult> UDP_RESULT = null;
-        private static Dictionary<int, VTSStateBroadcastData> PORTS = new Dictionary<int, VTSStateBroadcastData>();
+        private static readonly Dictionary<int, VTSStateBroadcastData> PORTS = new Dictionary<int, VTSStateBroadcastData>();
 
         public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility){
             if(this._ws != null){
@@ -38,22 +38,30 @@ namespace VTS.Networking {
         }
 
         private void FixedUpdate(){
-            CheckPorts();
             ProcessResponses();
+            CheckPorts();
         }
 
         private void CheckPorts(){
             if(UDP_CLIENT != null && this._json != null){
-                if(UDP_RESULT != null && UDP_RESULT.IsCompleted){
-                    string text = Encoding.UTF8.GetString(UDP_RESULT.Result.Buffer);
-                    UDP_RESULT.Dispose();
-                    UDP_RESULT = null;
-                    VTSStateBroadcastData data = this._json.FromJson<VTSStateBroadcastData>(text);
-                    if(PORTS.ContainsKey(data.data.port)){
-                        PORTS.Remove(data.data.port);
+                if(UDP_RESULT != null){
+                    if(UDP_RESULT.IsCanceled || UDP_RESULT.IsFaulted){
+                        // If the task faults, try again
+                        UDP_RESULT.Dispose();
+                        UDP_RESULT = null;
+                    }else if(UDP_RESULT.IsCompleted){
+                        // Otherwise, collect the result
+                        string text = Encoding.UTF8.GetString(UDP_RESULT.Result.Buffer);
+                        UDP_RESULT.Dispose();
+                        UDP_RESULT = null;
+                        VTSStateBroadcastData data = this._json.FromJson<VTSStateBroadcastData>(text);
+                        if(PORTS.ContainsKey(data.data.port)){
+                            PORTS.Remove(data.data.port);
+                        }
+                        PORTS.Add(data.data.port, data);
                     }
-                    PORTS.Add(data.data.port, data);
                 }
+                
                 if(UDP_RESULT == null){
                     UDP_RESULT = UDP_CLIENT.ReceiveAsync();
                 }

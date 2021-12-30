@@ -168,7 +168,7 @@ namespace VTS {
         #region Port Discovery
 
         /// <summary>
-        /// Generates a dictionary indexed by port number containing information about all available VTube Studio ports.
+        /// Gets a dictionary indexed by port number containing information about all available VTube Studio ports.
         /// 
         /// For more info, see 
         /// <a href="https://github.com/DenchiSoft/VTubeStudio#api-server-discovery-udp">https://github.com/DenchiSoft/VTubeStudio#api-server-discovery-udp</a>
