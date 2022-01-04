@@ -34,7 +34,6 @@ The method accepts two callbacks, `onSuccess` and `onError`, but does not return
 Upon the request being processed by VTube Studio, 
 one of these two callbacks will be invoked, depending on if the request was successful or not. The callback accepts in a single, strongly-typed argument reflecting the payload. You can find what to expect in each payload class in the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio).
 
-
 # API
 
 ## `class VTSPlugin`
@@ -122,8 +121,18 @@ Converts an object into a JSON string. Takes the following args:
 
 # Acknowledgements
 
+## [DenchiSoft](https://github.com/DenchiSoft/VTubeStudio)
+None of this would be possible without Denchi's tireless work on VTube Studio itself. 
+
 ## [WebSocketSharp](https://github.com/sta/websocket-sharp)
 An implementation of Websocket using WebSocketSharp has been included for use, adhering to the [library's MIT license](https://github.com/sta/websocket-sharp/blob/master/LICENSE.txt).
 
-## [DenchiSoft](https://github.com/DenchiSoft/VTubeStudio)
-None of this would be possible without Denchi's tireless work on VTube Studio itself. 
+# Made With VTS-Sharp
+
+Below is a list of some plugins which were made using this library! If you have made something you would like included on this list, please [send Tom a message](#about).
+
+| Plugin | Developer | Explanation |
+| --- | --- | --- |
+| [VTS-ChangeEyeColor](https://yataya2000.booth.pm/items/3551421) ([Github link](https://github.com/TaniNatsumi/VTS-ChangeEyeColor)) | [TaniNatsumi](https://twitter.com/BURAI_VC2008) | An app for changing the eye colors of your model. Can change each eye color individually (heterochromia).|
+| [VTSLive](https://github.com/fastestyukkuri/VTSLivePlugins) | [fastest_yukkuri](https://twitter.com/fastest_yukkuri) | An ap which allows VTube Studio to reflect the movement of analog and digital clocks, the movement of the sun and moon, and weather information from around the world.|
+|[VTS-Mod](https://github.com/MechaWolfVtuberShin/VTS-Mod/releases/tag/vts-mod)| [MechaWolfVtuberShin](https://twitter.com/ShinChannel3) | An app which allows users to change the surface color of the model including RGB. It can also change the rotation of the model.|
