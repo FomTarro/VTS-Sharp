@@ -133,7 +133,8 @@ Below is a list of some plugins which were made using this library! If you have 
 
 | Plugin | Developer | Explanation |
 | --- | --- | --- |
-| [VTS-ChangeEyeColor](https://yataya2000.booth.pm/items/3551421) ([Github link](https://github.com/TaniNatsumi/VTS-ChangeEyeColor)) | [TaniNatsumi](https://twitter.com/BURAI_VC2008) | An app for changing the eye colors of your model. Can change each eye color individually (heterochromia).|
-| [VTSLive](https://github.com/fastestyukkuri/VTSLivePlugins) | [fastest_yukkuri](https://twitter.com/fastest_yukkuri) | An ap which allows VTube Studio to reflect the movement of analog and digital clocks, the movement of the sun and moon, and weather information from around the world.|
+| [PentabInfoPickerForVTS](https://github.com/Ganeesya/PentabInfoPickerForVTS) ([Video](https://www.youtube.com/watch?v=kklcAzTequ)) | [Ganeesya](https://twitter.com/Ganeesya) | An app which allows users to contriol their model with a tablet and pen. |
+| [VTS-ChangeEyeColor](https://yataya2000.booth.pm/items/3551421) ([Github](https://github.com/TaniNatsumi/VTS-ChangeEyeColor)) | [TaniNatsumi](https://twitter.com/BURAI_VC2008) | An app which allows users to change the eye colors of their model. Can change each eye color individually (heterochromia).|
+| [VTSLive](https://github.com/fastestyukkuri/VTSLivePlugins) | [fastest_yukkuri](https://twitter.com/fastest_yukkuri) | An app which allows VTube Studio to reflect the movement of analog and digital clocks, the movement of the sun and moon, and weather information from around the world.|
 |[VTS-Mod](https://github.com/MechaWolfVtuberShin/VTS-Mod/releases/tag/vts-mod)| [MechaWolfVtuberShin](https://twitter.com/ShinChannel3) | An app which allows users to change the surface color of the model including RGB. It can also change the rotation of the model.|
 |[VTS-Heartrate](https://github.com/FomTarro/vts-heartrate)| [Skeletom](https://twitter.com/FomTarro) | An app which allows users to connect their heartrate data to VTube Studio, to cause their model to become flushed under stress and breathe more heavily, among other things. |
