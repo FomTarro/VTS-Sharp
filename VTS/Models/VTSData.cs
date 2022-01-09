@@ -460,6 +460,81 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
+    public class ExpressionData{
+        public string name;
+		public string file;
+		public bool active;
+		public bool deactivateWhenKeyIsLetGo;
+		public bool autoDeactivateAfterSeconds;
+		public float secondsRemaining;
+		public HotkeyData[] usedInHotkeys;
+        public VTSExpressionParameter[] parameters;
+    }
+
+    // TODO: this is going to standardized as a VTSParameter class in the next beta update
+    [System.Serializable]
+    public class VTSExpressionParameter {
+        public string id;
+        public float target;
+    }
+
+    [System.Serializable]
+    public class VTSExpressionStateData : VTSMessageData{
+        public VTSExpressionStateData(){
+            this.messageType = "ExpressionStateRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public bool details;
+            public string expressionFile;
+            public bool modelLoaded;
+		    public string modelName;
+		    public string modelID;
+            public ExpressionData[] expressions;
+
+        }
+    }
+
+    [System.Serializable]
+    public class VTSExpressionActivationData : VTSMessageData{
+        public VTSExpressionActivationData(){
+            this.messageType = "ExpressionActivationRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+		    public string expressionFile;
+		    public bool active;
+        }
+    }
+
+
+    [System.Serializable]
+    public class VTSNDIConfigData : VTSMessageData{
+        public VTSNDIConfigData(){
+            this.messageType = "NDIConfigRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+		    public bool setNewConfig;
+		    public bool ndiActive;
+		    public bool useNDI5;
+		    public bool useCustomResolution;
+		    public int customWidthNDI;
+		    public int customHeightNDI;
+
+        }
+    }
+
+    [System.Serializable]
     public class VTSStateBroadcastData : VTSMessageData{
         public VTSStateBroadcastData(){
             this.messageType = "VTubeStudioAPIStateBroadcast";

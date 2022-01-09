@@ -94,6 +94,23 @@ namespace VTS.Examples {
             this._headRolling = !this._headRolling;
         }
 
+        public void ActivateExpression(string expressionName){
+            GetExpressionStateList(
+                (r) => { 
+                    _text.text = new JsonUtilityImpl().ToJson(r); 
+                    ExpressionData expression = new List<ExpressionData>(r.data.expressions).Find((e) => { return e.file.ToLower().Contains(expressionName.ToLower()); });
+                    if(expression != null){
+                        SetExpressionState(expression.file ,true, 
+                            (x) => { _text.text = new JsonUtilityImpl().ToJson(x); }, 
+                            (e2) => { _text.text = e2.data.message; });
+                    }else{
+                        throw new System.Exception("No Expression with " + expressionName + " in the file name was found.");
+                    }
+                }, 
+                (e) => { _text.text = e.data.message; }
+            );
+        }
+
         private void SyncValues(VTSParameterInjectionValue[] values){
             InjectParameterValues(
                 values,

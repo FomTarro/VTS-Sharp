@@ -471,6 +471,50 @@ namespace VTS {
             this._socket.Send<VTSInjectParameterData>(request, onSuccess, onError);
         }
 
+        /// <summary>
+        /// Requests a list of the states of all expressions in the currently loaded model.
+        /// 
+        /// For more info, see 
+        /// <a href="https://github.com/DenchiSoft/VTubeStudio#requesting-current-expression-state-list">https://github.com/DenchiSoft/VTubeStudio#requesting-current-expression-state-list</a>
+        /// </summary>
+        /// <param name="onSuccess">Callback executed upon receiving a response.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void GetExpressionStateList(Action<VTSExpressionStateData> onSuccess, Action<VTSErrorData> onError){
+            VTSExpressionStateData request = new VTSExpressionStateData();
+            request.data.details = true;
+            this._socket.Send<VTSExpressionStateData>(request, onSuccess, onError);
+        }
+
+        /// <summary>
+        /// Activates or deactivates the given expression.
+        /// 
+        /// For more info, see 
+        /// <a href="https://github.com/DenchiSoft/VTubeStudio#requesting-activation-or-deactivation-of-expressions">https://github.com/DenchiSoft/VTubeStudio#requesting-activation-or-deactivation-of-expressions</a>
+        /// </summary>
+        /// <parame name="expression">The expression file name to change the state of.</param>
+        /// <param name="state">The state to set the expression to. True to activate, false to deactivate.</param>
+        /// <param name="onSuccess">Callback executed upon receiving a response.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void SetExpressionState(string expression, bool state, Action<VTSExpressionActivationData> onSuccess, Action<VTSErrorData> onError){
+            VTSExpressionActivationData request = new VTSExpressionActivationData();
+            request.data.expressionFile = expression;
+            request.data.active = state;
+            this._socket.Send<VTSExpressionActivationData>(request, onSuccess, onError);
+        }
+
+        /// <summary>
+        /// Changes the DNI configuration.
+        /// 
+        /// For more info, see 
+        /// <a href="https://github.com/DenchiSoft/VTubeStudio#get-and-set-ndi-settings">https://github.com/DenchiSoft/VTubeStudio#get-and-set-ndi-settings</a>
+        /// </summary>
+        /// <parame name="config">The desired NDI configuration.</param>
+        /// <param name="onSuccess">Callback executed upon receiving a response.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void SetNDIConfig(VTSNDIConfigData config, Action<VTSNDIConfigData> onSuccess, Action<VTSErrorData> onError){
+            this._socket.Send<VTSNDIConfigData>(config, onSuccess, onError);
+        }
+
         #endregion
 
         #region Helper Methods
