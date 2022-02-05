@@ -468,14 +468,7 @@ namespace VTS.Models {
 		public bool autoDeactivateAfterSeconds;
 		public float secondsRemaining;
 		public HotkeyData[] usedInHotkeys;
-        public VTSExpressionParameter[] parameters;
-    }
-
-    // TODO: this is going to standardized as a VTSParameter class in the next beta update
-    [System.Serializable]
-    public class VTSExpressionParameter {
-        public string id;
-        public float target;
+        public VTSParameter[] parameters;
     }
 
     [System.Serializable]
