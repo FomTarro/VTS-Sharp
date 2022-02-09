@@ -241,7 +241,6 @@ namespace VTS {
         /// <param name="onError">Callback executed upon receiving an error.</param>
         public void GetCurrentModel(Action<VTSCurrentModelData> onSuccess, Action<VTSErrorData> onError){
             VTSCurrentModelData request = new VTSCurrentModelData();
-            Debug.Log(request);
             this._socket.Send<VTSCurrentModelData>(request, onSuccess, onError);
         }
 
@@ -395,7 +394,7 @@ namespace VTS {
         /// Gets the value for the specified parameter.
         /// 
         /// For more info, see 
-        /// <a href="https://github.com/DenchiSoft/VTubeStudio#requesting-list-of-available-tracking-parameters">https://github.com/DenchiSoft/VTubeStudio#requesting-list-of-available-tracking-parameters</a>
+        /// <a href="https://github.com/DenchiSoft/VTubeStudio#get-the-value-for-one-specific-parameter-default-or-custom">https://github.com/DenchiSoft/VTubeStudio#get-the-value-for-one-specific-parameter-default-or-custom</a>
         /// </summary>
         /// <param name="parameterName">The name of the parameter to get the value of.</param>
         /// <param name="onSuccess">Callback executed upon receiving a response.</param>
@@ -471,13 +470,57 @@ namespace VTS {
             this._socket.Send<VTSInjectParameterData>(request, onSuccess, onError);
         }
 
+        /// <summary>
+        /// Requests a list of the states of all expressions in the currently loaded model.
+        /// 
+        /// For more info, see 
+        /// <a href="https://github.com/DenchiSoft/VTubeStudio#requesting-current-expression-state-list">https://github.com/DenchiSoft/VTubeStudio#requesting-current-expression-state-list</a>
+        /// </summary>
+        /// <param name="onSuccess">Callback executed upon receiving a response.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void GetExpressionStateList(Action<VTSExpressionStateData> onSuccess, Action<VTSErrorData> onError){
+            VTSExpressionStateData request = new VTSExpressionStateData();
+            request.data.details = true;
+            this._socket.Send<VTSExpressionStateData>(request, onSuccess, onError);
+        }
+
+        /// <summary>
+        /// Activates or deactivates the given expression.
+        /// 
+        /// For more info, see 
+        /// <a href="https://github.com/DenchiSoft/VTubeStudio#requesting-activation-or-deactivation-of-expressions">https://github.com/DenchiSoft/VTubeStudio#requesting-activation-or-deactivation-of-expressions</a>
+        /// </summary>
+        /// <parame name="expression">The expression file name to change the state of.</param>
+        /// <param name="active">The state to set the expression to. True to activate, false to deactivate.</param>
+        /// <param name="onSuccess">Callback executed upon receiving a response.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void SetExpressionState(string expression, bool active, Action<VTSExpressionActivationData> onSuccess, Action<VTSErrorData> onError){
+            VTSExpressionActivationData request = new VTSExpressionActivationData();
+            request.data.expressionFile = expression;
+            request.data.active = active;
+            this._socket.Send<VTSExpressionActivationData>(request, onSuccess, onError);
+        }
+
+        /// <summary>
+        /// Changes the DNI configuration.
+        /// 
+        /// For more info, see 
+        /// <a href="https://github.com/DenchiSoft/VTubeStudio#get-and-set-ndi-settings">https://github.com/DenchiSoft/VTubeStudio#get-and-set-ndi-settings</a>
+        /// </summary>
+        /// <parame name="config">The desired NDI configuration.</param>
+        /// <param name="onSuccess">Callback executed upon receiving a response.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void SetNDIConfig(VTSNDIConfigData config, Action<VTSNDIConfigData> onSuccess, Action<VTSErrorData> onError){
+            this._socket.Send<VTSNDIConfigData>(config, onSuccess, onError);
+        }
+
         #endregion
 
         #region Helper Methods
 
-        private static Regex ALPHANUMERIC = new Regex(@"\W|_");
+        private static Regex ALPHANUMERIC = new Regex(@"\W|");
         private string SanitizeParameterName(string name){
-            // between 4 and 32 chars, alphanumeric
+            // between 4 and 32 chars, alphanumeric, underscores allowed
             string output = name;
             output = ALPHANUMERIC.Replace(output, "");
             output.PadLeft(4, 'X');
