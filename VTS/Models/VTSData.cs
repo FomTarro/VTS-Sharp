@@ -506,6 +506,62 @@ namespace VTS.Models {
         }
     }
 
+    [System.Serializable]
+    public class VTSCurrentModelPhysicsData : VTSMessageData{
+        public VTSCurrentModelPhysicsData(){
+            this.messageType = "GetCurrentModelPhysicsRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public bool modelLoaded;
+		    public string modelName;
+		    public string modelID;
+		    public bool modelHasPhysics;
+		    public bool physicsSwitchedOn;
+		    public bool usingLegacyPhysics;
+		    public int physicsFPSSetting;
+		    public int baseStrength;
+		    public int baseWind;
+		    public bool apiPhysicsOverrideActive;
+		    public string apiPhysicsOverridePluginNam;
+		    public VTSPhysicsGroup[] physicsGroups;
+        }
+    }
+
+    [System.Serializable]
+    public class VTSOverrideModelPhysicsData : VTSMessageData{
+        public VTSOverrideModelPhysicsData(){
+            this.messageType = "SetCurrentModelPhysicsRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public VTSPhysicsOverride[] strengthOverrides;
+            public VTSPhysicsOverride[] windOverrides;
+        }
+    }
+
+    [System.Serializable]
+    public class VTSPhysicsGroup{
+        public string groupID;
+		public string groupName;
+		public float strengthMultiplier;
+	    public float windMultiplier;
+    }
+
+    [System.Serializable]
+    public class VTSPhysicsOverride{
+        public string id;
+		public float value;
+		public bool setBaseValue;
+		public float overrideSeconds;
+    }
+
 
     [System.Serializable]
     public class VTSNDIConfigData : VTSMessageData{

@@ -2,8 +2,7 @@
     /// <summary>
     /// Enum for API-related errors.
     /// </summary>
-    [System.Serializable]
-    public enum ErrorID : int
+    public enum ErrorID
     {
         // General errors
         InternalServerError = 0,
@@ -77,6 +76,28 @@
         InjectDataParamControlledByOtherPlugin = 454, // Only one plugin can send data for a parameter at a time
         
         // Errors related to ParameterValueRequest
-        ParameterValueRequestParameterNotFound = 500
+        ParameterValueRequestParameterNotFound = 500,
+
+        // Errors related to NDIConfigRequest
+        NDIConfigCooldownNotOver = 550,
+        NDIConfigResolutionInvalid = 551,
+
+        // Errors related to ExpressionStateRequest
+        ExpressionStateRequestInvalidFilename = 600,
+        ExpressionStateRequestFileNotFound = 601,
+
+        // Errors related to ExpressionStateRequest
+        ExpressionActivationRequestInvalidFilename = 650,
+        ExpressionActivationRequestFileNotFound = 651,
+        ExpressionActivationRequestNoModelLoaded = 652,
+        
+        // Errors related to SetCurrentModelPhysicsRequest
+        SetCurrentModelPhysicsRequestNoModelLoaded = 700,
+        SetCurrentModelPhysicsRequestModelHasNoPhysics = 701,
+        SetCurrentModelPhysicsRequestPhysicsControlledByOtherPlugin = 702, 
+        SetCurrentModelPhysicsRequestNoOverridesProvided = 703,
+        SetCurrentModelPhysicsRequestPhysicsGroupIDNotFound = 704,
+        SetCurrentModelPhysicsRequestNoOverrideValueProvided = 705,
+        SetCurrentModelPhysicsRequestDuplicatePhysicsGroupID = 706
     }
 }
