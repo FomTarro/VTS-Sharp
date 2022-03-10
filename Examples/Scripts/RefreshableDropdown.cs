@@ -42,13 +42,15 @@ public abstract class RefreshableDropdown : MonoBehaviour
         this._dropdown.AddOptions(options);
         this._dropdown.RefreshShownValue();
         // set current selection to the same value as it was before the refresh, if it exists
-        this._dropdown.SetValueWithoutNotify(
-            Mathf.Min(this._dropdown.options.Count, 
-            StringToIndex(currentSelection)));
+        int index = Mathf.Min(this._dropdown.options.Count, 
+            StringToIndex(currentSelection));
+        this._dropdown.SetValueWithoutNotify(index);
+        Debug.Log(index);
+        this.SetValue(index);
     }
 
     private int StringToIndex(string val){
-        return this._dropdown.options.FindIndex((o) 
-            => { return o.text.Equals(val); });
+        return Mathf.Max(this._dropdown.options.FindIndex((o) 
+            => { return o.text.Equals(val); }), 0);
     }
 }
