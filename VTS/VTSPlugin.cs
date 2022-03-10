@@ -502,6 +502,36 @@ namespace VTS {
         }
 
         /// <summary>
+        /// Gets physics information about the currently loaded model.
+        /// 
+        /// For more info, see
+        /// <a href="https://github.com/DenchiSoft/VTubeStudio#getting-physics-settings-of-currently-loaded-vts-model">https://github.com/DenchiSoft/VTubeStudio#getting-physics-settings-of-currently-loaded-vts-model</a>
+        /// </summary>
+        /// <param name="onSuccess">Callback executed upon receiving a response.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void GetCurrentModelPhysics(Action<VTSCurrentModelPhysicsData> onSuccess, Action<VTSErrorData> onError){
+            VTSCurrentModelPhysicsData request = new VTSCurrentModelPhysicsData();
+            this._socket.Send<VTSCurrentModelPhysicsData>(request, onSuccess, onError);
+        }
+
+        /// <summary>
+        /// Overrides the physics properties of the current model. Once a plugin has overridden a model's physics, no other plugins may do so.
+        /// 
+        /// For more info, see
+        /// <a href="https://github.com/DenchiSoft/VTubeStudio#overriding-physics-settings-of-currently-loaded-vts-model">https://github.com/DenchiSoft/VTubeStudio#overriding-physics-settings-of-currently-loaded-vts-model</a>
+        /// </summary>
+        /// <param name="strengthOverrides">A list of strength override settings </param>
+        /// <param name="windOverrides">A list of wind override settings.</param>
+        /// <param name="onSuccess">Callback executed upon receiving a response.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void SetCurrentModelPhysics(VTSPhysicsOverride[] strengthOverrides, VTSPhysicsOverride[] windOverrides, Action<VTSOverrideModelPhysicsData> onSuccess, Action<VTSErrorData> onError){
+            VTSOverrideModelPhysicsData request = new VTSOverrideModelPhysicsData();
+            request.data.strengthOverrides = strengthOverrides;
+            request.data.windOverrides = windOverrides;
+            this._socket.Send<VTSOverrideModelPhysicsData>(request, onSuccess, onError);
+        }
+
+        /// <summary>
         /// Changes the DNI configuration.
         /// 
         /// For more info, see 

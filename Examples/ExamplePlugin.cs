@@ -35,7 +35,7 @@ namespace VTS.Examples {
             Connect();
         }
 
-        private void Connect(){
+        public void Connect(){
             this._connectionLight.color = Color.yellow;
             this._connectionText.text = "Connecting...";
             Initialize(new WebSocketSharpImpl(), new JsonUtilityImpl(), new TokenStorageImpl(), 
@@ -107,6 +107,13 @@ namespace VTS.Examples {
                         throw new System.Exception("No Expression with " + expressionName + " in the file name was found.");
                     }
                 }, 
+                (e) => { _text.text = e.data.message; }
+            );
+        }
+
+        public void GetPhysicsData(){
+            GetCurrentModelPhysics(
+                (r) => { _text.text = new JsonUtilityImpl().ToJson(r); }, 
                 (e) => { _text.text = e.data.message; }
             );
         }

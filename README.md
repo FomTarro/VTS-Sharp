@@ -9,7 +9,7 @@ If you're more of an email-oriented person, you can contact his support email: [
 This library can also be found on the [Unity Asset Store](https://assetstore.unity.com/packages/tools/integration/vts-sharp-203218), but this repo will always be the most up-to-date version.
  
 ## Usage
-In order to start making a plugin, simply make a class which extends `VTSPlugin`. In your class, call the [`Initialize`](#void-initialize) method. Pass in your preferred implementations of a [JSON utility](#interface-ijsonutility), of a [websocket](#interface-iwebsocket), and of a [mechanism to store the authorization token](#interface-itokenstorage). Specify what happens on a successful or unsuccessful initialization. That's it. From there, you can call any method found in the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio).
+In order to start making a plugin, simply make a class which extends `VTSPlugin`. In your class, call the [`Initialize`](#void-initialize) method. Pass in your preferred implementations of a [JSON utility](#interface-ijsonutility), of a [websocket](#interface-iwebsocket), and of a [mechanism to store the authorization token](#interface-itokenstorage). Specify what happens on a successful or unsuccessful initialization. That's it. In fact, these steps are all done for you already, out of the box, in the `MyFirstPlugin` class! From there, you can call any method found in the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio).
  
 You can find an example of custom plugin creation in the `Examples` folder, which also includes default implementations of the aforementioned initialization dependencies. 
 
@@ -20,7 +20,7 @@ Because this library simply acts as an client interface for the official API, pl
 ## Design Pattern and Considerations
  
 ### Swappable Components
-In order to afford the most flexibility (and to be as decoupled from Unity as possible), the underlying components of the [`VTSPlugin`](#class-vtsplugin) are all defined as interfaces. This allows you to swap out the built-in implementations with more robust or platform-compliant ones, if you want. You can pass in your own implementations via the [`Initialize`](#void-initialize) method.
+In order to afford the most flexibility (and to be as decoupled from Unity as possible), the underlying components of the [`VTSPlugin`](#class-vtsplugin) are all defined as interfaces. This allows you to swap out the built-in implementations with more robust or platform-compliant ones. By default, the `MyFirstPlugin` class features working implemntations of all needed components, but if you want, you can pass in your own implementations via the [`Initialize`](#void-initialize) method.
 
 ### Asynchronous Design
 Because the VTube Studio API is websocket-based, all calls to it are inherently asynchronous. Therefore, this library follows a callback-based design pattern.

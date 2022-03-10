@@ -156,6 +156,12 @@ namespace VTS.Networking {
                                     case "ExpressionActivationResponse":
                                         this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSExpressionActivationData>(data));
                                         break;
+                                    case "GetCurrentModelPhysicsResponse":
+                                        this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSCurrentModelPhysicsData>(data));
+                                        break;
+                                    case "SetCurrentModelPhysicsResponse":
+                                        this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSOverrideModelPhysicsData>(data));
+                                        break;
                                     case "NDIConfigResponse":
                                         this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSNDIConfigData>(data));
                                         break;
