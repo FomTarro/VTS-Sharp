@@ -119,9 +119,6 @@ Deserializes a JSON string into an object of the specified type. Takes the follo
 Converts an object into a JSON string. Takes the following args:
 * `object obj`: The object to serialized.
 
-# How To Use Outside Unity
-While a major goal of this library is to make it accessible for all C# platforms, it is unfortunately not feasible to design in such a way that is simultaneously compliant with Unity's needs and 
-
 # Acknowledgements
 
 ## [DenchiSoft](https://github.com/DenchiSoft/VTubeStudio)
