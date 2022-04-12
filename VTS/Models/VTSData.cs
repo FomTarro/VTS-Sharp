@@ -111,10 +111,10 @@ namespace VTS.Models {
 
     [System.Serializable]
     public class ModelPosition{
-        public float positionX = float.MinValue;
-        public float positionY = float.MinValue;
-        public float rotation = float.MinValue;
-        public float size = float.MinValue;
+        public float positionX = float.NaN;
+        public float positionY = float.NaN;
+        public float rotation = float.NaN;
+        public float size = float.NaN;
 
     }
 
@@ -441,8 +441,8 @@ namespace VTS.Models {
     [System.Serializable]
     public class VTSParameterInjectionValue{
         public string id;
-        public float value = float.MinValue;
-        public float weight = float.MinValue;
+        public float value = float.NaN;
+        public float weight = float.NaN;
     }
 
     [System.Serializable]
