@@ -45,7 +45,6 @@ public abstract class RefreshableDropdown : MonoBehaviour
         int index = Mathf.Min(this._dropdown.options.Count, 
             StringToIndex(currentSelection));
         this._dropdown.SetValueWithoutNotify(index);
-        Debug.Log(index);
         this.SetValue(index);
     }
 
