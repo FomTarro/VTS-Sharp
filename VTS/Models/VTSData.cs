@@ -206,6 +206,7 @@ namespace VTS.Models {
             public bool modelLoaded;
             public string modelName;
             public string modelID;
+            public string live2DItemFileName;
             public HotkeyData[] availableHotkeys;
         }
     }
@@ -221,6 +222,7 @@ namespace VTS.Models {
         [System.Serializable]
         public class Data {
             public string hotkeyID;
+            public string itemInstanceID;
         }
     }
 
@@ -445,6 +447,12 @@ namespace VTS.Models {
         public float weight = float.NaN;
     }
 
+    public enum VTSInjectParameterMode : int {
+        UNKNOWN = -1,
+        SET = 0,
+        ADD = 1
+    }
+
     [System.Serializable]
     public class VTSInjectParameterData : VTSMessageData{
         public VTSInjectParameterData(){
@@ -455,6 +463,7 @@ namespace VTS.Models {
 
         [System.Serializable]
         public class Data {
+            public string mode;
             public VTSParameterInjectionValue[] parameterValues;
         }
     }
@@ -599,5 +608,233 @@ namespace VTS.Models {
             public string windowTitle;
         }
     }
+
+    [System.Serializable]
+    public class VTSItemInstance {
+        public string fileName;
+        public string instanceID;
+        public int order;
+        public string type;
+        public bool censored;
+        public bool flipped;
+        public bool locked;
+        public float smoothing;
+        public float framerate;
+        public int frameCount;
+        public int currentFrame;
+        public bool pinnedToModel;
+        public string pinnedModelID;
+        public string pinnedArtMeshID;
+        public string groupName;
+        public string sceneName;
+        public bool fromWorkshop;
+    }
+
+    [System.Serializable]
+    public class VTSItemFile {
+        public string fileName;
+        public string type;
+        public int loadedCount;
+    }
+
+    [System.Serializable]
+    public class VTSItemListRequestData : VTSMessageData {
+        public VTSItemListRequestData(){
+            this.messageType = "ItemListRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public bool includeAvailableSpots;
+            public bool includeItemInstancesInScene;
+            public bool includeAvailableItemFiles;
+            public string onlyItemsWithFileName;
+            public string onlyItemsWithInstanceID;
+        }
+    }
+
+    [System.Serializable]
+    public class VTSItemListResponseData : VTSMessageData {
+        public VTSItemListResponseData(){
+            this.messageType = "ItemListResponse";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public int itemsInSceneCount;
+            public int totalItemsAllowedCount;
+            public bool canLoadItemsRightNow;
+            public int[] availableSpots;
+            public VTSItemInstance[] itemInstancesInScene;
+            public VTSItemFile[] availableItemFiles;
+        }
+    }
+
+    [System.Serializable]
+    public class VTSItemLoadRequestData : VTSMessageData {
+        public VTSItemLoadRequestData(){
+            this.messageType = "ItemLoadRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public string fileName;
+		    public float positionX;
+		    public float positionY;
+		    public float size;
+		    public float rotation;
+		    public float fadeTime;
+		    public int order;
+		    public bool failIfOrderTaken;
+		    public float smoothing;
+		    public bool censored;
+		    public bool flipped;
+		    public bool locked;
+		    public bool unloadWhenPluginDisconnects;
+        }
+    }
+
+    [System.Serializable]
+    public class VTSItemLoadResponseData : VTSMessageData {
+        public VTSItemLoadResponseData(){
+            this.messageType = "ItemLoadResponse";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public string instanceID;
+        }
+    }
+
+    [System.Serializable]
+    public class VTSUnloadedItem { 
+        public string instanceID;
+        public string fileName;
+    }
+
+    [System.Serializable]
+    public class VTSItemUnloadRequestData : VTSMessageData {
+        public VTSItemUnloadRequestData(){
+            this.messageType = "ItemUnloadRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public bool unloadAllInScene;
+		    public bool unloadAllLoadedByThisPlugin;
+		    public bool allowUnloadingItemsLoadedByUserOrOtherPlugins;
+            public string[] instanceIDs;
+            public string [] fileNames; 
+        }
+    }
+
+    [System.Serializable]
+    public class VTSItemUnloadResponseData : VTSMessageData {
+        public VTSItemUnloadResponseData(){
+            this.messageType = "ItemUnloadResponse";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public VTSUnloadedItem[] unloadedItems;
+        }
+    }
+
+    [System.Serializable]
+    public class VTSItemAnimationControlRequestData : VTSMessageData {
+        public VTSItemAnimationControlRequestData(){
+            this.messageType = "ItemAnimationControlRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+		    public string itemInstanceID;
+		    public int framerate;
+		    public int frame;
+		    public float brightness;
+		    public float opacity;
+		    public bool setAutoStopFrames;
+		    public int[] autoStopFrames;
+		    public bool setAnimationPlayState;
+		    public bool animationPlayState;
+        }
+    }
+
+    [System.Serializable]
+    public class VTSItemAnimationControlResponseData : VTSMessageData {
+        public VTSItemAnimationControlResponseData(){
+            this.messageType = "ItemAnimationControlResponse";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+		    public int frame;
+		    public bool animationPlaying;
+        }
+    }
+
+    [System.Serializable]
+    public enum VTSItemAnimationCurve : int {
+        UNKNOW = -1,
+        EASE_IN = 0,
+        EASE_OUT = 1,
+        EASE_BOTH = 2,
+        OVERSHOOT = 3,
+        ZIP = 4
+    }
+
+    [System.Serializable]
+    public class VTSItemMoveRequestData : VTSMessageData {
+        public VTSItemMoveRequestData(){
+            this.messageType = "ItemMoveRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public string itemInstanceID;
+            public float timeInSeconds;
+            public string fadeMode;
+            public float positionX;
+            public float positionY;
+            public float size;
+            public float rotation;
+            public bool setFlip;
+            public bool flip;
+            public bool userCanStop;
+        }
+    }
+
+    [System.Serializable]
+    public class VTSItemMoveResponseData : VTSMessageData {
+        public VTSItemMoveResponseData(){
+            this.messageType = "ItemMoveResponse";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            // Empty on purpose!
+        }
+    }
 }
+
 

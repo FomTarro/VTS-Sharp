@@ -170,6 +170,15 @@ namespace VTS.Networking {
                                     case "NDIConfigResponse":
                                         this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSNDIConfigData>(data));
                                         break;
+                                    case "ItemListResponse":
+                                        this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSItemListResponseData>(data));
+                                        break;
+                                    case "ItemLoadResponse":
+                                        this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSItemLoadResponseData>(data));
+                                        break;
+                                    case "ItemUnloadResponse":
+                                        this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSItemUnloadResponseData>(data));
+                                        break;
                                     default:
                                         VTSErrorData error = new VTSErrorData();
                                         error.data.message = "Unable to parse response as valid response type: " + data;
@@ -199,10 +208,10 @@ namespace VTS.Networking {
             }
         }
 
-        public void Send<T>(T request, Action<T> onSuccess, Action<VTSErrorData> onError) where T : VTSMessageData{
+        public void Send<T, K>(T request, Action<K> onSuccess, Action<VTSErrorData> onError) where T : VTSMessageData where K : VTSMessageData{
             if(this._ws != null){
                 try{
-                    _callbacks.Add(request.requestID, new VTSCallbacks((t) => { onSuccess((T)t); } , onError));
+                    _callbacks.Add(request.requestID, new VTSCallbacks((t) => { onSuccess((K)t); } , onError));
                     // make sure to remove null properties
                     string output = _json.ToJson(request);
                     this._ws.Send(output);
