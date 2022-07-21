@@ -64,7 +64,7 @@ namespace VTS {
         #region Initialization
 
         /// <summary>
-        /// Authenticates the plugin as well as selects the Websocket, JSON utility, and Token Storage implementations.
+        /// Selects the Websocket, JSON utility, and Token Storage implementations, then attempts to Authenticate the plugin.
         /// </summary>
         /// <param name="webSocket">The websocket implementation.</param>
         /// <param name="jsonUtility">The JSON serializer/deserializer implementation.</param>
@@ -494,7 +494,7 @@ namespace VTS {
         /// <param name="onSuccess">Callback executed upon receiving a response.</param>
         /// <param name="onError">Callback executed upon receiving an error.</param>
         public void InjectParameterValues(VTSParameterInjectionValue[] values, Action<VTSInjectParameterData> onSuccess, Action<VTSErrorData> onError){
-            InjectParameterValues(VTSInjectParameterMode.SET, values, onSuccess, onError);
+            InjectParameterValues(values, VTSInjectParameterMode.SET, onSuccess, onError);
         }
 
         /// <summary>
@@ -503,11 +503,11 @@ namespace VTS {
         /// For more info, see 
         /// <a href="https://github.com/DenchiSoft/VTubeStudio#feeding-in-data-for-default-or-custom-parameters">https://github.com/DenchiSoft/VTubeStudio#feeding-in-data-for-default-or-custom-parameters</a>
         /// </summary>
-        /// <param name="mode">The method by which the parameter values are applied.</param>
         /// <param name="values">A list of parameters and the values to assign to them.</param>
+        /// <param name="mode">The method by which the parameter values are applied.</param>
         /// <param name="onSuccess">Callback executed upon receiving a response.</param>
         /// <param name="onError">Callback executed upon receiving an error.</param>
-        public void InjectParameterValues(VTSInjectParameterMode mode, VTSParameterInjectionValue[] values, Action<VTSInjectParameterData> onSuccess, Action<VTSErrorData> onError){
+        public void InjectParameterValues(VTSParameterInjectionValue[] values, VTSInjectParameterMode mode, Action<VTSInjectParameterData> onSuccess, Action<VTSErrorData> onError){
             VTSInjectParameterData request = new VTSInjectParameterData();
             foreach(VTSParameterInjectionValue value in values){
                 value.id = SanitizeParameterName(value.id);
@@ -595,22 +595,130 @@ namespace VTS {
             this._socket.Send<VTSNDIConfigData, VTSNDIConfigData>(config, onSuccess, onError);
         }
 
-        public void GetItemList(VTSItemListRequestData.Data data, Action<VTSItemListResponseData> onSuccess, Action<VTSErrorData> onError){
+        /// <summary>
+        /// Retrieves a list of items, either in the scene or available as files, based on the provided options.
+        /// 
+        /// For more, see 
+        /// <a href="https://github.com/DenchiSoft/VTubeStudio#requesting-list-of-available-items-or-items-in-scene">https://github.com/DenchiSoft/VTubeStudio#requesting-list-of-available-items-or-items-in-scene</a>
+        /// </summary>
+        /// <param name="options">Configuration options about the request.</param>
+        /// <param name="onSuccess">Callback executed upon receiving a response.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void GetItemList(VTSItemListOptions options, Action<VTSItemListResponseData> onSuccess, Action<VTSErrorData> onError){
             VTSItemListRequestData request = new VTSItemListRequestData();
-            request.data = data;
+            request.data.includeAvailableSpots = options.includeAvailableSpots;
+            request.data.includeItemInstancesInScene = options.includeItemInstancesInScene;
+            request.data.includeAvailableItemFiles = options.includeAvailableItemFiles;
+            request.data.onlyItemsWithFileName = options.onlyItemsWithFileName;
+            request.data.onlyItemsWithInstanceID = options.onlyItemsWithFileName;
             this._socket.Send<VTSItemListRequestData, VTSItemListResponseData>(request, onSuccess, onError);
         }
 
-        public void LoadItem(VTSItemLoadRequestData.Data data, Action<VTSItemLoadResponseData> onSuccess, Action<VTSErrorData> onError){
+        /// <summary>
+        /// Loads an item into the scene, with properties based on the provided options.
+        /// 
+        /// For more, see 
+        /// <a href="https://github.com/DenchiSoft/VTubeStudio#loading-item-into-the-scene">https://github.com/DenchiSoft/VTubeStudio#loading-item-into-the-scene</a>
+        /// </summary>
+        /// <param name="fileName">The file name of the item to load, typically retrieved from an ItemListRequest.</param>
+        /// <param name="options">Configuration options about the request.</param>
+        /// <param name="onSuccess">Callback executed upon receiving a response.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void LoadItem(string fileName, VTSItemLoadOptions options, Action<VTSItemLoadResponseData> onSuccess, Action<VTSErrorData> onError){
             VTSItemLoadRequestData request = new VTSItemLoadRequestData();
-            request.data = data;
+            request.data.fileName = fileName;
+            request.data.positionX = options.positionX;
+            request.data.positionY = options.positionY;
+            request.data.size = options.size;
+            request.data.rotation = options.rotation;
+            request.data.fadeTime = options.fadeTime;
+            request.data.order = options.order;
+            request.data.failIfOrderTaken = options.failIfOrderTaken;
+            request.data.smoothing = options.smoothing;
+            request.data.censored = options.censored;
+            request.data.flipped = options.flipped;
+            request.data.locked = options.locked;
+            request.data.unloadWhenPluginDisconnects = options.unloadWhenPluginDisconnects;
             this._socket.Send<VTSItemLoadRequestData, VTSItemLoadResponseData>(request, onSuccess, onError);
         }
 
-        public void UnloadItem(VTSItemUnloadRequestData.Data data, Action<VTSItemUnloadResponseData> onSuccess, Action<VTSErrorData> onError){
+        /// <summary>
+        /// Unload items from the scene, either broadly, by identifier, or by file name, based on the provided options.
+        /// 
+        /// For more, see 
+        /// <a href="https://github.com/DenchiSoft/VTubeStudio#removing-item-from-the-scene">https://github.com/DenchiSoft/VTubeStudio#removing-item-from-the-scene</a>
+        /// </summary>
+        /// <param name="options">Configuration options about the request.</param>
+        /// <param name="onSuccess">Callback executed upon receiving a response.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void UnloadItem(VTSItemUnloadOptions options, Action<VTSItemUnloadResponseData> onSuccess, Action<VTSErrorData> onError){
             VTSItemUnloadRequestData request = new VTSItemUnloadRequestData();
-            request.data = data;
+            request.data.instanceIDs = options.itemInstanceIDs;
+            request.data.fileNames = options.fileNames;
+            request.data.unloadAllInScene = options.unloadAllInScene;
+            request.data.unloadAllLoadedByThisPlugin = options.unloadAllLoadedByThisPlugin;
+            request.data.allowUnloadingItemsLoadedByUserOrOtherPlugins = options.allowUnloadingItemsLoadedByUserOrOtherPlugins;
             this._socket.Send<VTSItemUnloadRequestData, VTSItemUnloadResponseData>(request, onSuccess, onError);
+        }
+
+        /// <summary>
+        /// Alters the properties of the item of the specified ID based on the provided options.
+        /// 
+        /// For more info, see 
+        /// <a href="https://github.com/DenchiSoft/VTubeStudio#controling-items-and-item-animations">https://github.com/DenchiSoft/VTubeStudio#controling-items-and-item-animations</a>
+        /// <param name="itemInstanceID">The ID of the item to move.</param>
+        /// <param name="options">Configuration options about the request.</param>
+        /// <param name="onSuccess">Callback executed upon receiving a response.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void AnimateItem(string itemInstanceID, VTSItemAnimationControlOptions options, Action<VTSItemAnimationControlResponseData> onSuccess, Action<VTSErrorData> onError){
+            VTSItemAnimationControlRequestData request = new VTSItemAnimationControlRequestData();
+            request.data.itemInstanceID = itemInstanceID;
+            request.data.framerate = options.framerate;
+            request.data.frame = options.frame;
+            request.data.brightness = options.brightness;
+            request.data.opacity = options.opacity;
+            request.data.setAutoStopFrames = options.setAutoStopFrames;
+            request.data.autoStopFrames = options.autoStopFrames;
+            request.data.setAnimationPlayState = options.setAnimationPlayState;
+            request.data.animationPlayState = options.animationPlayState;
+            this._socket.Send<VTSItemAnimationControlRequestData, VTSItemAnimationControlResponseData>(request, onSuccess, onError);
+        }
+
+        /// <summary>
+        /// Moves the item of the specified ID based on the provided options.
+        /// 
+        /// For more info, see 
+        /// <a href="https://github.com/DenchiSoft/VTubeStudio#moving-items-in-the-scene">https://github.com/DenchiSoft/VTubeStudio#moving-items-in-the-scene</a>
+        /// </summary>
+        /// <param name="itemInstanceID">The ID of the item to move.</param>
+        /// <param name="options">Configuration options about the request.</param>
+        /// <param name="onSuccess">Callback executed upon receiving a response.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void MoveItem(string itemInstanceID, VTSItemMoveOptions options, Action<VTSItemMoveResponseData> onSuccess, Action<VTSErrorData> onError){
+            VTSItemMoveRequestData request = new VTSItemMoveRequestData();
+            request.data.itemInstanceID = itemInstanceID;
+            request.data.timeInSeconds = options.timeInSeconds;
+            if(options.fadeMode == VTSItemAnimationCurve.EASE_IN){
+                request.data.fadeMode = "easeIn";
+            }else if(options.fadeMode == VTSItemAnimationCurve.EASE_OUT){
+                request.data.fadeMode = "easeOut";
+            }else if(options.fadeMode == VTSItemAnimationCurve.EASE_BOTH){
+                request.data.fadeMode = "easeBoth";
+            }else if(options.fadeMode == VTSItemAnimationCurve.OVERSHOOT){
+                request.data.fadeMode = "overshoot";
+            }else if(options.fadeMode == VTSItemAnimationCurve.ZIP){
+                request.data.fadeMode = "easeOut";
+            }else{
+                request.data.fadeMode = "unknown";
+            }
+            request.data.positionX = options.positionX;
+            request.data.positionY = options.positionY;
+            request.data.size = options.size;
+            request.data.rotation = options.rotation;
+            request.data.setFlip = options.setFlip;
+            request.data.flip = options.flip;
+            request.data.userCanStop = options.userCanStop;
+            this._socket.Send<VTSItemMoveRequestData, VTSItemMoveResponseData>(request, onSuccess, onError);
         }
 
         #endregion

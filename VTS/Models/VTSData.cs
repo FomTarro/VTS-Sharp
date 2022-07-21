@@ -609,6 +609,43 @@ namespace VTS.Models {
         }
     }
 
+    /// <summary>
+    /// A container for holding the numerous retrieval options for an Item List request.
+    /// 
+    /// For more info about what each field does, see 
+    /// <a href="https://github.com/DenchiSoft/VTubeStudio#requesting-list-of-available-items-or-items-in-scene">https://github.com/DenchiSoft/VTubeStudio#requesting-list-of-available-items-or-items-in-scene</a>
+    /// </summary>
+    [System.Serializable]
+    public class VTSItemListOptions {
+        public VTSItemListOptions(){
+            this.includeAvailableSpots = false;
+            this.includeItemInstancesInScene = false;
+            this.includeAvailableItemFiles = false;
+            this.onlyItemsWithFileName = string.Empty;
+            this.onlyItemsWithInstanceID = string.Empty;
+        }
+
+        public VTSItemListOptions(
+            bool includeAvailableSpots,
+            bool includeItemInstancesInScene,
+            bool includeAvailableItemFiles,
+            string onlyItemsWithFileName,
+            string onlyItemsWithInstanceID
+        ){
+            this.includeAvailableSpots = includeAvailableSpots;
+            this.includeItemInstancesInScene = includeItemInstancesInScene;
+            this.includeAvailableItemFiles = includeAvailableItemFiles;
+            this.onlyItemsWithFileName = onlyItemsWithFileName;
+            this.onlyItemsWithInstanceID = onlyItemsWithInstanceID;
+        }
+
+        public bool includeAvailableSpots;
+        public bool includeItemInstancesInScene;
+        public bool includeAvailableItemFiles;
+        public string onlyItemsWithFileName;
+        public string onlyItemsWithInstanceID;
+    }
+
     [System.Serializable]
     public class VTSItemInstance {
         public string fileName;
@@ -674,6 +711,71 @@ namespace VTS.Models {
         }
     }
 
+    /// <summary>
+    /// A container for holding the numerous loading options for an Item Load request.
+    /// 
+    /// For more info about what each field does, see 
+    /// <a href="https://github.com/DenchiSoft/VTubeStudio#loading-item-into-the-scene">https://github.com/DenchiSoft/VTubeStudio#loading-item-into-the-scene</a>
+    /// </summary>
+    [System.Serializable]
+    public class VTSItemLoadOptions {
+        public VTSItemLoadOptions(){
+            this.positionX = 0;
+            this.positionY = 0;
+            this.size = 0.32f;
+            this.rotation = 0f;
+            this.fadeTime = 0;
+            this.order = 1;
+            this.failIfOrderTaken = false;
+            this.smoothing = 0f;
+            this.censored = false;
+            this.flipped = false;
+            this.locked = false;
+            this.unloadWhenPluginDisconnects = true;
+        }
+
+        public VTSItemLoadOptions(
+            float positionX,
+            float positionY,
+            float size,
+            float rotation,
+            float fadeTime,
+            int order,
+            bool failIfOrderTaken,
+            float smoothing,
+            bool censored,
+            bool flipped,
+            bool locked,
+            bool unloadWhenPluginDisconnects
+        ){
+            this.positionX = positionX;
+            this.positionY = positionY;
+            this.size = size;
+            this.rotation = rotation;
+            this.fadeTime = fadeTime;
+            this.order = order;
+            this.failIfOrderTaken = failIfOrderTaken;
+            this.smoothing = smoothing;
+            this.censored = censored;
+            this.flipped = flipped;
+            this.locked = locked;
+            this.unloadWhenPluginDisconnects = unloadWhenPluginDisconnects;
+        }
+
+        public float positionX;
+        public float positionY;
+        public float size;
+        public float rotation;
+        public float fadeTime;
+        public int order;
+        public bool failIfOrderTaken;
+        public float smoothing;
+        public bool censored;
+        public bool flipped;
+        public bool locked;
+        public bool unloadWhenPluginDisconnects;
+    }
+
     [System.Serializable]
     public class VTSItemLoadRequestData : VTSMessageData {
         public VTSItemLoadRequestData(){
@@ -714,6 +816,43 @@ namespace VTS.Models {
         }
     }
 
+    /// <summary>
+    /// A container for holding the numerous unloading options for an Item Unload request.
+    /// 
+    /// For more info about what each field does, see 
+    /// <a href="https://github.com/DenchiSoft/VTubeStudio#removing-item-from-the-scene">https://github.com/DenchiSoft/VTubeStudio#removing-item-from-the-scene</a>
+    /// </summary>
+    [System.Serializable]
+    public class VTSItemUnloadOptions {
+            public VTSItemUnloadOptions(){
+                this.itemInstanceIDs = new string[0];
+                this.fileNames = new string[0];
+                this.unloadAllInScene = false;
+                this.unloadAllLoadedByThisPlugin = false;
+                this.allowUnloadingItemsLoadedByUserOrOtherPlugins = false;
+            }
+
+            public VTSItemUnloadOptions(
+                string[] itemInstanceIDs,
+                string[] fileNames,
+                bool unloadAllInScene,
+                bool unloadAllLoadedByThisPlugin,
+                bool allowUnloadingItemsLoadedByUserOrOtherPlugins
+            ){
+                this.itemInstanceIDs = itemInstanceIDs;
+                this.fileNames = fileNames;
+                this.unloadAllInScene = unloadAllInScene;
+                this.unloadAllLoadedByThisPlugin = unloadAllLoadedByThisPlugin;
+                this.allowUnloadingItemsLoadedByUserOrOtherPlugins = allowUnloadingItemsLoadedByUserOrOtherPlugins;
+            }
+
+            public string[] itemInstanceIDs;
+            public string[] fileNames;
+            public bool unloadAllInScene;
+		    public bool unloadAllLoadedByThisPlugin;
+		    public bool allowUnloadingItemsLoadedByUserOrOtherPlugins;
+    }
+
     [System.Serializable]
     public class VTSUnloadedItem { 
         public string instanceID;
@@ -734,7 +873,7 @@ namespace VTS.Models {
 		    public bool unloadAllLoadedByThisPlugin;
 		    public bool allowUnloadingItemsLoadedByUserOrOtherPlugins;
             public string[] instanceIDs;
-            public string [] fileNames; 
+            public string[] fileNames; 
         }
     }
 
@@ -750,6 +889,55 @@ namespace VTS.Models {
         public class Data {
             public VTSUnloadedItem[] unloadedItems;
         }
+    }
+
+    /// <summary>
+    /// A container for holding the numerous animation options for an Item Animation Control request.
+    /// 
+    /// For more info about what each field does, see 
+    /// <a href="https://github.com/DenchiSoft/VTubeStudio#controling-items-and-item-animations">https://github.com/DenchiSoft/VTubeStudio#controling-items-and-item-animations</a>
+    /// </summary>
+    [System.Serializable]
+    public class VTSItemAnimationControlOptions{
+        public VTSItemAnimationControlOptions(){
+            this.framerate = -1;
+            this.frame = -1;
+            this.brightness = -1;
+            this.opacity = -1;
+            this.setAutoStopFrames = false;
+            this.autoStopFrames = new int[0];
+            this.setAnimationPlayState = false;
+            this.animationPlayState = false;
+        }
+
+        public VTSItemAnimationControlOptions(
+            int framerate,
+            int frame,
+            float brightness,
+            float opacity,
+            bool setAutoStopFrames,
+            int[] autoStopFrames,
+            bool setAnimationPlayState,
+            bool animationPlayState
+        ){
+            this.framerate = framerate;
+            this.frame = frame;
+            this.brightness = brightness;
+            this.opacity = opacity;
+            this.setAutoStopFrames = setAutoStopFrames;
+            this.autoStopFrames = autoStopFrames;
+            this.setAnimationPlayState = setAnimationPlayState;
+            this.animationPlayState = animationPlayState;
+        }
+
+        public int framerate;
+        public int frame;
+        public float brightness;
+        public float opacity;
+        public bool setAutoStopFrames;
+        public int[] autoStopFrames;
+        public bool setAnimationPlayState;
+        public bool animationPlayState;
     }
 
     [System.Serializable]
@@ -799,6 +987,59 @@ namespace VTS.Models {
         ZIP = 4
     }
 
+    /// <summary>
+    /// A container for holding the numerous movement options for an Item Move request.
+    /// 
+    /// For more info about what each field does, see 
+    /// <a href="https://github.com/DenchiSoft/VTubeStudio#moving-items-in-the-scene">https://github.com/DenchiSoft/VTubeStudio#moving-items-in-the-scene</a>
+    /// </summary>
+    [System.Serializable]
+    public class VTSItemMoveOptions{
+        public VTSItemMoveOptions(){
+            this.timeInSeconds = 0f;
+            this.fadeMode = VTSItemAnimationCurve.EASE_IN;
+            this.positionX = -1000;
+            this.positionY = -1000;
+            this.size = -1000;
+            this.rotation = -1;
+            this.setFlip = false;
+            this.flip = false;
+            this.userCanStop = false;
+        }
+
+        public VTSItemMoveOptions(
+            float timeInSeconds,
+            VTSItemAnimationCurve fadeMode,
+            float positionX,
+            float positionY,
+            float size,
+            float rotation,
+            bool setFlip,
+            bool flip,
+            bool userCanStop
+        ){
+            this.timeInSeconds = timeInSeconds;
+            this.fadeMode = fadeMode;
+            this.positionX = positionX;
+            this.positionY = positionY;
+            this.size = size;
+            this.rotation = rotation;
+            this.setFlip = setFlip;
+            this.flip = flip;
+            this.userCanStop = userCanStop;
+        }
+        
+        public float timeInSeconds;
+        public VTSItemAnimationCurve fadeMode;
+        public float positionX;
+        public float positionY;
+        public float size;
+        public float rotation;
+        public bool setFlip;
+        public bool flip;
+        public bool userCanStop;
+    }
+
     [System.Serializable]
     public class VTSItemMoveRequestData : VTSMessageData {
         public VTSItemMoveRequestData(){
@@ -836,5 +1077,3 @@ namespace VTS.Models {
         }
     }
 }
-
-

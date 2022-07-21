@@ -38,6 +38,7 @@ namespace VTS.Examples {
         public void Connect(){
             this._connectionLight.color = Color.yellow;
             this._connectionText.text = "Connecting...";
+            // Debug.Log(JsonUtility.ToJson(new VTSItemMoveOptions{itemInstanceID = "Hello", timeInSeconds = 5f}));
             Initialize(new WebSocketSharpImpl(), new JsonUtilityImpl(), new TokenStorageImpl(), 
             () => {
                 Debug.Log("Connected!");
