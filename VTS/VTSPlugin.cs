@@ -621,7 +621,7 @@ namespace VTS {
             request.data.includeItemInstancesInScene = options.includeItemInstancesInScene;
             request.data.includeAvailableItemFiles = options.includeAvailableItemFiles;
             request.data.onlyItemsWithFileName = options.onlyItemsWithFileName;
-            request.data.onlyItemsWithInstanceID = options.onlyItemsWithFileName;
+            request.data.onlyItemsWithInstanceID = options.onlyItemsWithInstanceID;
             this._socket.Send<VTSItemListRequestData, VTSItemListResponseData>(request, onSuccess, onError);
         }
 

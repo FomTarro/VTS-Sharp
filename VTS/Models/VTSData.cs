@@ -826,33 +826,33 @@ namespace VTS.Models {
     /// </summary>
     [System.Serializable]
     public class VTSItemUnloadOptions {
-            public VTSItemUnloadOptions(){
-                this.itemInstanceIDs = new string[0];
-                this.fileNames = new string[0];
-                this.unloadAllInScene = false;
-                this.unloadAllLoadedByThisPlugin = false;
-                this.allowUnloadingItemsLoadedByUserOrOtherPlugins = false;
-            }
+        public VTSItemUnloadOptions(){
+            this.itemInstanceIDs = new string[0];
+            this.fileNames = new string[0];
+            this.unloadAllInScene = false;
+            this.unloadAllLoadedByThisPlugin = false;
+            this.allowUnloadingItemsLoadedByUserOrOtherPlugins = false;
+        }
 
-            public VTSItemUnloadOptions(
-                string[] itemInstanceIDs,
-                string[] fileNames,
-                bool unloadAllInScene,
-                bool unloadAllLoadedByThisPlugin,
-                bool allowUnloadingItemsLoadedByUserOrOtherPlugins
-            ){
-                this.itemInstanceIDs = itemInstanceIDs;
-                this.fileNames = fileNames;
-                this.unloadAllInScene = unloadAllInScene;
-                this.unloadAllLoadedByThisPlugin = unloadAllLoadedByThisPlugin;
-                this.allowUnloadingItemsLoadedByUserOrOtherPlugins = allowUnloadingItemsLoadedByUserOrOtherPlugins;
-            }
+        public VTSItemUnloadOptions(
+            string[] itemInstanceIDs,
+            string[] fileNames,
+            bool unloadAllInScene,
+            bool unloadAllLoadedByThisPlugin,
+            bool allowUnloadingItemsLoadedByUserOrOtherPlugins
+        ){
+            this.itemInstanceIDs = itemInstanceIDs;
+            this.fileNames = fileNames;
+            this.unloadAllInScene = unloadAllInScene;
+            this.unloadAllLoadedByThisPlugin = unloadAllLoadedByThisPlugin;
+            this.allowUnloadingItemsLoadedByUserOrOtherPlugins = allowUnloadingItemsLoadedByUserOrOtherPlugins;
+        }
 
-            public string[] itemInstanceIDs;
-            public string[] fileNames;
-            public bool unloadAllInScene;
-		    public bool unloadAllLoadedByThisPlugin;
-		    public bool allowUnloadingItemsLoadedByUserOrOtherPlugins;
+        public string[] itemInstanceIDs;
+        public string[] fileNames;
+        public bool unloadAllInScene;
+        public bool unloadAllLoadedByThisPlugin;
+        public bool allowUnloadingItemsLoadedByUserOrOtherPlugins;
     }
 
     [System.Serializable]
@@ -872,8 +872,8 @@ namespace VTS.Models {
         [System.Serializable]
         public class Data {
             public bool unloadAllInScene;
-		    public bool unloadAllLoadedByThisPlugin;
-		    public bool allowUnloadingItemsLoadedByUserOrOtherPlugins;
+            public bool unloadAllLoadedByThisPlugin;
+            public bool allowUnloadingItemsLoadedByUserOrOtherPlugins;
             public string[] instanceIDs;
             public string[] fileNames; 
         }
@@ -952,15 +952,15 @@ namespace VTS.Models {
 
         [System.Serializable]
         public class Data {
-		    public string itemInstanceID;
-		    public int framerate;
-		    public int frame;
-		    public float brightness;
-		    public float opacity;
-		    public bool setAutoStopFrames;
-		    public int[] autoStopFrames;
-		    public bool setAnimationPlayState;
-		    public bool animationPlayState;
+            public string itemInstanceID;
+            public int framerate;
+            public int frame;
+            public float brightness;
+            public float opacity;
+            public bool setAutoStopFrames;
+            public int[] autoStopFrames;
+            public bool setAnimationPlayState;
+            public bool animationPlayState;
         }
     }
 
@@ -974,8 +974,8 @@ namespace VTS.Models {
 
         [System.Serializable]
         public class Data {
-		    public int frame;
-		    public bool animationPlaying;
+            public int frame;
+            public bool animationPlaying;
         }
     }
 
