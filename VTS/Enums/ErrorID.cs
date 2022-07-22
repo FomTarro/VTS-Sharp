@@ -1,8 +1,9 @@
-﻿namespace VTS{
+﻿namespace VTS {
     /// <summary>
     /// Enum for API-related errors.
     /// </summary>
-    public enum ErrorID
+    [System.Serializable]
+    public enum ErrorID : int
     {
         // General errors
         InternalServerError = 0,
@@ -35,13 +36,15 @@
         CannotCurrentlyChangeModel = 154,
 
         // Errors related to HotkeyTriggerRequest
-        HotkeyQueueFull = 200, // 
+        HotkeyQueueFull = 200, // Only a certain amount of hotkey activations can be queued until you have to wait for execution completion.
         HotkeyExecutionFailedBecauseNoModelLoaded = 201,
         HotkeyIDNotFoundInModel = 202,
         HotkeyCooldownNotOver = 203, // Individual hotkeys have a global 5 second cooldown
         HotkeyIDFoundButHotkeyDataInvalid = 204, // For example missing files for expression/animation hotkey
         HotkeyExecutionFailedBecauseBadState = 205, // For example when trying to load a model and the user has certain config windows open that temporarily prevent that
         HotkeyUnknownExecutionFailure = 206,
+        HotkeyExecutionFailedBecauseLive2DItemNotFound = 207, // When triggering hotkeys in Live2D items, this will be returned if the requested Live2D item has not been found.
+        HotkeyExecutionFailedBecauseLive2DItemsDoNotSupportThisHotkeyType = 208, // Only a subset of hotkey actions are supported in Live2D items, for example Expression hotkeys.
         
         // Errors related to ColorTintRequest
         ColorTintRequestNoModelLoaded = 250,
@@ -74,6 +77,7 @@
         InjectDataWeightInvalid = 452,
         InjectDataParamNameNotFound = 453, // Trying to send data for parameter that doesn't exist
         InjectDataParamControlledByOtherPlugin = 454, // Only one plugin can send data for a parameter at a time
+        InjectDataModeUnknown = 455, // Only "add" and "set" can be used. If no mode is provided, "set" will be used.
         
         // Errors related to ParameterValueRequest
         ParameterValueRequestParameterNotFound = 500,
@@ -98,6 +102,30 @@
         SetCurrentModelPhysicsRequestNoOverridesProvided = 703,
         SetCurrentModelPhysicsRequestPhysicsGroupIDNotFound = 704,
         SetCurrentModelPhysicsRequestNoOverrideValueProvided = 705,
-        SetCurrentModelPhysicsRequestDuplicatePhysicsGroupID = 706
+        SetCurrentModelPhysicsRequestDuplicatePhysicsGroupID = 706,
+        
+        // Errors related to ItemLoadRequest
+        ItemFileNameMissing = 750,
+        ItemFileNameNotFound = 751,
+        ItemLoadLoadCooldownNotOver = 752,
+        CannotCurrentlyLoadItem = 753, // This is usually because the user has menus open that prevent items from being loaded.
+        CannotLoadItemSceneFull = 754,
+        ItemOrderInvalid = 755,
+        ItemOrderAlreadyTaken = 756,
+        ItemLoadValuesInvalid = 757, // Invalid values for fields like size, position, ...
+
+        // Errors related to ItemUnloadRequest
+        CannotCurrentlyUnloadItem = 800,  // This is usually because the user has menus open that prevent items from being unloaded.
+
+        // Errors related to ItemAnimationControlRequest
+        ItemAnimationControlInstanceIDNotFound = 850,
+        ItemAnimationControlUnsupportedItemType = 851, // Returned when trying to use this request for Live2D items.
+        ItemAnimationControlAutoStopFramesInvalid = 852, // Auto-stop frames indices have to be between 0 and the last frame index of the animated item.
+        ItemAnimationControlTooManyAutoStopFrames = 853, // Maximum allowed number per item is 1024.
+        ItemAnimationControlSimpleImageDoesNotSupportAnim = 854, // You can set stuff like transparency and brightness for normal PNG/JPG items, but nothing animation-related.
+
+        // Errors related to ItemMoveRequest
+        ItemMoveRequestInstanceIDNotFound = 900,
+        ItemMoveRequestInvalidFadeMode = 901
     }
 }

@@ -68,7 +68,9 @@ namespace VTS.Networking.Impl{
 
         public void Stop()
         {
-            this._socket.Close();
+	        if(this._socket != null){
+                this._socket.Close();
+            }
         }
     }
 

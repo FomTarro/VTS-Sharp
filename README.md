@@ -15,7 +15,7 @@ You can find an example of custom plugin creation in the `Examples` folder, whic
 
 You can find a video tutorial that demonstrates [how to get started in under 90 seconds here](https://www.youtube.com/watch?v=lUGeMEVzjAU).
  
-Because this library simply acts as an client interface for the official API, please check out the official API's readme for in-depth explanations about the API functionality.
+Because this library simply acts as an client interface for the official API, please check out the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio) for in-depth explanations about the API functionality.
  
 ## Design Pattern and Considerations
  
@@ -32,7 +32,7 @@ void GetAPIState(Action<VTSStateData> onSuccess, Action<VTSErrorData> onError)
 The method accepts two callbacks, `onSuccess` and `onError`, but does not return a value. 
 
 Upon the request being processed by VTube Studio, 
-one of these two callbacks will be invoked, depending on if the request was successful or not. The callback accepts in a single, strongly-typed argument reflecting the payload. You can find what to expect in each payload class in the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio).
+one of these two callbacks will be invoked, depending on if the request was successful or not. The callback accepts in a single, strongly-typed argument reflecting the response payload. You can find what to expect in each payload class in the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio).
 
 # API
 
@@ -73,6 +73,8 @@ Sets the connection port to the given number. Returns true if the number is a va
 
 If the port number is changed while an active connection exists, you will need to reconnect. Takes the following args:
 * `int port` The port number to set. 
+
+#### `VTube Studio API Requests`
 
 All other methods can be inferred from the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio).
 
