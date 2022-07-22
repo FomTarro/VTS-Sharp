@@ -494,7 +494,7 @@ namespace VTS {
         /// <param name="onSuccess">Callback executed upon receiving a response.</param>
         /// <param name="onError">Callback executed upon receiving an error.</param>
         public void InjectParameterValues(VTSParameterInjectionValue[] values, Action<VTSInjectParameterData> onSuccess, Action<VTSErrorData> onError){
-            InjectParameterValues(values, VTSInjectParameterMode.SET, onSuccess, onError);
+            InjectParameterValues(values, VTSInjectParameterMode.SET, false, onSuccess, onError);
         }
 
         /// <summary>
@@ -508,6 +508,21 @@ namespace VTS {
         /// <param name="onSuccess">Callback executed upon receiving a response.</param>
         /// <param name="onError">Callback executed upon receiving an error.</param>
         public void InjectParameterValues(VTSParameterInjectionValue[] values, VTSInjectParameterMode mode, Action<VTSInjectParameterData> onSuccess, Action<VTSErrorData> onError){
+            InjectParameterValues(values, mode, false, onSuccess, onError);
+        }
+
+        /// <summary>
+        /// Sends a list of parameter names and corresponding values to assign to them.
+        /// 
+        /// For more info, see 
+        /// <a href="https://github.com/DenchiSoft/VTubeStudio#feeding-in-data-for-default-or-custom-parameters">https://github.com/DenchiSoft/VTubeStudio#feeding-in-data-for-default-or-custom-parameters</a>
+        /// </summary>
+        /// <param name="values">A list of parameters and the values to assign to them.</param>
+        /// <param name="mode">The method by which the parameter values are applied.</param>
+        /// <param name="faceFound">A flag which can be set to True to tell VTube Studio to consider the user face as found.</param>
+        /// <param name="onSuccess">Callback executed upon receiving a response.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void InjectParameterValues(VTSParameterInjectionValue[] values, VTSInjectParameterMode mode, bool faceFound, Action<VTSInjectParameterData> onSuccess, Action<VTSErrorData> onError){
             VTSInjectParameterData request = new VTSInjectParameterData();
             foreach(VTSParameterInjectionValue value in values){
                 value.id = SanitizeParameterName(value.id);

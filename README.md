@@ -15,7 +15,7 @@ You can find an example of custom plugin creation in the `Examples` folder, whic
 
 You can find a video tutorial that demonstrates [how to get started in under 90 seconds here](https://www.youtube.com/watch?v=lUGeMEVzjAU).
  
-Because this library simply acts as an client interface for the official API, please check out the [official API's README](https://github.com/DenchiSoft/VTubeStudio) for in-depth explanations about the API functionality.
+Because this library simply acts as an client interface for the official API, please check out the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio) for in-depth explanations about the API functionality.
  
 ## Design Pattern and Considerations
  
