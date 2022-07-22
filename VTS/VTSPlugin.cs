@@ -775,7 +775,7 @@ namespace VTS {
             }else if(curve == VTSItemMotionCurve.OVERSHOOT){
                 return "overshoot";
             }else if(curve == VTSItemMotionCurve.ZIP){
-                return "easeOut";
+                return "zip";
             }
             return "linear";
         }
