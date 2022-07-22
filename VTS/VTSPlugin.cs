@@ -376,7 +376,7 @@ namespace VTS {
         public void TintArtMesh(Color32 tint, float mixWithSceneLightingColor,  ArtMeshMatcher matcher, Action<VTSColorTintData> onSuccess, Action<VTSErrorData> onError){
             VTSColorTintData request = new VTSColorTintData();
             ArtMeshColorTint colorTint = new ArtMeshColorTint();
-            colorTint.fromColor32(tint);
+            colorTint.FromColor32(tint);
             colorTint.mixWithSceneLightingColor = System.Math.Min(1, System.Math.Max(mixWithSceneLightingColor, 0));
             request.data.colorTint = colorTint;
             request.data.artMeshMatcher = matcher;
@@ -513,11 +513,7 @@ namespace VTS {
                 value.id = SanitizeParameterName(value.id);
             }
             request.data.parameterValues = values;
-            if(mode == VTSInjectParameterMode.ADD){
-                request.data.mode = "add";
-            }else if(mode == VTSInjectParameterMode.SET){
-                request.data.mode = "set";
-            }
+            request.data.mode = InjectParameterModeToString(mode);
             this._socket.Send<VTSInjectParameterData, VTSInjectParameterData>(request, onSuccess, onError);
         }
 
@@ -685,39 +681,33 @@ namespace VTS {
         }
 
         /// <summary>
-        /// Moves the item of the specified ID based on the provided options.
+        /// Moves the items of the specified IDs based on their provided options.
         /// 
         /// For more info, see 
         /// <a href="https://github.com/DenchiSoft/VTubeStudio#moving-items-in-the-scene">https://github.com/DenchiSoft/VTubeStudio#moving-items-in-the-scene</a>
         /// </summary>
-        /// <param name="itemInstanceID">The ID of the item to move.</param>
-        /// <param name="options">Configuration options about the request.</param>
+        /// <param name="items">The list of Item Insance IDs and their corresponding movement options</param>
         /// <param name="onSuccess">Callback executed upon receiving a response.</param>
         /// <param name="onError">Callback executed upon receiving an error.</param>
-        public void MoveItem(string itemInstanceID, VTSItemMoveOptions options, Action<VTSItemMoveResponseData> onSuccess, Action<VTSErrorData> onError){
+        public void MoveItem(VTSItemMoveEntry[] items, Action<VTSItemMoveResponseData> onSuccess, Action<VTSErrorData> onError){
             VTSItemMoveRequestData request = new VTSItemMoveRequestData();
-            request.data.itemInstanceID = itemInstanceID;
-            request.data.timeInSeconds = options.timeInSeconds;
-            if(options.fadeMode == VTSItemAnimationCurve.EASE_IN){
-                request.data.fadeMode = "easeIn";
-            }else if(options.fadeMode == VTSItemAnimationCurve.EASE_OUT){
-                request.data.fadeMode = "easeOut";
-            }else if(options.fadeMode == VTSItemAnimationCurve.EASE_BOTH){
-                request.data.fadeMode = "easeBoth";
-            }else if(options.fadeMode == VTSItemAnimationCurve.OVERSHOOT){
-                request.data.fadeMode = "overshoot";
-            }else if(options.fadeMode == VTSItemAnimationCurve.ZIP){
-                request.data.fadeMode = "easeOut";
-            }else{
-                request.data.fadeMode = "unknown";
+            request.data.itemsToMove = new VTSItemToMove[items.Length];
+            for(int i = 0; i < items.Length; i++){
+                VTSItemMoveEntry entry = items[i];
+                request.data.itemsToMove[i] = new VTSItemToMove(
+                    entry.itemInsanceID,
+                    entry.options.timeInSeconds,
+                    MotionCurveToString(entry.options.fadeMode),
+                    entry.options.positionX,
+                    entry.options.positionY,
+                    entry.options.size,
+                    entry.options.rotation,
+                    entry.options.order,
+                    entry.options.setFlip,
+                    entry.options.flip,
+                    entry.options.userCanStop
+                );
             }
-            request.data.positionX = options.positionX;
-            request.data.positionY = options.positionY;
-            request.data.size = options.size;
-            request.data.rotation = options.rotation;
-            request.data.setFlip = options.setFlip;
-            request.data.flip = options.flip;
-            request.data.userCanStop = options.userCanStop;
             this._socket.Send<VTSItemMoveRequestData, VTSItemMoveResponseData>(request, onSuccess, onError);
         }
 
@@ -726,7 +716,7 @@ namespace VTS {
         #region Helper Methods
 
         private static Regex ALPHANUMERIC = new Regex(@"\W|");
-        private string SanitizeParameterName(string name){
+        private static string SanitizeParameterName(string name){
             // between 4 and 32 chars, alphanumeric, underscores allowed
             string output = name;
             output = ALPHANUMERIC.Replace(output, "");
@@ -736,7 +726,7 @@ namespace VTS {
 
         }
 
-        private string EncodeIcon(Texture2D icon){
+        private static string EncodeIcon(Texture2D icon){
             try{
                 if(icon.width != 128 && icon.height != 128){
                     Debug.LogWarning("Icon resolution must be exactly 128*128 pixels!");
@@ -747,6 +737,32 @@ namespace VTS {
                 Debug.LogError(e);
             }
             return null;
+        }
+
+        private static string  InjectParameterModeToString(VTSInjectParameterMode mode){
+            if(mode == VTSInjectParameterMode.ADD){
+                return "add";
+            }else if(mode == VTSInjectParameterMode.SET){
+                return "set";
+            }
+            return "set";
+        }
+
+        private static string MotionCurveToString(VTSItemMotionCurve curve){
+            if(curve == VTSItemMotionCurve.LINEAR){
+                return "linear";
+            }else if(curve == VTSItemMotionCurve.EASE_IN){
+                return "easeIn";
+            }else if(curve == VTSItemMotionCurve.EASE_OUT){
+                return "easeOut";
+            }else if(curve == VTSItemMotionCurve.EASE_BOTH){
+                return "easeBoth";
+            }else if(curve == VTSItemMotionCurve.OVERSHOOT){
+                return "overshoot";
+            }else if(curve == VTSItemMotionCurve.ZIP){
+                return "easeOut";
+            }
+            return "linear";
         }
 
         #endregion

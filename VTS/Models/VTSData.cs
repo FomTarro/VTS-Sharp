@@ -1,6 +1,7 @@
 ﻿using System;
 
 namespace VTS.Models {
+    [System.Serializable]
     public class VTSMessageData
     {
         public string apiName = "VTubeStudioPublicAPI";
@@ -11,7 +12,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSErrorData : VTSMessageData{
+    public class VTSErrorData : VTSMessageData {
          public VTSErrorData(){
             this.messageType = "APIError";
             this.data = new Data();
@@ -26,7 +27,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSStateData : VTSMessageData{
+    public class VTSStateData : VTSMessageData {
         public VTSStateData(){
             this.messageType = "APIStateRequest";
             this.data = new Data();
@@ -42,7 +43,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSAuthData : VTSMessageData{
+    public class VTSAuthData : VTSMessageData {
         public VTSAuthData(){
             this.messageType = "AuthenticationTokenRequest";
             this.data = new Data();
@@ -61,7 +62,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSStatisticsData : VTSMessageData{
+    public class VTSStatisticsData : VTSMessageData {
          public VTSStatisticsData(){
             this.messageType = "StatisticsRequest";
             this.data = new Data();
@@ -82,7 +83,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSFolderInfoData : VTSMessageData{
+    public class VTSFolderInfoData : VTSMessageData {
          public VTSFolderInfoData(){
             this.messageType = "VTSFolderInfoRequestuest";
             this.data = new Data();
@@ -110,7 +111,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class ModelPosition{
+    public class ModelPosition {
         public float positionX = float.NaN;
         public float positionY = float.NaN;
         public float rotation = float.NaN;
@@ -119,7 +120,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSCurrentModelData : VTSMessageData{
+    public class VTSCurrentModelData : VTSMessageData {
          public VTSCurrentModelData(){
             this.messageType = "CurrentModelRequest";
             this.data = new Data();
@@ -142,7 +143,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSAvailableModelsData : VTSMessageData{
+    public class VTSAvailableModelsData : VTSMessageData {
          public VTSAvailableModelsData(){
             this.messageType = "AvailableModelsRequest";
             this.data = new Data();
@@ -157,7 +158,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSModelLoadData : VTSMessageData{
+    public class VTSModelLoadData : VTSMessageData {
         public VTSModelLoadData(){
             this.messageType = "ModelLoadRequest";
             this.data = new Data();
@@ -171,7 +172,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSMoveModelData : VTSMessageData{
+    public class VTSMoveModelData : VTSMessageData {
         public VTSMoveModelData(){
             this.messageType = "MoveModelRequest";
             this.data = new Data();
@@ -194,7 +195,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSHotkeysInCurrentModelData : VTSMessageData{
+    public class VTSHotkeysInCurrentModelData : VTSMessageData {
         public VTSHotkeysInCurrentModelData(){
             this.messageType = "HotkeysInCurrentModelRequest";
             this.data = new Data();
@@ -212,7 +213,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSHotkeyTriggerData : VTSMessageData{
+    public class VTSHotkeyTriggerData : VTSMessageData {
         public VTSHotkeyTriggerData(){
             this.messageType = "HotkeyTriggerRequest";
             this.data = new Data();
@@ -227,7 +228,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSArtMeshListData : VTSMessageData{
+    public class VTSArtMeshListData : VTSMessageData {
         public VTSArtMeshListData(){
             this.messageType = "ArtMeshListRequest";
             this.data = new Data();
@@ -256,7 +257,7 @@ namespace VTS.Models {
         /// Converts the color into a Unity color struct.
         /// </summary>
         /// <returns></returns>
-        public UnityEngine.Color32 toColor32(){
+        public UnityEngine.Color32 ToColor32(){
             return new UnityEngine.Color32(colorR, colorG, colorB, colorA);
         }
 
@@ -264,7 +265,7 @@ namespace VTS.Models {
         /// Loads color data from a Unity color struct
         /// </summary>
         /// <param name="color"></param>
-        public void fromColor32(UnityEngine.Color32 color){
+        public void FromColor32(UnityEngine.Color32 color){
             this.colorA = color.a;
             this.colorB = color.b;
             this.colorG = color.g;
@@ -273,7 +274,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class ArtMeshColorTint : ColorTint{
+    public class ArtMeshColorTint : ColorTint {
         public float mixWithSceneLightingColor = 1.0f;
     }
 
@@ -288,7 +289,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSColorTintData : VTSMessageData{
+    public class VTSColorTintData : VTSMessageData {
         public VTSColorTintData(){
             this.messageType = "ColorTintRequest";
             this.data = new Data();
@@ -309,7 +310,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSSceneColorOverlayData : VTSMessageData{
+    public class VTSSceneColorOverlayData : VTSMessageData {
         public VTSSceneColorOverlayData(){
             this.messageType = "SceneColorOverlayInfoRequest";
             this.data = new Data();
@@ -334,7 +335,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSFaceFoundData : VTSMessageData{
+    public class VTSFaceFoundData : VTSMessageData {
         public VTSFaceFoundData(){
             this.messageType = "FaceFoundRequest";
             this.data = new Data();
@@ -358,7 +359,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSInputParameterListData : VTSMessageData{
+    public class VTSInputParameterListData : VTSMessageData {
         public VTSInputParameterListData(){
             this.messageType = "InputParameterListRequest";
             this.data = new Data();
@@ -376,7 +377,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSParameterValueData : VTSMessageData{
+    public class VTSParameterValueData : VTSMessageData {
         public VTSParameterValueData(){
             this.messageType = "ParameterValueRequest";
             this.data = new Data();
@@ -388,7 +389,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSLive2DParameterListData : VTSMessageData{
+    public class VTSLive2DParameterListData : VTSMessageData {
         public VTSLive2DParameterListData(){
             this.messageType = "Live2DParameterListRequest";
             this.data = new Data();
@@ -415,7 +416,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSParameterCreationData : VTSMessageData{
+    public class VTSParameterCreationData : VTSMessageData {
         public VTSParameterCreationData(){
             this.messageType = "ParameterCreationRequest";
             this.data = new Data();
@@ -427,7 +428,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSParameterDeletionData : VTSMessageData{
+    public class VTSParameterDeletionData : VTSMessageData {
         public VTSParameterDeletionData(){
             this.messageType = "ParameterDeletionRequest";
             this.data = new Data();
@@ -441,12 +442,13 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSParameterInjectionValue{
+    public class VTSParameterInjectionValue {
         public string id;
         public float value = float.NaN;
         public float weight = float.NaN;
     }
 
+    [System.Serializable]
     public enum VTSInjectParameterMode : int {
         UNKNOWN = -1,
         SET = 0,
@@ -454,7 +456,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSInjectParameterData : VTSMessageData{
+    public class VTSInjectParameterData : VTSMessageData {
         public VTSInjectParameterData(){
             this.messageType = "InjectParameterDataRequest";
             this.data = new Data();
@@ -469,7 +471,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class ExpressionData{
+    public class ExpressionData {
         public string name;
 		public string file;
 		public bool active;
@@ -481,7 +483,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSExpressionStateData : VTSMessageData{
+    public class VTSExpressionStateData : VTSMessageData {
         public VTSExpressionStateData(){
             this.messageType = "ExpressionStateRequest";
             this.data = new Data();
@@ -501,7 +503,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSExpressionActivationData : VTSMessageData{
+    public class VTSExpressionActivationData : VTSMessageData {
         public VTSExpressionActivationData(){
             this.messageType = "ExpressionActivationRequest";
             this.data = new Data();
@@ -516,7 +518,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSCurrentModelPhysicsData : VTSMessageData{
+    public class VTSCurrentModelPhysicsData : VTSMessageData {
         public VTSCurrentModelPhysicsData(){
             this.messageType = "GetCurrentModelPhysicsRequest";
             this.data = new Data();
@@ -541,7 +543,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSOverrideModelPhysicsData : VTSMessageData{
+    public class VTSOverrideModelPhysicsData : VTSMessageData {
         public VTSOverrideModelPhysicsData(){
             this.messageType = "SetCurrentModelPhysicsRequest";
             this.data = new Data();
@@ -556,7 +558,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSPhysicsGroup{
+    public class VTSPhysicsGroup {
         public string groupID;
 		public string groupName;
 		public float strengthMultiplier;
@@ -564,7 +566,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSPhysicsOverride{
+    public class VTSPhysicsOverride {
         public string id;
 		public float value;
 		public bool setBaseValue;
@@ -573,7 +575,7 @@ namespace VTS.Models {
 
 
     [System.Serializable]
-    public class VTSNDIConfigData : VTSMessageData{
+    public class VTSNDIConfigData : VTSMessageData {
         public VTSNDIConfigData(){
             this.messageType = "NDIConfigRequest";
             this.data = new Data();
@@ -593,7 +595,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSStateBroadcastData : VTSMessageData{
+    public class VTSStateBroadcastData : VTSMessageData {
         public VTSStateBroadcastData(){
             this.messageType = "VTubeStudioAPIStateBroadcast";
             this.data = new Data();
@@ -647,7 +649,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSItemInstance {
+    public class ItemInstance {
         public string fileName;
         public string instanceID;
         public int order;
@@ -668,7 +670,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSItemFile {
+    public class ItemFile {
         public string fileName;
         public string type;
         public int loadedCount;
@@ -706,8 +708,8 @@ namespace VTS.Models {
             public int totalItemsAllowedCount;
             public bool canLoadItemsRightNow;
             public int[] availableSpots;
-            public VTSItemInstance[] itemInstancesInScene;
-            public VTSItemFile[] availableItemFiles;
+            public ItemInstance[] itemInstancesInScene;
+            public ItemFile[] availableItemFiles;
         }
     }
 
@@ -854,7 +856,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSUnloadedItem { 
+    public class UnloadedItem { 
         public string instanceID;
         public string fileName;
     }
@@ -887,7 +889,7 @@ namespace VTS.Models {
 
         [System.Serializable]
         public class Data {
-            public VTSUnloadedItem[] unloadedItems;
+            public UnloadedItem[] unloadedItems;
         }
     }
 
@@ -898,7 +900,7 @@ namespace VTS.Models {
     /// <a href="https://github.com/DenchiSoft/VTubeStudio#controling-items-and-item-animations">https://github.com/DenchiSoft/VTubeStudio#controling-items-and-item-animations</a>
     /// </summary>
     [System.Serializable]
-    public class VTSItemAnimationControlOptions{
+    public class VTSItemAnimationControlOptions {
         public VTSItemAnimationControlOptions(){
             this.framerate = -1;
             this.frame = -1;
@@ -978,13 +980,14 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public enum VTSItemAnimationCurve : int {
+    public enum VTSItemMotionCurve : int {
         UNKNOW = -1,
-        EASE_IN = 0,
-        EASE_OUT = 1,
-        EASE_BOTH = 2,
-        OVERSHOOT = 3,
-        ZIP = 4
+        LINEAR = 0,
+        EASE_IN = 1,
+        EASE_OUT = 2,
+        EASE_BOTH = 3,
+        OVERSHOOT = 4,
+        ZIP = 5
     }
 
     /// <summary>
@@ -994,14 +997,15 @@ namespace VTS.Models {
     /// <a href="https://github.com/DenchiSoft/VTubeStudio#moving-items-in-the-scene">https://github.com/DenchiSoft/VTubeStudio#moving-items-in-the-scene</a>
     /// </summary>
     [System.Serializable]
-    public class VTSItemMoveOptions{
+    public class VTSItemMoveOptions {
         public VTSItemMoveOptions(){
             this.timeInSeconds = 0f;
-            this.fadeMode = VTSItemAnimationCurve.EASE_IN;
+            this.fadeMode = VTSItemMotionCurve.LINEAR;
             this.positionX = -1000;
             this.positionY = -1000;
             this.size = -1000;
-            this.rotation = -1;
+            this.rotation = -1000;
+            this.order = -1000;
             this.setFlip = false;
             this.flip = false;
             this.userCanStop = false;
@@ -1009,11 +1013,12 @@ namespace VTS.Models {
 
         public VTSItemMoveOptions(
             float timeInSeconds,
-            VTSItemAnimationCurve fadeMode,
+            VTSItemMotionCurve fadeMode,
             float positionX,
             float positionY,
             float size,
             float rotation,
+            int order,
             bool setFlip,
             bool flip,
             bool userCanStop
@@ -1024,15 +1029,75 @@ namespace VTS.Models {
             this.positionY = positionY;
             this.size = size;
             this.rotation = rotation;
+            this.order = order;
             this.setFlip = setFlip;
             this.flip = flip;
             this.userCanStop = userCanStop;
         }
         
         public float timeInSeconds;
-        public VTSItemAnimationCurve fadeMode;
+        public VTSItemMotionCurve fadeMode;
         public float positionX;
         public float positionY;
+        public int order;
+        public float size;
+        public float rotation;
+        public bool setFlip;
+        public bool flip;
+        public bool userCanStop;
+    }
+
+    /// <summary>
+    /// A container for linking an Item Instance ID to its corresponding options for an Item Move request.
+    /// 
+    /// For more info about what each field does, see 
+    /// <a href="https://github.com/DenchiSoft/VTubeStudio#moving-items-in-the-scene">https://github.com/DenchiSoft/VTubeStudio#moving-items-in-the-scene</a>
+    /// </summary>
+    [System.Serializable]
+    public struct VTSItemMoveEntry {
+        public VTSItemMoveEntry(string itemInsanceID, VTSItemMoveOptions options){
+            this.itemInsanceID = itemInsanceID;
+            this.options = options;
+        }
+        
+        public string itemInsanceID;
+        public VTSItemMoveOptions options;
+    }
+
+    [System.Serializable]
+    public struct VTSItemToMove {
+        public VTSItemToMove(
+            string itemInstanceID,
+            float timeInSeconds,
+            string fadeMode,
+            float positionX,
+            float positionY,
+            float size,
+            float rotation,
+            int order,
+            bool setFlip,
+            bool flip,
+            bool userCanStop
+        ){
+            this.itemInstanceID = itemInstanceID;
+            this.timeInSeconds = timeInSeconds;
+            this.fadeMode = fadeMode;
+            this.positionX = positionX;
+            this.positionY = positionY;
+            this.size = size;
+            this.rotation = rotation;
+            this.order = order;
+            this.setFlip = setFlip;
+            this.flip = flip;
+            this.userCanStop = userCanStop;
+        }
+
+        public string itemInstanceID;
+        public float timeInSeconds;
+        public string fadeMode;
+        public float positionX;
+        public float positionY;
+        public int order;
         public float size;
         public float rotation;
         public bool setFlip;
@@ -1050,17 +1115,15 @@ namespace VTS.Models {
 
         [System.Serializable]
         public class Data {
-            public string itemInstanceID;
-            public float timeInSeconds;
-            public string fadeMode;
-            public float positionX;
-            public float positionY;
-            public float size;
-            public float rotation;
-            public bool setFlip;
-            public bool flip;
-            public bool userCanStop;
+            public VTSItemToMove[] itemsToMove;
         }
+    }
+
+    [System.Serializable]
+    public struct MovedItem {
+        public string itemInstanceID;
+        public bool success;
+        public ErrorID errorID;
     }
 
     [System.Serializable]
@@ -1073,7 +1136,7 @@ namespace VTS.Models {
 
         [System.Serializable]
         public class Data {
-            // Empty on purpose!
+            public MovedItem[] movedItems;
         }
     }
 }

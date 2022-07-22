@@ -221,6 +221,7 @@ namespace VTS.Networking {
                     this._callbacks.Add(request.requestID, new VTSCallbacks((t) => { onSuccess((K)t); } , onError));
                     // make sure to remove null properties
                     string output = this._json.ToJson(request);
+                    // Debug.Log(output);
                     this._ws.Send(output);
                 }catch(Exception e){
                     Debug.LogError(e);

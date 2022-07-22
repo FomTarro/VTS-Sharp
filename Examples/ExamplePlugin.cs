@@ -19,13 +19,7 @@ namespace VTS.Examples {
 
         [SerializeField]
         private bool _headRolling = false;
-
-        [SerializeField]
-        private Button _portConnectButtonPrefab = null;
-
-        [SerializeField]
-        private RectTransform _portConnectButtonParent = null;
-
+        
         [SerializeField]
         private Image _connectionLight = null;
         [SerializeField]
@@ -122,27 +116,11 @@ namespace VTS.Examples {
         private void SyncValues(VTSParameterInjectionValue[] values){
             InjectParameterValues(
                 values,
+                VTSInjectParameterMode.ADD,
                 (r) => { },
                 (e) => { print(e.data.message); }
             );
 	    }
-
-        public void RefreshPortList(){
-            List<int> ports = new List<int>(GetPorts().Keys);
-            foreach(Transform child in this._portConnectButtonParent){
-                Destroy(child.gameObject);
-            }
-            foreach(int port in ports){
-                Button button = Instantiate<Button>(this._portConnectButtonPrefab, Vector3.zero, Quaternion.identity, this._portConnectButtonParent);
-                button.name = port.ToString();
-                button.GetComponentInChildren<Text>().text = button.name;
-                button.onClick.AddListener(() => {
-                    if(SetPort(int.Parse(button.name))){
-                        Connect();
-                    }
-                });
-            }
-        }
 
         private void FixedUpdate(){
 
