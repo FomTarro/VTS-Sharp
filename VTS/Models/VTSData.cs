@@ -466,6 +466,7 @@ namespace VTS.Models {
         [System.Serializable]
         public class Data {
             public string mode;
+            public bool faceFound;
             public VTSParameterInjectionValue[] parameterValues;
         }
     }

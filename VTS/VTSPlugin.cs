@@ -527,6 +527,7 @@ namespace VTS {
             foreach(VTSParameterInjectionValue value in values){
                 value.id = SanitizeParameterName(value.id);
             }
+            request.data.faceFound = faceFound;
             request.data.parameterValues = values;
             request.data.mode = InjectParameterModeToString(mode);
             this._socket.Send<VTSInjectParameterData, VTSInjectParameterData>(request, onSuccess, onError);
