@@ -2,6 +2,8 @@
 
 namespace VTS.Models {
 
+    #region Common
+
     [System.Serializable]
     public class VTSMessageData
     {
@@ -27,6 +29,8 @@ namespace VTS.Models {
         }
     }
 
+    #endregion
+
     #region General API
 
     [System.Serializable]
@@ -38,7 +42,7 @@ namespace VTS.Models {
         public Data data;
 
         [System.Serializable]
-        public class Data{
+        public class Data {
             public bool active;
             public string vTubeStudioVersion;
             public bool currentSessionAuthenticated;
@@ -105,10 +109,14 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public class VTSModelData {
+    public class ModelData {
         public bool modelLoaded;
         public string modelName;
         public string modelID;
+    }
+
+    [System.Serializable]
+    public class VTSModelData : ModelData {
         public string vtsModelName;
         public string vtsModelIconName;
     }
@@ -131,7 +139,7 @@ namespace VTS.Models {
         public Data data;
 
         [System.Serializable]
-        public class Data : VTSModelData{
+        public class Data : VTSModelData {
 		    public string live2DModelName;
 		    public long modelLoadTime;
 		    public long timeSinceModelLoaded;
@@ -1155,13 +1163,33 @@ namespace VTS.Models {
         public abstract void SetSubscribed(bool subscribe);
         public abstract bool GetSubscribed();
         public abstract void SetConfig(VTSEventConfigData config);
-        public abstract VTSEventConfigData GetConfig();
     }
 
     [System.Serializable]
     public abstract class VTSEventSubscriptonData {
         public string eventName;
         public bool subscribe;
+    }
+
+    [System.Serializable]
+    public abstract class VTSEventConfigData { }
+
+    [System.Serializable]
+    public abstract class VTSEventData : VTSMessageData { }
+
+    [System.Serializable]
+    public class VTSEventSubscriptionResponseData : VTSMessageData {
+        public VTSEventSubscriptionResponseData(){
+            this.messageType = "EventSubscriptionResponse";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public int subscribedEventCount;
+            public string[] subscribedEvents;
+        }
     }
 
     [System.Serializable]
@@ -1196,40 +1224,28 @@ namespace VTS.Models {
         public override void SetConfig(VTSEventConfigData config){
             this.data.config = (VTSTestEventConfigOptions)config;
         }
-
-        public override VTSEventConfigData GetConfig(){
-            return (VTSTestEventConfigOptions)this.data.config;
-        }
     }
 
+    /// <summary>
+    /// A container for providing subscription options for a Test Event subscription.
+    /// 
+    /// For more info about what each field does, see 
+    /// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#test-event">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#test-event</a>
+    /// </summary>
     [System.Serializable]
-    public class VTSEventSubscriptionResponseData : VTSMessageData {
-        public VTSEventSubscriptionResponseData(){
-            this.messageType = "EventSubscriptionResponse";
-            this.data = new Data();
+    public class VTSTestEventConfigOptions : VTSEventConfigData {
+        public VTSTestEventConfigOptions(){
+            this.testMessageForEvent = null;
         }
-        public Data data;
-
-        [System.Serializable]
-        public class Data{
-            public int subscribedEventCount;
-            public string[] subscribedEvents;
+        
+        public VTSTestEventConfigOptions(string message){
+            this.testMessageForEvent = message;
         }
-    }
-
-    [System.Serializable]
-    public abstract class VTSEventConfigData {
-
-    }
-
-    [System.Serializable]
-    public abstract class VTSEventData : VTSMessageData {
-
+        public string testMessageForEvent;
     }
 
     [System.Serializable]
     public class VTSTestEventData : VTSEventData {
-        
         public VTSTestEventData(){
             this.messageType = "TestEvent";
             this.data = new Data();
@@ -1237,18 +1253,73 @@ namespace VTS.Models {
         public Data data;
 
         [System.Serializable]
-        public class Data{
+        public class Data {
             public string yourTestMessage;
-            public int counter;
+            public long counter;
         }
     }
 
     [System.Serializable]
-    public class VTSTestEventConfigOptions : VTSEventConfigData {
-        public VTSTestEventConfigOptions(string message){
-            this.testMessageForEvent = message;
+    public class VTSModelLoadedEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+        public VTSModelLoadedEventSubscriptionRequestData(){
+            this.messageType = "EventSubscriptionRequest";
+            this.data = new Data();
         }
-        public string testMessageForEvent;
+        public Data data;
+
+        [System.Serializable]
+        public class Data : VTSEventSubscriptonData {
+            public VTSModelLoadedEventConfigOptions config;
+        }
+
+        public override void SetEventName(string eventName){
+            this.data.eventName = "ModelLoadedEvent";
+        }
+
+        public override string GetEventName(){
+            return this.data.eventName;
+        }
+
+        public override void SetSubscribed(bool subscribe){
+            this.data.subscribe = subscribe;
+        }
+
+        public override bool GetSubscribed(){
+            return this.data.subscribe;
+        }
+
+        public override void SetConfig(VTSEventConfigData config){
+            this.data.config = (VTSModelLoadedEventConfigOptions)config;
+        }
+    }
+
+    /// <summary>
+    /// A container for providing subscription options for a Model Loaded Event subscription.
+    /// 
+    /// For more info about what each field does, see 
+    /// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#model-loadedunloaded">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#model-loadedunloaded</a>
+    /// </summary>
+    [System.Serializable]
+    public class VTSModelLoadedEventConfigOptions : VTSEventConfigData {
+        public VTSModelLoadedEventConfigOptions(){
+            this.modelID = null;
+        }
+        public VTSModelLoadedEventConfigOptions(string modelID){
+            this.modelID = modelID;
+        }
+        public string modelID;
+    }
+
+    [System.Serializable]
+    public class VTSModelLoadedEventData : VTSEventData {
+        public VTSModelLoadedEventData(){
+            this.messageType = "ModelLoadedEvent";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data : ModelData { }
     }
 
     #endregion

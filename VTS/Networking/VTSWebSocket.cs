@@ -10,20 +10,27 @@ using UnityEngine;
 using VTS.Models;
 
 namespace VTS.Networking {
+    /// <summary>
+    /// Underlying VTS socket connection and response processor.
+    /// </summary>
     public class VTSWebSocket : MonoBehaviour
     {
+        // Dependencies
         private const string VTS_WS_URL = "ws://localhost:{0}";
         private int _port = 8001;
         private IWebSocket _ws = null;
         private IJsonUtility _json = null;
-        private Dictionary<string, VTSCallbacks> _callbacks = new Dictionary<string, VTSCallbacks>();
 
+        // API Callbacks
+        private Dictionary<string, VTSCallbacks> _callbacks = new Dictionary<string, VTSCallbacks>();
         private Dictionary<string, VTSEventCallbacks> _events = new Dictionary<string, VTSEventCallbacks>();
 
         // UDP 
         private static UdpClient UDP_CLIENT = null;
         private static Task<UdpReceiveResult> UDP_RESULT = null;
         private static readonly Dictionary<int, VTSStateBroadcastData> PORTS = new Dictionary<int, VTSStateBroadcastData>();
+
+        #region Lifecycle
 
         public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility){
             if(this._ws != null){
@@ -42,6 +49,10 @@ namespace VTS.Networking {
             ProcessResponses();
             CheckPorts();
         }
+
+        #endregion
+
+        #region UDP
 
         private void CheckPorts(){
             StartUDP();
@@ -84,6 +95,22 @@ namespace VTS.Networking {
             }
         }
         
+        public Dictionary<int, VTSStateBroadcastData> GetPorts(){
+            return new Dictionary<int, VTSStateBroadcastData>(PORTS);
+        }
+
+        public bool SetPort(int port){
+            if(PORTS.ContainsKey(port)){
+                this._port = port;
+                return true;
+            }
+            return false;
+        }
+
+        #endregion
+
+        #region I/O
+
         private void ProcessResponses(){
             string data = null;
             do{
@@ -96,6 +123,9 @@ namespace VTS.Networking {
                                 switch(response.messageType){
                                     case "TestEvent":
                                         this._events[response.messageType].onEvent(this._json.FromJson<VTSTestEventData>(data));
+                                        break;
+                                    case "ModelLoadedEvent":
+                                        this._events[response.messageType].onEvent(this._json.FromJson<VTSModelLoadedEventData>(data));
                                         break;
                                 }
                             }catch(Exception e){
@@ -227,12 +257,6 @@ namespace VTS.Networking {
             }while(data != null);
         }
 
-        public void Resubscribe(){
-            foreach(VTSEventCallbacks callback in this._events.Values){
-                callback.resubscribe();
-            }
-        }
-
         public void Connect(System.Action onConnect, System.Action onDisconnect, System.Action onError){
             if(this._ws != null){
                 this._ws.Start(string.Format(VTS_WS_URL, this._port), onConnect, onDisconnect, onError);
@@ -244,10 +268,9 @@ namespace VTS.Networking {
         public void Send<T, K>(T request, Action<K> onSuccess, Action<VTSErrorData> onError) where T : VTSMessageData where K : VTSMessageData{
             if(this._ws != null){
                 try{
-                    this._callbacks.Add(request.requestID, new VTSCallbacks((t) => { onSuccess((K)t); } , onError));
+                    this._callbacks.Add(request.requestID, new VTSCallbacks((k) => { onSuccess((K)k); }, onError));
                     // make sure to remove null properties
                     string output = this._json.ToJson(request);
-                    // Debug.Log(output);
                     this._ws.Send(output);
                 }catch(Exception e){
                     Debug.LogError(e);
@@ -264,43 +287,31 @@ namespace VTS.Networking {
             }
         }
 
-        public void SendEventSubscription<T, K>(T request, Action<K> onEvent, Action<VTSErrorData> onError, Action resubscribe) where T : VTSEventSubscriptionRequestData where K : VTSEventData{
+        public void SendEventSubscription<T, K>(T request, Action<K> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError, Action resubscribe) where T : VTSEventSubscriptionRequestData where K : VTSEventData{
             this.Send<T, VTSEventSubscriptionResponseData>(
                 request, 
                 (s) => {
                     // add event or remove event from register
-                    if(request.GetSubscribed()){
-                        if(this._events.ContainsKey(request.GetEventName())){
-                            this._events.Remove(request.GetEventName());
-                        }
-                        this._events.Add(request.GetEventName(), new VTSEventCallbacks(
-                            (t) => { onEvent((K)t); } , 
-                            onError,
-                            request.GetEventName(),
-                            request.GetConfig(),
-                            resubscribe));
-                    }else{
-                        if(this._events.ContainsKey(request.GetEventName())){
-                            this._events.Remove(request.GetEventName());
-                        }
+                    if(this._events.ContainsKey(request.GetEventName())){
+                        this._events.Remove(request.GetEventName());
                     }
+                    if(request.GetSubscribed()){
+                        this._events.Add(request.GetEventName(), new VTSEventCallbacks((k) => { onEvent((K)k); }, onError, resubscribe));
+                    }
+                    onSubscribe(s);
                 },
                 onError);
         }
 
-        public Dictionary<int, VTSStateBroadcastData> GetPorts(){
-            return new Dictionary<int, VTSStateBroadcastData>(PORTS);
-        }
-
-        public bool SetPort(int port){
-            if(PORTS.ContainsKey(port)){
-                this._port = port;
-                return true;
+        public void ResubscribeToEvents(){
+            foreach(VTSEventCallbacks callback in this._events.Values){
+                callback.resubscribe();
             }
-            return false;
         }
 
-        private struct VTSCallbacks{
+        #endregion
+
+        private struct VTSCallbacks {
             public Action<VTSMessageData> onSuccess; 
             public Action<VTSErrorData> onError;
             public VTSCallbacks(Action<VTSMessageData> onSuccess, Action<VTSErrorData> onError){
@@ -309,17 +320,13 @@ namespace VTS.Networking {
             }
         }
 
-        private struct VTSEventCallbacks{
+        private struct VTSEventCallbacks {
             public Action<VTSEventData> onEvent;
             public Action<VTSErrorData> onError;
-            public string eventType;
-            public VTSEventConfigData config;
             public Action resubscribe;
-            public VTSEventCallbacks(Action<VTSEventData> onEvent, Action<VTSErrorData> onError, string eventType, VTSEventConfigData config, Action resubscribe){
+            public VTSEventCallbacks(Action<VTSEventData> onEvent, Action<VTSErrorData> onError, Action resubscribe){
                 this.onEvent = onEvent;
                 this.onError = onError;
-                this.eventType = eventType;
-                this.config = config;
                 this.resubscribe = resubscribe;
             }
         }

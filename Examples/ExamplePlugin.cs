@@ -15,6 +15,9 @@ namespace VTS.Examples {
         private Text _text = null;
 
         [SerializeField]
+        private Text _eventText = null;
+
+        [SerializeField]
         private Color _color = Color.black;
 
         [SerializeField]
@@ -25,8 +28,6 @@ namespace VTS.Examples {
         [SerializeField]
         private Text _connectionText = null;
 
-        [SerializeField]
-        private Text _eventText = null;
 
         private void Awake(){
             Connect();
@@ -121,11 +122,13 @@ namespace VTS.Examples {
             this.SubscribeToTestEvent(
                 config, 
                 (s) => { _eventText.text = string.Format("{0} - {1}", s.data.counter, s.data.yourTestMessage); },
+                DoNothingCallback,
                 (e) => { _eventText.text = e.data.message; } );
         }
 
         public void UnsubTestEvent(){
             this.UnsubscribeFromTestEvent(
+                (s) => { _eventText.text = "[Event Output]"; },
                 (e) => { _eventText.text = e.data.message; } );
         }
 
