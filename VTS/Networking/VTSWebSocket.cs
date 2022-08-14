@@ -227,6 +227,12 @@ namespace VTS.Networking {
             }while(data != null);
         }
 
+        public void Resubscribe(){
+            foreach(VTSEventCallbacks callback in this._events.Values){
+                callback.resubscribe();
+            }
+        }
+
         public void Connect(System.Action onConnect, System.Action onDisconnect, System.Action onError){
             if(this._ws != null){
                 this._ws.Start(string.Format(VTS_WS_URL, this._port), onConnect, onDisconnect, onError);
@@ -258,21 +264,25 @@ namespace VTS.Networking {
             }
         }
 
-        public void SendEventSubscription<T, K>(T request, Action<K> onEvent, Action<VTSErrorData> onError) where T : VTSEventSubscriptionRequestData where K : VTSEventData{
+        public void SendEventSubscription<T, K>(T request, Action<K> onEvent, Action<VTSErrorData> onError, Action resubscribe) where T : VTSEventSubscriptionRequestData where K : VTSEventData{
             this.Send<T, VTSEventSubscriptionResponseData>(
                 request, 
                 (s) => {
                     // add event or remove event from register
                     if(request.GetSubscribed()){
+                        if(this._events.ContainsKey(request.GetEventName())){
+                            this._events.Remove(request.GetEventName());
+                        }
                         this._events.Add(request.GetEventName(), new VTSEventCallbacks(
                             (t) => { onEvent((K)t); } , 
                             onError,
                             request.GetEventName(),
-                            request.GetConfig()));
+                            request.GetConfig(),
+                            resubscribe));
                     }else{
                         if(this._events.ContainsKey(request.GetEventName())){
                             this._events.Remove(request.GetEventName());
-                        };
+                        }
                     }
                 },
                 onError);
@@ -304,11 +314,13 @@ namespace VTS.Networking {
             public Action<VTSErrorData> onError;
             public string eventType;
             public VTSEventConfigData config;
-            public VTSEventCallbacks(Action<VTSEventData> onEvent, Action<VTSErrorData> onError, string eventType, VTSEventConfigData config){
+            public Action resubscribe;
+            public VTSEventCallbacks(Action<VTSEventData> onEvent, Action<VTSErrorData> onError, string eventType, VTSEventConfigData config, Action resubscribe){
                 this.onEvent = onEvent;
                 this.onError = onError;
                 this.eventType = eventType;
                 this.config = config;
+                this.resubscribe = resubscribe;
             }
         }
     }

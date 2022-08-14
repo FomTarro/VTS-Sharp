@@ -76,21 +76,25 @@ namespace VTS {
             this._tokenStorage = tokenStorage;
             this._socket = GetComponent<VTSWebSocket>();
             this._socket.Initialize(webSocket, jsonUtility);
+            Action onCombinedConnect = () => {
+                this._socket.Resubscribe();
+                onConnect();
+            };
             this._socket.Connect(() => {
                 // If API enabled, authenticate
                 Authenticate(
                     (r) => { 
                         if(!r.data.authenticated){
-                            Reauthenticate(onConnect, onError);
+                            Reauthenticate(onCombinedConnect, onError);
                         }else{
                             this._isAuthenticated = true;
-                            onConnect();
+                            onCombinedConnect();
                         }
                     }, 
                     (r) => { 
                         // If initial authentication fails, try again
                         // (Likely just needs fresh token)
-                        Reauthenticate(onConnect, onError); 
+                        Reauthenticate(onCombinedConnect, onError); 
                     }
                 );
             },
@@ -740,7 +744,9 @@ namespace VTS {
             request.SetEventName(eventName);
             request.SetSubscribed(subscribed);
             request.SetConfig(config);
-            this._socket.SendEventSubscription<T, K>(request, onEvent, onError);
+            this._socket.SendEventSubscription<T, K>(request, onEvent, onError, () => {
+                SubscribeToEvent<T, K>(eventName, subscribed, config, onEvent, onError);
+            });
         }
 
         public void SubscribeToTestEvent(VTSTestEventConfigOptions config, Action<VTSTestEventData> onEvent, Action<VTSErrorData> onError){            
