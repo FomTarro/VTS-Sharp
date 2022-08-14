@@ -34,6 +34,17 @@ The method accepts two callbacks, `onSuccess` and `onError`, but does not return
 Upon the request being processed by VTube Studio, 
 one of these two callbacks will be invoked, depending on if the request was successful or not. The callback accepts in a single, strongly-typed argument reflecting the response payload. You can find what to expect in each payload class in the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio).
 
+This library also supports the [VTube Studio Event Subscription API](https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md). With this feature, you can subscribe to various events to make sure your plugin gets a message when something happens in VTube Studio. Event Subscription follows a similar asynchronous design pattern. 
+Take, for example, the following method signature, found in the [`VTSPlugin`](#class-vtsplugin) class:
+
+```
+ void SubscribeToTestEvent(VTSTestEventConfigOptions config, Action<VTSTestEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError)
+```
+The method accepts an optional configuration class, and three callbacks, `onEvent`, `onSubscribe` and `onError`, but does not return a value.
+
+
+Upon successfully subscribing to the event in VTube Studio, the `onSubscribe` callback will be invoked, and then `onEvent` will be invoked any time VTube Studio publishes an event of that type. If the subscription fails for any reason, `onError` will be invoked. 
+
 # API
 
 ## `class VTSPlugin`
@@ -76,7 +87,11 @@ If the port number is changed while an active connection exists, you will need t
 
 #### `VTube Studio API Requests`
 
-All other methods can be inferred from the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio).
+Request methods can be inferred from the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio).
+
+### `VTube Studio API Events`
+
+Event subscription methods can be inferred from the [official VTube Studio Event Subscription API](https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md).
 
 ## `interface IWebSocket`
 
