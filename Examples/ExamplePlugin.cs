@@ -25,6 +25,9 @@ namespace VTS.Examples {
         [SerializeField]
         private Text _connectionText = null;
 
+        [SerializeField]
+        private Text _eventText = null;
+
         private void Awake(){
             Connect();
         }
@@ -111,6 +114,19 @@ namespace VTS.Examples {
                 (r) => { _text.text = new JsonUtilityImpl().ToJson(r); }, 
                 (e) => { _text.text = e.data.message; }
             );
+        }
+
+        public void SubTestEvent(){
+            VTSTestEventConfigOptions config = new VTSTestEventConfigOptions("ECHO!");
+            this.SubscribeToTestEvent(
+                config, 
+                (s) => { _eventText.text = string.Format("{0} - {1}", s.data.counter, s.data.yourTestMessage); },
+                (e) => { _eventText.text = e.data.message; } );
+        }
+
+        public void UnsubTestEvent(){
+            this.UnsubscribeFromTestEvent(
+                (e) => { _eventText.text = e.data.message; } );
         }
 
         private void SyncValues(VTSParameterInjectionValue[] values){

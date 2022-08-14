@@ -1,6 +1,7 @@
 ﻿using System;
 
 namespace VTS.Models {
+
     [System.Serializable]
     public class VTSMessageData
     {
@@ -25,6 +26,8 @@ namespace VTS.Models {
             public string message;
         }
     }
+
+    #region General API
 
     [System.Serializable]
     public class VTSStateData : VTSMessageData {
@@ -1140,4 +1143,113 @@ namespace VTS.Models {
             public MovedItem[] movedItems;
         }
     }
+
+    #endregion
+
+    #region Event API
+
+    [System.Serializable]
+    public abstract class VTSEventSubscriptionRequestData : VTSMessageData { 
+        public abstract void SetEventName(string eventName);
+        public abstract string GetEventName();
+        public abstract void SetSubscribed(bool subscribe);
+        public abstract bool GetSubscribed();
+        public abstract void SetConfig(VTSEventConfigData config);
+        public abstract VTSEventConfigData GetConfig();
+    }
+
+    [System.Serializable]
+    public abstract class VTSEventSubscriptonData {
+        public string eventName;
+        public bool subscribe;
+    }
+
+    [System.Serializable]
+    public class VTSTestEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+        public VTSTestEventSubscriptionRequestData(){
+            this.messageType = "EventSubscriptionRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data : VTSEventSubscriptonData {
+            public VTSTestEventConfigOptions config;
+        }
+
+        public override void SetEventName(string eventName) {
+            this.data.eventName = eventName;
+        }
+
+        public override string GetEventName(){
+            return this.data.eventName;
+        }
+
+        public override void SetSubscribed(bool subscribe) {
+            this.data.subscribe = subscribe;
+        }
+
+        public override bool GetSubscribed(){
+            return this.data.subscribe;
+        }
+
+        public override void SetConfig(VTSEventConfigData config){
+            this.data.config = (VTSTestEventConfigOptions)config;
+        }
+
+        public override VTSEventConfigData GetConfig(){
+            return (VTSTestEventConfigOptions)this.data.config;
+        }
+    }
+
+    [System.Serializable]
+    public class VTSEventSubscriptionResponseData : VTSMessageData {
+        public VTSEventSubscriptionResponseData(){
+            this.messageType = "EventSubscriptionResponse";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data{
+            public int subscribedEventCount;
+            public string[] subscribedEvents;
+        }
+    }
+
+    [System.Serializable]
+    public abstract class VTSEventConfigData {
+
+    }
+
+    [System.Serializable]
+    public abstract class VTSEventData : VTSMessageData {
+
+    }
+
+    [System.Serializable]
+    public class VTSTestEventData : VTSEventData {
+        
+        public VTSTestEventData(){
+            this.messageType = "TestEvent";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data{
+            public string yourTestMessage;
+            public int counter;
+        }
+    }
+
+    [System.Serializable]
+    public class VTSTestEventConfigOptions : VTSEventConfigData {
+        public VTSTestEventConfigOptions(string message){
+            this.testMessageForEvent = message;
+        }
+        public string testMessageForEvent;
+    }
+
+    #endregion
 }

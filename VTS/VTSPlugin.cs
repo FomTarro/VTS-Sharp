@@ -729,6 +729,30 @@ namespace VTS {
 
         #endregion
 
+        #region VTS Event Subscription API Wrapper
+
+        private void SubscribeToEvent<T, K>(string eventName, 
+            bool subscribed,
+            VTSEventConfigData config, 
+            Action<K> onEvent,
+            Action<VTSErrorData> onError) where T : VTSEventSubscriptionRequestData, new() where K : VTSEventData {
+            T request = new T();
+            request.SetEventName(eventName);
+            request.SetSubscribed(subscribed);
+            request.SetConfig(config);
+            this._socket.SendEventSubscription<T, K>(request, onEvent, onError);
+        }
+
+        public void SubscribeToTestEvent(VTSTestEventConfigOptions config, Action<VTSTestEventData> onEvent, Action<VTSErrorData> onError){            
+            SubscribeToEvent<VTSTestEventSubscriptionRequestData, VTSTestEventData>("TestEvent", true, config, onEvent, onError);
+        }
+
+        public void UnsubscribeFromTestEvent(Action<VTSErrorData> onError){
+            SubscribeToEvent<VTSTestEventSubscriptionRequestData, VTSTestEventData>("TestEvent", false, null, (s) => {}, onError);
+        }
+
+        #endregion
+
         #region Helper Methods
 
         private static Regex ALPHANUMERIC = new Regex(@"\W|");

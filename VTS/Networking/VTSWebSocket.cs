@@ -18,6 +18,8 @@ namespace VTS.Networking {
         private IJsonUtility _json = null;
         private Dictionary<string, VTSCallbacks> _callbacks = new Dictionary<string, VTSCallbacks>();
 
+        private Dictionary<string, VTSEventCallbacks> _events = new Dictionary<string, VTSEventCallbacks>();
+
         // UDP 
         private static UdpClient UDP_CLIENT = null;
         private static Task<UdpReceiveResult> UDP_RESULT = null;
@@ -89,7 +91,22 @@ namespace VTS.Networking {
                     data = this._ws.GetNextResponse();
                     if(data != null){
                         VTSMessageData response = this._json.FromJson<VTSMessageData>(data);
-                        if(this._callbacks.ContainsKey(response.requestID)){
+                        if(this._events.ContainsKey(response.messageType)){
+                            try{
+                                switch(response.messageType){
+                                    case "TestEvent":
+                                        this._events[response.messageType].onEvent(this._json.FromJson<VTSTestEventData>(data));
+                                        break;
+                                }
+                            }catch(Exception e){
+                                // Neatly handle errors in case the deserialization or success callback throw an exception
+                                VTSErrorData error = new VTSErrorData();
+                                error.requestID = response.requestID;
+                                error.data.message = e.Message;
+                                this._events[response.messageType].onError(error);
+                            }
+                        }
+                        else if(this._callbacks.ContainsKey(response.requestID)){
                             try{
                                 switch(response.messageType){
                                     case "APIError":
@@ -186,6 +203,9 @@ namespace VTS.Networking {
                                     case "ItemMoveResponse":
                                         this._callbacks[response.requestID].onSuccess(this._json.FromJson<VTSItemMoveResponseData>(data));
                                         break;
+                                    case "EventSubscriptionResponse":
+                                        this._callbacks[response.requestID].onSuccess(this._json.FromJson<VTSEventSubscriptionResponseData>(data));
+                                        break;
                                     default:
                                         VTSErrorData error = new VTSErrorData();
                                         error.data.message = "Unable to parse response as valid response type: " + data;
@@ -238,6 +258,26 @@ namespace VTS.Networking {
             }
         }
 
+        public void SendEventSubscription<T, K>(T request, Action<K> onEvent, Action<VTSErrorData> onError) where T : VTSEventSubscriptionRequestData where K : VTSEventData{
+            this.Send<T, VTSEventSubscriptionResponseData>(
+                request, 
+                (s) => {
+                    // add event or remove event from register
+                    if(request.GetSubscribed()){
+                        this._events.Add(request.GetEventName(), new VTSEventCallbacks(
+                            (t) => { onEvent((K)t); } , 
+                            onError,
+                            request.GetEventName(),
+                            request.GetConfig()));
+                    }else{
+                        if(this._events.ContainsKey(request.GetEventName())){
+                            this._events.Remove(request.GetEventName());
+                        };
+                    }
+                },
+                onError);
+        }
+
         public Dictionary<int, VTSStateBroadcastData> GetPorts(){
             return new Dictionary<int, VTSStateBroadcastData>(PORTS);
         }
@@ -256,6 +296,19 @@ namespace VTS.Networking {
             public VTSCallbacks(Action<VTSMessageData> onSuccess, Action<VTSErrorData> onError){
                 this.onSuccess = onSuccess;
                 this.onError = onError;
+            }
+        }
+
+        private struct VTSEventCallbacks{
+            public Action<VTSEventData> onEvent;
+            public Action<VTSErrorData> onError;
+            public string eventType;
+            public VTSEventConfigData config;
+            public VTSEventCallbacks(Action<VTSEventData> onEvent, Action<VTSErrorData> onError, string eventType, VTSEventConfigData config){
+                this.onEvent = onEvent;
+                this.onError = onError;
+                this.eventType = eventType;
+                this.config = config;
             }
         }
     }
