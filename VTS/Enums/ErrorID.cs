@@ -2,9 +2,7 @@
     /// <summary>
     /// Enum for API-related errors.
     /// </summary>
-    [System.Serializable]
-    public enum ErrorID : int
-    {
+    public enum ErrorID {
         // General errors
         InternalServerError = 0,
         APIAccessDeactivated = 1,
@@ -107,7 +105,7 @@
         // Errors related to ItemLoadRequest
         ItemFileNameMissing = 750,
         ItemFileNameNotFound = 751,
-        ItemLoadLoadCooldownNotOver = 752,
+        ItemLoadLoadCooldownNotOver = 752, // Not used anymore. The cooldown for loading items has been removed.
         CannotCurrentlyLoadItem = 753, // This is usually because the user has menus open that prevent items from being loaded.
         CannotLoadItemSceneFull = 754,
         ItemOrderInvalid = 755,
@@ -126,6 +124,21 @@
 
         // Errors related to ItemMoveRequest
         ItemMoveRequestInstanceIDNotFound = 900,
-        ItemMoveRequestInvalidFadeMode = 901
+        ItemMoveRequestInvalidFadeMode = 901,
+        ItemMoveRequestItemOrderTakenOrInvalid = 902,
+        ItemMoveRequestCannotCurrentlyChangeOrder = 903, // Cannot change order when any windows are open.
+        
+        // Errors related to EventSubscriptionRequest
+        EventSubscriptionRequestEventTypeUnknown = 950,
+        
+        // -------------- EVENT CONFIG ERRORS --------------
+        
+        EVENT_OFFSET = 100000,
+
+        // Event subscription errors for TestEvent
+        Event_TestEvent_TestMessageTooLong = EVENT_OFFSET + 0,
+
+        // Event subscription errors for ModelLoadedEvent
+        Event_ModelLoadedEvent_ModelIDInvalid = EVENT_OFFSET + 50
     }
 }

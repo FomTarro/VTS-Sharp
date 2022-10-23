@@ -10,8 +10,7 @@ namespace VTS {
     /// The base class for VTS plugin creation.
     /// </summary>
     [RequireComponent(typeof(VTSWebSocket))]
-    public abstract class VTSPlugin : MonoBehaviour
-    {
+    public abstract class VTSPlugin : MonoBehaviour {
         #region Properties
 
         [SerializeField]
@@ -76,21 +75,25 @@ namespace VTS {
             this._tokenStorage = tokenStorage;
             this._socket = GetComponent<VTSWebSocket>();
             this._socket.Initialize(webSocket, jsonUtility);
+            Action onCombinedConnect = () => {
+                this._socket.ResubscribeToEvents();
+                onConnect();
+            };
             this._socket.Connect(() => {
                 // If API enabled, authenticate
                 Authenticate(
                     (r) => { 
                         if(!r.data.authenticated){
-                            Reauthenticate(onConnect, onError);
+                            Reauthenticate(onCombinedConnect, onError);
                         }else{
                             this._isAuthenticated = true;
-                            onConnect();
+                            onCombinedConnect();
                         }
                     }, 
                     (r) => { 
                         // If initial authentication fails, try again
                         // (Likely just needs fresh token)
-                        Reauthenticate(onConnect, onError); 
+                        Reauthenticate(onCombinedConnect, onError); 
                     }
                 );
             },
@@ -102,6 +105,15 @@ namespace VTS {
                 this._isAuthenticated = false;
                 onError();
             });
+        }
+
+        /// <summary>
+        /// Disconnects from VTube Studio. Will fire the onDisconnect callback set via the Initialize method.
+        /// </summary>
+        public void Disconnect(){
+            if(this._socket != null){
+                this._socket.Disconnect();
+            }
         }
 
         #endregion
@@ -190,7 +202,7 @@ namespace VTS {
 
         #endregion
 
-        #region VTS API Wrapper
+        #region VTS General API Wrapper
 
         /// <summary>
         /// Gets the current state of the VTS API.
@@ -727,9 +739,213 @@ namespace VTS {
             this._socket.Send<VTSItemMoveRequestData, VTSItemMoveResponseData>(request, onSuccess, onError);
         }
 
+        public void RequestArtMeshSelection(string textOverride, string helpOverride, int count, 
+            ICollection<string> activeArtMeshes, 
+            Action<VTSArtMeshSelectionResponseData> onSuccess, Action<VTSErrorData> onError){
+            VTSArtMeshSelectionRequestData request = new VTSArtMeshSelectionRequestData();
+            request.data.textOverride = textOverride;
+            request.data.helpOverride = helpOverride;
+            request.data.requestedArtMeshCount = count;
+            string[] array = new string[activeArtMeshes.Count];
+            activeArtMeshes.CopyTo(array, 0);
+            request.data.activeArtMeshes = array;
+
+            this._socket.Send<VTSArtMeshSelectionRequestData, VTSArtMeshSelectionResponseData>(request, onSuccess, onError);
+        }
+
+        #endregion
+
+        #region VTS Event Subscription API Wrapper
+
+        private void SubscribeToEvent<T, K>(string eventName, bool subscribed, VTSEventConfigData config, Action<K> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) where T : VTSEventSubscriptionRequestData, new() where K : VTSEventData {
+            T request = new T();
+            request.SetEventName(eventName);
+            request.SetSubscribed(subscribed);
+            if(config != null){
+                request.SetConfig(config);
+            }
+            this._socket.SendEventSubscription<T, K>(request, onEvent, onSubscribe, onError, () => {
+                SubscribeToEvent<T, K>(eventName, subscribed, config, onEvent, onSubscribe, onError);
+            });
+        }
+
+        /// <summary>
+        /// Unsubscribes from all events.
+        /// </summary>
+        /// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing to the event.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void UnsubscribeFromAllEvents(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError){
+            SubscribeToEvent<VTSTestEventSubscriptionRequestData, VTSTestEventData>(null, false, null, DoNothingCallback, onUnsubscribe, onError);
+        }
+
+        /// <summary>
+        /// Subscribes to the Test Event for testing the event API. Can be configured with a message to echo back every second.
+        /// 
+        /// For more info, see 
+        /// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#test-event">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#test-event</a>
+        /// </summary>
+        /// <param name="config">Configuration options about the subscription.</param>
+        /// <param name="onEvent">Callback to execute upon receiving an event.</param>
+        /// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void SubscribeToTestEvent(VTSTestEventConfigOptions config, Action<VTSTestEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError){
+            SubscribeToEvent<VTSTestEventSubscriptionRequestData, VTSTestEventData>("TestEvent", true, config, onEvent, onSubscribe, onError);
+        }
+
+        /// <summary>
+        /// Unsubscribes from the Test Event.
+        /// </summary>
+        /// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing from the event.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void UnsubscribeFromTestEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError){
+            SubscribeToEvent<VTSTestEventSubscriptionRequestData, VTSTestEventData>("TestEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
+        }
+
+        /// <summary>
+        /// Subscribes to the Model Loaded Event. Can be configured with a model ID to only recieve events about the given model.
+        /// 
+        /// For more info, see 
+        /// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#model-loadedunloaded">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#model-loadedunloaded</a>
+        /// </summary>
+        /// <param name="config">Configuration options about the subscription.</param>
+        /// <param name="onEvent">Callback to execute upon receiving an event.</param>
+        /// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void SubscribeToModelLoadedEvent(VTSModelLoadedEventConfigOptions config, Action<VTSModelLoadedEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError){
+            SubscribeToEvent<VTSModelLoadedEventSubscriptionRequestData, VTSModelLoadedEventData>("ModelLoadedEvent", true, config, onEvent, onSubscribe, onError);
+        }
+
+        /// <summary>
+        /// Unsubscribes from the Model Loaded Event.
+        /// </summary>
+        /// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing from the event.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void UnsubscribeFromModelLoadedEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError){
+            SubscribeToEvent<VTSModelLoadedEventSubscriptionRequestData, VTSTestEventData>("ModelLoadedEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
+        }
+
+        /// <summary>
+        /// Subscribes to the Tracking Status Changed Event.
+        /// 
+        /// For more info, see 
+        /// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#lostfound-tracking">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#lostfound-tracking</a>
+        /// </summary>
+        /// <param name="onEvent">Callback to execute upon receiving an event.</param>
+        /// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void SubscribeToTrackingEvent(Action<VTSTrackingEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError){
+            SubscribeToEvent<VTSTrackingEventSubscriptionRequestData, VTSTrackingEventData>("TrackingStatusChangedEvent", true, new VTSTrackingEventConfigOptions(), onEvent, onSubscribe, onError);
+        }
+
+        /// <summary>
+        /// Unsubscribes from the Tracking Status Changed Event.
+        /// </summary>
+        /// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing from the event.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void UnsubscribeFromTrackingEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError){
+            SubscribeToEvent<VTSTrackingEventSubscriptionRequestData, VTSTrackingEventData>("TrackingStatusChangedEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
+        }
+
+        /// <summary>
+        /// Subscribes to the Background Changed Event.
+        /// 
+        /// For more info, see 
+        /// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#lostfound-tracking">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#lostfound-tracking</a>
+        /// </summary>
+        /// <param name="onEvent">Callback to execute upon receiving an event.</param>
+        /// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void SubscribeToBackgroundChangedEvent(Action<VTSBackgroundChangedEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError){
+            SubscribeToEvent<VTSBackgroundChangedEventSubscriptionRequestData, VTSBackgroundChangedEventData>("BackgroundChangedEvent", true, new VTSBackgroundChangedEventConfigOptions(), onEvent, onSubscribe, onError);
+        }
+
+        /// <summary>
+        /// Unsubscribes from the Background Changed Event.
+        /// </summary>
+        /// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing from the event.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void UnsubscribeFromBackgroundChangedEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError){
+            SubscribeToEvent<VTSBackgroundChangedEventSubscriptionRequestData, VTSBackgroundChangedEventData>("BackgroundChangedEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
+        }
+
+        /// <summary>
+        /// Subscribes to the Model Config Changed Event.
+        /// 
+        /// For more info, see 
+        /// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#model-config-modified">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#model-config-modified</a>
+        /// </summary>
+        /// <param name="onEvent">Callback to execute upon receiving an event.</param>
+        /// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void SubscribeToModelConfigChangedEvent(Action<VTSModelConfigChangedEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError){
+            SubscribeToEvent<VTSModelConfigChangedEventSubscriptionRequestData, VTSModelConfigChangedEventData>("ModelConfigChangedEvent", true, new VTSBackgroundChangedEventConfigOptions(), onEvent, onSubscribe, onError);
+        }
+
+        /// <summary>
+        /// Unsubscribes from the Model Config Changed Event.
+        /// </summary>
+        /// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing from the event.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void UnsubscribeFromModelConfigChangedEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError){
+            SubscribeToEvent<VTSModelConfigChangedEventSubscriptionRequestData, VTSModelConfigChangedEventData>("ModelConfigChangedEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
+        }
+
+        /// <summary>
+        /// Subscribes to the Model Moved Event.
+        /// 
+        /// For more info, see 
+        /// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#model-movedresizedrotated">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#model-movedresizedrotated</a>
+        /// </summary>
+        /// <param name="onEvent">Callback to execute upon receiving an event.</param>
+        /// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void SubscribeToModelMovedEvent(Action<VTSModelMovedEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError){
+            SubscribeToEvent<VTSModelMovedEventSubscriptionRequestData, VTSModelMovedEventData>("ModelMovedEvent", true, new VTSBackgroundChangedEventConfigOptions(), onEvent, onSubscribe, onError);
+        }
+
+        /// <summary>
+        /// Unsubscribes from the Model Moved Event.
+        /// </summary>
+        /// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing from the event.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void UnsubscribeFromModelMovedEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError){
+            SubscribeToEvent<VTSModelMovedEventSubscriptionRequestData, VTSModelMovedEventData>("ModelMovedEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
+        }        
+
+        /// <summary>
+        /// Subscribes to the Model Outline Event.
+        /// 
+        /// For more info, see 
+        /// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#model-outline-changed">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#model-outline-changed</a>
+        /// </summary>
+        /// <param name="config">Configuration options about the subscription.</param>
+        /// <param name="onEvent">Callback to execute upon receiving an event.</param>
+        /// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void SubscribeToModelOutlineEvent(VTSModelOutlineEventConfigOptions config, Action<VTSModelOutlineEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError){
+            SubscribeToEvent<VTSModelOutlineEventSubscriptionRequestData, VTSModelOutlineEventData>("ModelOutlineEvent", true,config, onEvent, onSubscribe, onError);
+        }
+
+        /// <summary>
+        /// Unsubscribes from the Model Outline Event.
+        /// </summary>
+        /// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing from the event.</param>
+        /// <param name="onError">Callback executed upon receiving an error.</param>
+        public void UnsubscribeFromModelOutlineEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError){
+            SubscribeToEvent<VTSModelOutlineEventSubscriptionRequestData, VTSModelOutlineEventData>("ModelOutlineEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
+        }  
+
         #endregion
 
         #region Helper Methods
+
+        /// <summary>
+        /// Static VTS API callback method which does nothing. Saves you from needing to make a new inline function each time.
+        /// </summary>
+        /// <param name="response"></param>
+        protected static void DoNothingCallback(VTSMessageData response){
+            // Do nothing!
+        }
 
         private static Regex ALPHANUMERIC = new Regex(@"\W|");
         private static string SanitizeParameterName(string name){
@@ -755,7 +971,7 @@ namespace VTS {
             return null;
         }
 
-        private static string  InjectParameterModeToString(VTSInjectParameterMode mode){
+        private static string InjectParameterModeToString(VTSInjectParameterMode mode){
             if(mode == VTSInjectParameterMode.ADD){
                 return "add";
             }else if(mode == VTSInjectParameterMode.SET){
@@ -781,7 +997,15 @@ namespace VTS {
             return "linear";
         }
 
+        /// <summary>
+        /// Converts the VTS Pair struct to a Unity Vector2 struct.
+        /// </summary>
+        /// <param name="pair">The Pair to convert</param>
+        /// <returns></returns>
+        public static Vector2 PairToVector2(Pair pair){
+            return new Vector2(pair.x, pair.y);
+        }
+
         #endregion
-        
     }
 }

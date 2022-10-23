@@ -15,6 +15,9 @@ namespace VTS.Examples {
         private Text _text = null;
 
         [SerializeField]
+        private Text _eventText = null;
+
+        [SerializeField]
         private Color _color = Color.black;
 
         [SerializeField]
@@ -24,6 +27,7 @@ namespace VTS.Examples {
         private Image _connectionLight = null;
         [SerializeField]
         private Text _connectionText = null;
+
 
         private void Awake(){
             Connect();
@@ -112,6 +116,47 @@ namespace VTS.Examples {
                 (e) => { _text.text = e.data.message; }
             );
         }
+
+        public void GetArtMeshes(){
+            this.RequestArtMeshSelection("", "", 2, new List<string>(), 
+            (s) => {
+                this._text.text = new JsonUtilityImpl().ToJson(s);
+            },
+            (e) => {
+                this._text.text = new JsonUtilityImpl().ToJson(e);
+            });
+        }
+
+        public void SubTestEvent(){
+            VTSTestEventConfigOptions config = new VTSTestEventConfigOptions("ECHO!");
+            this.SubscribeToTestEvent(
+                config, 
+                (s) => { _eventText.text = string.Format("{0} - {1}", s.data.counter, s.data.yourTestMessage); },
+                DoNothingCallback,
+                (e) => { _eventText.text = e.data.message; } );
+        }
+
+        public void UnsubTestEvent(){
+            this.UnsubscribeFromTestEvent(
+                (s) => { _eventText.text = "[Event Output]"; },
+                (e) => { _eventText.text = e.data.message; } );
+        }
+
+        public void SubOutlineEvent(){
+            VTSModelOutlineEventConfigOptions config = new VTSModelOutlineEventConfigOptions(true);
+            this.SubscribeToModelOutlineEvent(
+                config, 
+                (s) => { _eventText.text = string.Format("Model center: ({0}, {1})", s.data.convexHullCenter.x, s.data.convexHullCenter.y); },
+                DoNothingCallback,
+                (e) => { _eventText.text = e.data.message; } );
+        }
+
+        public void UnsubOutlineEvent(){
+            this.UnsubscribeFromModelOutlineEvent(
+                (s) => { _eventText.text = "[Event Output]"; },
+                (e) => { _eventText.text = e.data.message; } );
+        }
+
 
         private void SyncValues(VTSParameterInjectionValue[] values){
             InjectParameterValues(
