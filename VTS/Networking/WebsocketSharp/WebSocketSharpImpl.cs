@@ -25,12 +25,12 @@ namespace VTS.Networking.Impl{
 
         public bool IsConnecting()
         {
-            return this._socket != null && this._socket.ReadyState == WebSocketState.CONNECTING;
+            return this._socket != null && this._socket.ReadyState == WebSocketState.Connecting;
         }
 
         public bool IsConnectionOpen()
         {
-            return this._socket != null && this._socket.ReadyState == WebSocketState.OPEN;
+            return this._socket != null && this._socket.ReadyState == WebSocketState.Open;
         }
 
         public void Send(string message)

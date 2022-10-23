@@ -117,6 +117,16 @@ namespace VTS.Examples {
             );
         }
 
+        public void GetArtMeshes(){
+            this.RequestArtMeshSelection("", "", 2, new List<string>(), 
+            (s) => {
+                this._text.text = new JsonUtilityImpl().ToJson(s);
+            },
+            (e) => {
+                this._text.text = new JsonUtilityImpl().ToJson(e);
+            });
+        }
+
         public void SubTestEvent(){
             VTSTestEventConfigOptions config = new VTSTestEventConfigOptions("ECHO!");
             this.SubscribeToTestEvent(
@@ -131,6 +141,16 @@ namespace VTS.Examples {
                 (s) => { _eventText.text = "[Event Output]"; },
                 (e) => { _eventText.text = e.data.message; } );
         }
+
+        public void SubOutlineEvent(){
+            VTSModelOutlineEventConfigOptions config = new VTSModelOutlineEventConfigOptions(true);
+            this.SubscribeToModelOutlineEvent(
+                config, 
+                (s) => { },
+                DoNothingCallback,
+                (e) => { } );
+        }
+
 
         private void SyncValues(VTSParameterInjectionValue[] values){
             InjectParameterValues(

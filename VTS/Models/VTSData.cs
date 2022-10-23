@@ -5,8 +5,7 @@ namespace VTS.Models {
     #region Common
 
     [System.Serializable]
-    public class VTSMessageData
-    {
+    public class VTSMessageData {
         public string apiName = "VTubeStudioPublicAPI";
         public long timestamp;
         public string apiVersion = "1.0";
@@ -27,6 +26,12 @@ namespace VTS.Models {
             public ErrorID errorID;
             public string message;
         }
+    }
+
+    [System.Serializable]
+    public struct Tuple {
+        public float x;
+        public float y;
     }
 
     #endregion
@@ -1152,6 +1157,43 @@ namespace VTS.Models {
         }
     }
 
+    [System.Serializable]
+    public class VTSArtMeshSelectionRequestData : VTSMessageData {
+        public VTSArtMeshSelectionRequestData(){
+            this.messageType = "ArtMeshSelectionRequest";
+            this.data = new Data();
+
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public string textOverride;
+            public string helpOverride;
+            public int requestedArtMeshCount;
+            public string[] activeArtMeshes;
+
+        }
+    }
+
+    [System.Serializable]
+    public class VTSArtMeshSelectionResponseData : VTSMessageData {
+        public VTSArtMeshSelectionResponseData(){
+            this.messageType = "ArtMeshSelectionResponse";
+            this.data = new Data();
+
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+
+            public bool success;
+            public string[] activeArtMeshes;
+            public string[] inactiveArtMeshes;
+        }
+    }
+
     #endregion
 
     #region Event API
@@ -1320,6 +1362,319 @@ namespace VTS.Models {
 
         [System.Serializable]
         public class Data : ModelData { }
+    }
+    
+    [System.Serializable]
+    public class VTSTrackingEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+        public VTSTrackingEventSubscriptionRequestData(){
+            this.messageType = "EventSubscriptionRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data : VTSEventSubscriptonData {
+            public VTSTrackingEventConfigOptions config;
+        }
+
+        public override void SetEventName(string eventName) {
+            this.data.eventName = eventName;
+        }
+
+        public override string GetEventName(){
+            return this.data.eventName;
+        }
+
+        public override void SetSubscribed(bool subscribe) {
+            this.data.subscribe = subscribe;
+        }
+
+        public override bool GetSubscribed(){
+            return this.data.subscribe;
+        }
+
+        public override void SetConfig(VTSEventConfigData config){
+            this.data.config = (VTSTrackingEventConfigOptions)config;
+        }
+    }
+
+    /// <summary>
+    /// A container for providing subscription options for a Lost Tracking Event subscription.
+    /// 
+    /// For more info about what each field does, see 
+    /// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#lostfound-tracking">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#lostfound-tracking</a>
+    /// </summary>
+    [System.Serializable]
+    public class VTSTrackingEventConfigOptions : VTSEventConfigData {
+        public VTSTrackingEventConfigOptions(){ }
+    }
+
+    [System.Serializable]
+    public class VTSTrackingEventData : VTSEventData {
+        public VTSTrackingEventData(){
+            this.messageType = "TrackingStatusChangedEvent";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public bool faceFound;
+            public bool leftHandFound;
+            public bool rightHandFound;
+        }
+    }
+
+    [System.Serializable]
+    public class VTSBackgroundChangedEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+        public VTSBackgroundChangedEventSubscriptionRequestData(){
+            this.messageType = "EventSubscriptionRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data : VTSEventSubscriptonData {
+            public VTSBackgroundChangedEventConfigOptions config;
+        }
+
+        public override void SetEventName(string eventName) {
+            this.data.eventName = eventName;
+        }
+
+        public override string GetEventName(){
+            return this.data.eventName;
+        }
+
+        public override void SetSubscribed(bool subscribe) {
+            this.data.subscribe = subscribe;
+        }
+
+        public override bool GetSubscribed(){
+            return this.data.subscribe;
+        }
+
+        public override void SetConfig(VTSEventConfigData config){
+            this.data.config = (VTSBackgroundChangedEventConfigOptions)config;
+        }
+    }
+
+    /// <summary>
+    /// A container for providing subscription options for a Background Changed Event subscription.
+    /// 
+    /// For more info about what each field does, see 
+    /// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#background-changed">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#background-changed</a>
+    /// </summary>
+    [System.Serializable]
+    public class VTSBackgroundChangedEventConfigOptions : VTSEventConfigData {
+        public VTSBackgroundChangedEventConfigOptions(){ }
+    }
+
+    [System.Serializable]
+    public class VTSBackgroundChangedEventData : VTSEventData {
+        public VTSBackgroundChangedEventData(){
+            this.messageType = "BackgroundChangedEvent";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public string backgroundName;
+        }
+    }
+
+    [System.Serializable]
+    public class VTSModelConfigChangedEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+        public VTSModelConfigChangedEventSubscriptionRequestData(){
+            this.messageType = "EventSubscriptionRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data : VTSEventSubscriptonData {
+            public VTSModelConfigChangedEventConfigOptions config;
+        }
+
+        public override void SetEventName(string eventName) {
+            this.data.eventName = eventName;
+        }
+
+        public override string GetEventName(){
+            return this.data.eventName;
+        }
+
+        public override void SetSubscribed(bool subscribe) {
+            this.data.subscribe = subscribe;
+        }
+
+        public override bool GetSubscribed(){
+            return this.data.subscribe;
+        }
+
+        public override void SetConfig(VTSEventConfigData config){
+            this.data.config = (VTSModelConfigChangedEventConfigOptions)config;
+        }
+    }
+
+    /// <summary>
+    /// A container for providing subscription options for a Model Config Changed Event subscription.
+    /// 
+    /// For more info about what each field does, see 
+    /// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#model-config-modified">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#model-config-modified</a>
+    /// </summary>
+    [System.Serializable]
+    public class VTSModelConfigChangedEventConfigOptions : VTSEventConfigData {
+        public VTSModelConfigChangedEventConfigOptions(){ }
+    }
+
+    [System.Serializable]
+    public class VTSModelConfigChangedEventData : VTSEventData {
+        public VTSModelConfigChangedEventData(){
+            this.messageType = "ModelConfigChangedEvent";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public string modelID;
+            public string modelName;
+            public bool hotkeyConfigChanged;
+        }
+    }
+
+    [System.Serializable]
+    public class VTSModelMovedEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+        public VTSModelMovedEventSubscriptionRequestData(){
+            this.messageType = "EventSubscriptionRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data : VTSEventSubscriptonData {
+            public VTSModelMovedEventConfigOptions config;
+        }
+
+        public override void SetEventName(string eventName) {
+            this.data.eventName = eventName;
+        }
+
+        public override string GetEventName(){
+            return this.data.eventName;
+        }
+
+        public override void SetSubscribed(bool subscribe) {
+            this.data.subscribe = subscribe;
+        }
+
+        public override bool GetSubscribed(){
+            return this.data.subscribe;
+        }
+
+        public override void SetConfig(VTSEventConfigData config){
+            this.data.config = (VTSModelMovedEventConfigOptions)config;
+        }
+    }
+
+    /// <summary>
+    /// A container for providing subscription options for a Model Config Changed Event subscription.
+    /// 
+    /// For more info about what each field does, see 
+    /// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#model-movedresizedrotated">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#model-movedresizedrotated</a>
+    /// </summary>
+    [System.Serializable]
+    public class VTSModelMovedEventConfigOptions : VTSEventConfigData {
+        public VTSModelMovedEventConfigOptions(){ }
+    }
+
+    [System.Serializable]
+    public class VTSModelMovedEventData : VTSEventData {
+        public VTSModelMovedEventData(){
+            this.messageType = "ModelMovedEvent";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public string modelID;
+            public string modelName;
+            public ModelPosition modelPosition;
+        }
+    }
+
+    [System.Serializable]
+    public class VTSModelOutlineEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+        public VTSModelOutlineEventSubscriptionRequestData(){
+            this.messageType = "EventSubscriptionRequest";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data : VTSEventSubscriptonData {
+            public VTSModelOutlineEventConfigOptions config;
+        }
+
+        public override void SetEventName(string eventName) {
+            this.data.eventName = eventName;
+        }
+
+        public override string GetEventName(){
+            return this.data.eventName;
+        }
+
+        public override void SetSubscribed(bool subscribe) {
+            this.data.subscribe = subscribe;
+        }
+
+        public override bool GetSubscribed(){
+            return this.data.subscribe;
+        }
+
+        public override void SetConfig(VTSEventConfigData config){
+            this.data.config = (VTSModelOutlineEventConfigOptions)config;
+        }
+    }
+
+    /// <summary>
+    /// A container for providing subscription options for a Model Outline Event subscription.
+    /// 
+    /// For more info about what each field does, see 
+    /// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#model-outline-changed">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#model-outline-changed</a>
+    /// </summary>
+    [System.Serializable]
+    public class VTSModelOutlineEventConfigOptions : VTSEventConfigData {
+        public VTSModelOutlineEventConfigOptions(){ 
+            this.draw = false;
+        }
+
+        public VTSModelOutlineEventConfigOptions(bool draw){ 
+            this.draw = draw;
+        }
+
+        public bool draw = false;
+    }
+
+    [System.Serializable]
+    public class VTSModelOutlineEventData : VTSEventData {
+        public VTSModelOutlineEventData(){
+            this.messageType = "ModelOutlineEvent";
+            this.data = new Data();
+        }
+        public Data data;
+
+        [System.Serializable]
+        public class Data {
+            public string modelID;
+            public string modelName;
+            public Tuple[] convexHull;
+            public Tuple convexHullCenter;
+            public Tuple windowSize;
+        }
     }
 
     #endregion

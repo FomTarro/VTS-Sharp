@@ -127,6 +127,21 @@ namespace VTS.Networking {
                                     case "ModelLoadedEvent":
                                         this._events[response.messageType].onEvent(this._json.FromJson<VTSModelLoadedEventData>(data));
                                         break;
+                                    case "TrackingStatusChangedEvent":
+                                        this._events[response.messageType].onEvent(this._json.FromJson<VTSTrackingEventData>(data));
+                                        break;
+                                    case "BackgroundChangedEvent":
+                                        this._events[response.messageType].onEvent(this._json.FromJson<VTSBackgroundChangedEventData>(data));
+                                        break;
+                                    case "ModelConfigChangedEvent":
+                                        this._events[response.messageType].onEvent(this._json.FromJson<VTSModelConfigChangedEventData>(data));
+                                        break;
+                                    case "ModelMovedEvent":
+                                        this._events[response.messageType].onEvent(this._json.FromJson<VTSModelMovedEventData>(data));
+                                        break;
+                                    case "ModelOutlineEvent":
+                                        this._events[response.messageType].onEvent(this._json.FromJson<VTSModelOutlineEventData>(data));
+                                        break;
                                 }
                             }catch(Exception e){
                                 // Neatly handle errors in case the deserialization or success callback throw an exception
@@ -232,6 +247,9 @@ namespace VTS.Networking {
                                         break;
                                     case "ItemMoveResponse":
                                         this._callbacks[response.requestID].onSuccess(this._json.FromJson<VTSItemMoveResponseData>(data));
+                                        break;
+                                    case "ArtMeshSelectionResponse":
+                                        this._callbacks[response.requestID].onSuccess(this._json.FromJson<VTSArtMeshSelectionResponseData>(data));
                                         break;
                                     case "EventSubscriptionResponse":
                                         this._callbacks[response.requestID].onSuccess(this._json.FromJson<VTSEventSubscriptionResponseData>(data));

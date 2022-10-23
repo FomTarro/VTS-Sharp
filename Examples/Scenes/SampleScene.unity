@@ -445,7 +445,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 863546772}
-        m_MethodName: SubTestEvent
+        m_MethodName: SubOutlineEvent
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2432,7 +2432,7 @@ GameObject:
   - component: {fileID: 706147569}
   - component: {fileID: 706147568}
   m_Layer: 5
-  m_Name: Get Screen Color
+  m_Name: Get Art Meshes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2502,7 +2502,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 863546772}
-        m_MethodName: PrintScreenColorData
+        m_MethodName: GetArtMeshes
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3066,11 +3066,11 @@ MonoBehaviour:
   _pluginAuthor: Skeletom
   _pluginIcon: {fileID: 2800000, guid: 774c2806a6e98e74e93c0f98f34d9aa4, type: 3}
   _text: {fileID: 1652142700}
+  _eventText: {fileID: 844840015}
   _color: {r: 1, g: 0.6556604, b: 0.87041146, a: 1}
   _headRolling: 0
   _connectionLight: {fileID: 1302218137}
   _connectionText: {fileID: 17735967}
-  _eventText: {fileID: 844840015}
 --- !u!4 &863546773
 Transform:
   m_ObjectHideFlags: 0
@@ -5975,7 +5975,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Get Scene Color
+  m_Text: Request Art Meshes
 --- !u!222 &1826009935
 CanvasRenderer:
   m_ObjectHideFlags: 0
