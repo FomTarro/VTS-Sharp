@@ -10,8 +10,7 @@ namespace VTS {
     /// The base class for VTS plugin creation.
     /// </summary>
     [RequireComponent(typeof(VTSWebSocket))]
-    public abstract class VTSPlugin : MonoBehaviour
-    {
+    public abstract class VTSPlugin : MonoBehaviour {
         #region Properties
 
         [SerializeField]
@@ -106,6 +105,15 @@ namespace VTS {
                 this._isAuthenticated = false;
                 onError();
             });
+        }
+
+        /// <summary>
+        /// Disconnects from VTube Studio. Will fire the onDisconnect callback set via the Initialize method.
+        /// </summary>
+        public void Disconnect(){
+            if(this._socket != null){
+                this._socket.Disconnect();
+            }
         }
 
         #endregion
@@ -771,7 +779,7 @@ namespace VTS {
         }
 
         /// <summary>
-        /// Sunscribes to the Test Event for testing the event API. Can be configured with a message to echo back every second.
+        /// Subscribes to the Test Event for testing the event API. Can be configured with a message to echo back every second.
         /// 
         /// For more info, see 
         /// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#test-event">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#test-event</a>
@@ -794,7 +802,7 @@ namespace VTS {
         }
 
         /// <summary>
-        /// Sunscribes to the Model Loaded Event. Can be configured with a model ID to only recieve events about the given model.
+        /// Subscribes to the Model Loaded Event. Can be configured with a model ID to only recieve events about the given model.
         /// 
         /// For more info, see 
         /// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#model-loadedunloaded">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#model-loadedunloaded</a>
@@ -817,7 +825,7 @@ namespace VTS {
         }
 
         /// <summary>
-        /// Sunscribes to the Tracking Status Changed Event.
+        /// Subscribes to the Tracking Status Changed Event.
         /// 
         /// For more info, see 
         /// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#lostfound-tracking">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#lostfound-tracking</a>
@@ -923,7 +931,7 @@ namespace VTS {
         /// </summary>
         /// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing from the event.</param>
         /// <param name="onError">Callback executed upon receiving an error.</param>
-        public void Outline(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError){
+        public void UnsubscribeFromModelOutlineEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError){
             SubscribeToEvent<VTSModelOutlineEventSubscriptionRequestData, VTSModelOutlineEventData>("ModelOutlineEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
         }  
 
@@ -932,10 +940,10 @@ namespace VTS {
         #region Helper Methods
 
         /// <summary>
-        /// Static VTS API callback method which does nothing.
+        /// Static VTS API callback method which does nothing. Saves you from needing to make a new inline function each time.
         /// </summary>
         /// <param name="response"></param>
-        public static void DoNothingCallback(VTSMessageData response){
+        protected static void DoNothingCallback(VTSMessageData response){
             // Do nothing!
         }
 
@@ -963,7 +971,7 @@ namespace VTS {
             return null;
         }
 
-        private static string  InjectParameterModeToString(VTSInjectParameterMode mode){
+        private static string InjectParameterModeToString(VTSInjectParameterMode mode){
             if(mode == VTSInjectParameterMode.ADD){
                 return "add";
             }else if(mode == VTSInjectParameterMode.SET){
@@ -989,7 +997,15 @@ namespace VTS {
             return "linear";
         }
 
-        #endregion
+        /// <summary>
+        /// Converts the VTS Pair struct to a Unity Vector2 struct.
+        /// </summary>
+        /// <param name="pair">The Pair to convert</param>
+        /// <returns></returns>
+        public static Vector2 PairToVector2(Pair pair){
+            return new Vector2(pair.x, pair.y);
+        }
 
+        #endregion
     }
 }

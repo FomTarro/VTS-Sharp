@@ -4071,7 +4071,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 863546772}
-        m_MethodName: UnsubTestEvent
+        m_MethodName: UnsubOutlineEvent
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

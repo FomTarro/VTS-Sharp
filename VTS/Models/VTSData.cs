@@ -29,7 +29,7 @@ namespace VTS.Models {
     }
 
     [System.Serializable]
-    public struct Tuple {
+    public struct Pair {
         public float x;
         public float y;
     }
@@ -1234,6 +1234,8 @@ namespace VTS.Models {
         }
     }
 
+    // Test Event
+
     [System.Serializable]
     public class VTSTestEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
         public VTSTestEventSubscriptionRequestData(){
@@ -1301,6 +1303,8 @@ namespace VTS.Models {
         }
     }
 
+    // Model Loaded Event
+
     [System.Serializable]
     public class VTSModelLoadedEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
         public VTSModelLoadedEventSubscriptionRequestData(){
@@ -1364,6 +1368,8 @@ namespace VTS.Models {
         public class Data : ModelData { }
     }
     
+    // Tracking Changed Event
+
     [System.Serializable]
     public class VTSTrackingEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
         public VTSTrackingEventSubscriptionRequestData(){
@@ -1425,6 +1431,8 @@ namespace VTS.Models {
         }
     }
 
+    // Background Changed Event
+
     [System.Serializable]
     public class VTSBackgroundChangedEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
         public VTSBackgroundChangedEventSubscriptionRequestData(){
@@ -1483,6 +1491,8 @@ namespace VTS.Models {
             public string backgroundName;
         }
     }
+
+    // Model Config Changed Event
 
     [System.Serializable]
     public class VTSModelConfigChangedEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
@@ -1545,6 +1555,8 @@ namespace VTS.Models {
         }
     }
 
+    // Model Moved Event
+
     [System.Serializable]
     public class VTSModelMovedEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
         public VTSModelMovedEventSubscriptionRequestData(){
@@ -1605,6 +1617,8 @@ namespace VTS.Models {
             public ModelPosition modelPosition;
         }
     }
+
+    // Model Outline Event
 
     [System.Serializable]
     public class VTSModelOutlineEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
@@ -1671,9 +1685,9 @@ namespace VTS.Models {
         public class Data {
             public string modelID;
             public string modelName;
-            public Tuple[] convexHull;
-            public Tuple convexHullCenter;
-            public Tuple windowSize;
+            public Pair[] convexHull;
+            public Pair convexHullCenter;
+            public Pair windowSize;
         }
     }
 

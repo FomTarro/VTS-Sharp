@@ -283,6 +283,12 @@ namespace VTS.Networking {
             }
         }
 
+        public void Disconnect(){
+            if(this._ws != null){
+                this._ws.Stop();
+            }
+        }
+
         public void Send<T, K>(T request, Action<K> onSuccess, Action<VTSErrorData> onError) where T : VTSMessageData where K : VTSMessageData{
             if(this._ws != null){
                 try{

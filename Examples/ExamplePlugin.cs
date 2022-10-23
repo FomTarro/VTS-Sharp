@@ -146,9 +146,15 @@ namespace VTS.Examples {
             VTSModelOutlineEventConfigOptions config = new VTSModelOutlineEventConfigOptions(true);
             this.SubscribeToModelOutlineEvent(
                 config, 
-                (s) => { },
+                (s) => { _eventText.text = string.Format("Model center: ({0}, {1})", s.data.convexHullCenter.x, s.data.convexHullCenter.y); },
                 DoNothingCallback,
-                (e) => { } );
+                (e) => { _eventText.text = e.data.message; } );
+        }
+
+        public void UnsubOutlineEvent(){
+            this.UnsubscribeFromModelOutlineEvent(
+                (s) => { _eventText.text = "[Event Output]"; },
+                (e) => { _eventText.text = e.data.message; } );
         }
 
 
