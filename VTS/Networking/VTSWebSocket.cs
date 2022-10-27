@@ -16,7 +16,8 @@ namespace VTS.Networking {
     public class VTSWebSocket : MonoBehaviour
     {
         // Dependencies
-        private const string VTS_WS_URL = "ws://localhost:{0}";
+        private const string VTS_WS_URL = "ws://{0}:{1}";
+        private IPAddress _ip = IPAddress.Loopback;
         private int _port = 8001;
         private IWebSocket _ws = null;
         private IJsonUtility _json = null;
@@ -102,6 +103,15 @@ namespace VTS.Networking {
         public bool SetPort(int port){
             if(PORTS.ContainsKey(port)){
                 this._port = port;
+                return true;
+            }
+            return false;
+        }
+
+        public bool SetIPAddress(string ipString){
+            IPAddress address;
+            if(IPAddress.TryParse(ipString, out address)){
+                this._ip = address;
                 return true;
             }
             return false;
@@ -277,7 +287,7 @@ namespace VTS.Networking {
 
         public void Connect(System.Action onConnect, System.Action onDisconnect, System.Action onError){
             if(this._ws != null){
-                this._ws.Start(string.Format(VTS_WS_URL, this._port), onConnect, onDisconnect, onError);
+                this._ws.Start(string.Format(VTS_WS_URL, this._ip.ToString(), this._port), onConnect, onDisconnect, onError);
             }else{
                 onError();
             }

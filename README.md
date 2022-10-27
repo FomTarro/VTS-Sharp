@@ -73,6 +73,9 @@ Authenticates the plugin as well as selects the Websocket, JSON utility, and Tok
 * `Action onDisconnect`: Callback executed upon disconnecting from VTS (accidental or otherwise).
 * `Action onError`: The Callback executed upon failed initialization.
 
+#### `void Disconnect`
+Disconnects from VTube Studio. Will fire the onDisconnect callback set via the Initialize method.
+
 #### `Dictionary<int, VTSStateBroadcastData> GetPorts`
 Generates a dictionary indexed by port number containing information about all available VTube Studio ports.
 
@@ -84,6 +87,12 @@ Sets the connection port to the given number. Returns true if the number is a va
 
 If the port number is changed while an active connection exists, you will need to reconnect. Takes the following args:
 * `int port` The port number to set. 
+
+#### `bool SetIPAddress`
+Sets the connection IP address to the given string. Returns true if the string is a valid IP Address format, returns false otherwise.
+
+If the IP Address is changed while an active connection exists, you will need to reconnect. Takes the following args:
+* `string ipString` The string form of the IP address, in dotted-quad notation for IPv4.
 
 #### `VTube Studio API Requests`
 

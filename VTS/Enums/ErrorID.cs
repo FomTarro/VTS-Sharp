@@ -2,7 +2,8 @@
     /// <summary>
     /// Enum for API-related errors.
     /// </summary>
-    public enum ErrorID {
+    public enum ErrorID
+    {
         // General errors
         InternalServerError = 0,
         APIAccessDeactivated = 1,

@@ -200,6 +200,16 @@ namespace VTS {
             return this._socket.SetPort(port);
         }
 
+        /// <summary>
+        /// Sets the connection IP address to the given string. Returns true if the string is a valid IP Address format, returns false otherwise.
+        /// If the IP Address is changed while an active connection exists, you will need to reconnect.
+        /// </summary>
+        /// <param name="ipString">The string form of the IP address, in dotted-quad notation for IPv4.</param>
+        /// <returns>True if the string is a valid IP Address format, False otherwise.</returns>
+        public bool SetIPAddress(string ipString){
+            return this._socket.SetIPAddress(ipString);
+        }
+
         #endregion
 
         #region VTS General API Wrapper
@@ -878,7 +888,7 @@ namespace VTS {
         /// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
         /// <param name="onError">Callback executed upon receiving an error.</param>
         public void SubscribeToModelConfigChangedEvent(Action<VTSModelConfigChangedEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError){
-            SubscribeToEvent<VTSModelConfigChangedEventSubscriptionRequestData, VTSModelConfigChangedEventData>("ModelConfigChangedEvent", true, new VTSBackgroundChangedEventConfigOptions(), onEvent, onSubscribe, onError);
+            SubscribeToEvent<VTSModelConfigChangedEventSubscriptionRequestData, VTSModelConfigChangedEventData>("ModelConfigChangedEvent", true, new VTSModelConfigChangedEventConfigOptions(), onEvent, onSubscribe, onError);
         }
 
         /// <summary>
@@ -900,7 +910,7 @@ namespace VTS {
         /// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
         /// <param name="onError">Callback executed upon receiving an error.</param>
         public void SubscribeToModelMovedEvent(Action<VTSModelMovedEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError){
-            SubscribeToEvent<VTSModelMovedEventSubscriptionRequestData, VTSModelMovedEventData>("ModelMovedEvent", true, new VTSBackgroundChangedEventConfigOptions(), onEvent, onSubscribe, onError);
+            SubscribeToEvent<VTSModelMovedEventSubscriptionRequestData, VTSModelMovedEventData>("ModelMovedEvent", true, new VTSModelMovedEventConfigOptions(), onEvent, onSubscribe, onError);
         }
 
         /// <summary>
