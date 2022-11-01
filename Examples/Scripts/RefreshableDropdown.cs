@@ -15,13 +15,13 @@ public abstract class RefreshableDropdown : MonoBehaviour
 
     protected abstract void SetValue(int index);
 
-    public void OnEnable(){
-        try{
-            Refresh();
-        }catch(System.Exception){
+    // public void OnEnable(){
+    //     try{
+    //         Refresh();
+    //     }catch(System.Exception){
 
-        }
-    }
+    //     }
+    // }
 
     public abstract void Refresh();
 
@@ -45,10 +45,10 @@ public abstract class RefreshableDropdown : MonoBehaviour
         int index = Mathf.Min(this._dropdown.options.Count, 
             StringToIndex(currentSelection));
         this._dropdown.SetValueWithoutNotify(index);
-        this.SetValue(index);
+        // this.SetValue(index);
     }
 
-    private int StringToIndex(string val){
+    protected int StringToIndex(string val){
         return Mathf.Max(this._dropdown.options.FindIndex((o) 
             => { return o.text.Equals(val); }), 0);
     }
