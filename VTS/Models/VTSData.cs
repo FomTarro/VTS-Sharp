@@ -97,7 +97,7 @@ namespace VTS.Models {
     [System.Serializable]
     public class VTSFolderInfoData : VTSMessageData {
          public VTSFolderInfoData(){
-            this.messageType = "VTSFolderInfoRequestuest";
+            this.messageType = "VTSFolderInfoRequest";
             this.data = new Data();
         }
         public Data data;
@@ -554,7 +554,7 @@ namespace VTS.Models {
 		    public int baseStrength;
 		    public int baseWind;
 		    public bool apiPhysicsOverrideActive;
-		    public string apiPhysicsOverridePluginNam;
+		    public string apiPhysicsOverridePluginName;
 		    public VTSPhysicsGroup[] physicsGroups;
         }
     }
