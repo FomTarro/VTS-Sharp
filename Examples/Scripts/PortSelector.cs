@@ -11,9 +11,21 @@ namespace VTS.Examples {
             this._plugin.Connect();
         }
 
-        public override void Refresh()
-        {
-            RefreshValues(this._plugin.GetPorts().Keys);
+        public override void Refresh(){
+            List<int> sortedPorts = new List<int>(this._plugin.GetPorts().Keys);
+            sortedPorts.Sort();
+            RefreshValues(sortedPorts);
+            // Set display value to actual port
+            UpdateDisplay();
         }
+
+        private void UpdateDisplay(){
+            int index = StringToIndex(this._plugin.GetPort().ToString());
+            if(index > -1 && index < this._dropdown.options.Count){
+                this._dropdown.SetValueWithoutNotify(index);
+            }
+        }
+
+        
     }
 }

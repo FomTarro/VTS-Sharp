@@ -65,13 +65,18 @@ Is the plugin currently authenticated?
 
 ### Methods
 #### `void Initialize`
-Authenticates the plugin as well as selects the Websocket, JSON utility, and Token Storage implementations. Takes the following args:
+Connects to Vtube Studio, authenticates the plugin, and also selects the Websocket, JSON utility, and Token Storage implementations. Takes the following args:
 * `IWebSocket webSocket`: The websocket implementation.
 * `IJsonUtility jsonUtility`: The JSON serializer/deserializer implementation.
 * `ITokenStorage tokenStorage`: The Token Storage implementation.
 * `Action onConnect`: Callback executed upon successful initialization.
 * `Action onDisconnect`: Callback executed upon disconnecting from VTS (accidental or otherwise).
 * `Action onError`: The Callback executed upon failed initialization.
+
+The plugin will attempt to intelligently choose a port to connect to, using the following criteria:
+* It will first attempt to connect to the designated port (8001 by default, can be manusally set with [SetPort](#bool-setport)). 
+* If that fails, it will attempt to connect to the first port discovered by UDP. 
+* If that takes too long and times out, it will attempt to connect to the default port (8001).
 
 #### `void Disconnect`
 Disconnects from VTube Studio. Will fire the onDisconnect callback set via the Initialize method.
@@ -164,8 +169,11 @@ Below is a list of some plugins which were made using this library! If you have 
 | [VTSLive](https://github.com/fastestyukkuri/VTSLivePlugins) | [fastest_yukkuri](https://twitter.com/fastest_yukkuri) | An app which allows VTube Studio to reflect the movement of analog and digital clocks, the movement of the sun and moon, and weather information from around the world.|
 |[VTS-Mod](https://github.com/MechaWolfVtuberShin/VTS-Mod/releases/tag/vts-mod)| [MechaWolfVtuberShin](https://twitter.com/ShinChannel3) | An app which allows users to change the surface color of the model including RGB. It can also change the rotation of the model.|
 |[Twitch Integrated Throwing System (T.I.T.S)](https://remasuri3.itch.io/tits) ([Video](https://www.youtube.com/watch?v=hWOIZqv-u50)) | [Remasuri3](https://twitter.com/Remasuri32) | An app which allows your chat to bully you as much as possible >:D It can be used with or without VTube Studio to let people throw items at your face!|
-|[VTS-Heartrate](https://github.com/FomTarro/vts-heartrate)| [Skeletom](https://twitter.com/FomTarro) | An app which allows users to connect their heartrate data to VTube Studio, to cause their model to become flushed under stress and breathe more heavily, among other things. |
+|[VTS-Heartrate](https://github.com/FomTarro/vts-heartrate)| [Skeletom](https://twitter.com/FomTarro) ([Video](https://www.youtube.com/watch?v=tV1kK0uSjFE)| An app which allows users to connect their heartrate data to VTube Studio, to cause their model to become flushed under stress and breathe more heavily, among other things. |
 |[ViewLink](https://kawaentertainment.com/view-link-vr-to-live2-d/)| [Kawa Entertainment](https://twitter.com/kawa_entertain) | An app for translating 3D VR movement into Live2D motion tracking, allowing you to stream VR games with your Live2D model. |
 |[VBridger](https://store.steampowered.com/app/1898830/VBridger/) ([Video](https://www.youtube.com/watch?v=mFUG4L4Lgfo)) | [PiPuProductions](https://twitter.com/PiPuProductions) | An app designed for VTube Studio and Live2D, which allows the user to make better use of iPhoneX ARKit tracking on their Live2D model. |
 |[Audiomimi](https://artemiz.booth.pm/items/3800791/) ([Video](https://twitter.com/ArtemizComs/status/1522834869247651840)) | [Artemiz](https://twitter.com/ArtemizComs) | An app that allows you to use SFX based on VTS parameter movement. |
 |[VTS Desktop Audio](https://lualucky.itch.io/vts-desktop-audio-plugin) ([Video](https://twitter.com/LuaVLucky/status/1592741024509853696)) | [Lua V. Lucky](https://twitter.com/LuaVLucky) | An app that allows you to control your model with your desktop audio! Converts various parts of the audio spectrum to custom tracking parameters. |
+|[Twitch High Intensity Color Changer (T.H.I.C.C)](https://remasuri3.itch.io/thicc) | [Remasuri3](https://twitter.com/Remasuri32) | An app which allows your chat to change colors on your model via point redeems and other events!|
+|[Winter Wonderland Twitch Overlay](https://lualucky.itch.io/winter-wonderland-twitch-overlay) ([Video](https://youtu.be/htP9_D6Z5Qg)) | [Lua V. Lucky](https://twitter.com/LuaVLucky) | An app which provides numerous festive elements for any stream. Decorate a Christmas tree, pelt the streamer with snowballs, and more!|
+|[VInput](https://store.steampowered.com/app/2174170/VInput/) ([Video](https://twitter.com/xiaoye1997/status/1611374527988256770)) | [xiaoye1997](https://twitter.com/xiaoye1997) | An app for sending data to VTubeStudio, such as game controller inputs, racing steering wheel data, time data, hardware monitoring data and data derived from custom LUA scripting.|
