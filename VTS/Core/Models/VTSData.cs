@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VTS.Models {
+namespace VTS {
 
     #region Common
 

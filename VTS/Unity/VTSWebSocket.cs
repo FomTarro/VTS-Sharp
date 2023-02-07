@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using VTS.Core;
-using VTS.Models;
 
-namespace VTS.Networking {
+namespace VTS.Unity {
+
 	/// <summary>
 	/// Underlying VTS socket connection and response processor.
 	/// </summary>
@@ -42,9 +41,9 @@ namespace VTS.Networking {
 			return this.Socket.GetPorts();
 		}
 
-		public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility) {
+		public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, IVTSLogger logger) {
 			this._socket = new Core.VTSWebSocket();
-			this.Socket.Initialize(webSocket, jsonUtility);
+			this.Socket.Initialize(webSocket, jsonUtility, logger);
 		}
 
 		public void ResubscribeToEvents() {

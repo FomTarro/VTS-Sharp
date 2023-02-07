@@ -5,13 +5,11 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-using VTS.Models;
-using VTS.Networking;
-
-using UnityEngine;
 
 namespace VTS.Core {
+	
 	public class VTSWebSocket : IVTSWebSocket {
+
 		// Dependencies
 		private const string VTS_WS_URL = "ws://{0}:{1}";
 		private IPAddress _ip = IPAddress.Loopback;
@@ -20,6 +18,7 @@ namespace VTS.Core {
 		public int Port { get { return this._port; } }
 		private IWebSocket _ws = null;
 		private IJsonUtility _json = null;
+		private static IVTSLogger LOGGER = null;
 
 		// API Callbacks
 		private Dictionary<string, VTSCallbacks> _callbacks = new Dictionary<string, VTSCallbacks>();
@@ -30,8 +29,6 @@ namespace VTS.Core {
 		private static UdpClient UDP_CLIENT = null;
 		private static Task<UdpReceiveResult> UDP_RESULT = null;
 		private static readonly Dictionary<IPAddress, Dictionary<int, VTSStateBroadcastData>> PORTS_BY_IP = new Dictionary<IPAddress, Dictionary<int, VTSStateBroadcastData>>();
-		// private static readonly Dictionary<int, VTSStateBroadcastData> PORTS = new Dictionary<int, VTSStateBroadcastData>();
-
 		private static event Action<IPAddress, int> GLOBAL_PORT_DISCOVERY_EVENT;
 
 		private Action<int> _onLocalPortDiscovered = null;
@@ -41,7 +38,7 @@ namespace VTS.Core {
 
 		#region Lifecycle
 
-		public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility) {
+		public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, IVTSLogger logger) {
 			if (this._ws == null) {
 				// Only add this listener to the event the first time we initialize.
 				GLOBAL_PORT_DISCOVERY_EVENT += OnPortDiscovered;
@@ -51,6 +48,7 @@ namespace VTS.Core {
 
 			this._ws = webSocket;
 			this._json = jsonUtility;
+			LOGGER = logger;
 			StartUDP();
 		}
 
@@ -88,8 +86,6 @@ namespace VTS.Core {
 						UDP_RESULT.Dispose();
 						UDP_RESULT = null;
 						VTSStateBroadcastData data = this._json.FromJson<VTSStateBroadcastData>(text);
-						// Debug.Log(string.Format("{0} - {1}", address, text));
-
 						// New IP addresses get new records made
 						if (!PORTS_BY_IP.ContainsKey(address)) {
 							PORTS_BY_IP.Add(address, new Dictionary<int, VTSStateBroadcastData>());
@@ -134,14 +130,14 @@ namespace VTS.Core {
 				}
 			}
 			catch (Exception e) {
-				Debug.LogError(e);
+				LOGGER.LogError(e.ToString());
 			}
 		}
 
 		private void OnPortDiscovered(IPAddress address, int port) {
 			if (MapAddress(address).Equals(MapAddress(this._ip))) {
 				if (this._onLocalPortDiscovered != null) {
-					Debug.Log(string.Format("Available VTube Studio port discovered: {0}!", port));
+					LOGGER.Log(string.Format("Available VTube Studio port discovered: {0}!", port));
 					this._onLocalPortDiscovered.Invoke(port);
 				}
 			}
@@ -159,48 +155,32 @@ namespace VTS.Core {
 			}
 		}
 
-		/// <summary>
-		/// Returns a map of ports available to the current IP Address. Indexed by port number.
-		/// </summary>
-		/// <returns></returns>
 		public Dictionary<int, VTSStateBroadcastData> GetPorts() {
 			return PORTS_BY_IP.ContainsKey(this._ip)
 				? new Dictionary<int, VTSStateBroadcastData>(PORTS_BY_IP[this._ip])
 				: new Dictionary<int, VTSStateBroadcastData>();
 		}
 
-		/// <summary>
-		/// Sets the connection port to the given number. Returns true if the port is a valid VTube Studio port, returns false otherwise. 
-		/// If the port number is changed while an active connection exists, you will need to reconnect.
-		/// </summary>
-		/// <param name="port">The port to connect to.</param>
-		/// <returns>True if the port is a valid VTube Studio port, False otherwise.</returns>
 		public bool SetPort(int port) {
-			Debug.Log(string.Format("Setting port: {0}...", port));
+			LOGGER.Log(string.Format("Setting port: {0}...", port));
 			this._port = port;
 			if (PORTS_BY_IP.ContainsKey(this._ip) && PORTS_BY_IP[this._ip].ContainsKey(port)) {
-				Debug.Log(string.Format("Port {0} is a known VTube Studio Port.", port));
+				LOGGER.Log(string.Format("Port {0} is a known VTube Studio Port.", port));
 				return true;
 			}
-			Debug.LogWarning(string.Format("Port {0} is not a known VTube Studio Port!", port));
+			LOGGER.LogWarning(string.Format("Port {0} is not a known VTube Studio Port!", port));
 			return false;
 		}
 
-		/// <summary>
-		/// Sets the connection IP address to the given string. Returns true if the string is a valid IP Address format, returns false otherwise.
-		/// If the IP Address is changed while an active connection exists, you will need to reconnect.
-		/// </summary>
-		/// <param name="ipString">The string form of the IP address, in dotted-quad notation for IPv4.</param>
-		/// <returns>True if the string is a valid IP Address format, False otherwise.</returns>
 		public bool SetIPAddress(string ipString) {
 			IPAddress address;
-			Debug.Log(string.Format("Setting IP address: {0}...", ipString));
+			LOGGER.Log(string.Format("Setting IP address: {0}...", ipString));
 			if (IPAddress.TryParse(ipString, out address)) {
 				this._ip = MapAddress(address);
-				Debug.Log(string.Format("IP address {0} is valid IPv4 format.", ipString));
+				LOGGER.Log(string.Format("IP address {0} is valid IPv4 format.", ipString));
 				return true;
 			}
-			Debug.LogWarning(string.Format("IP address {0} is not valid IPv4 format! Unable to set.", ipString));
+			LOGGER.LogWarning(string.Format("IP address {0} is not valid IPv4 format! Unable to set.", ipString));
 			return false;
 		}
 
@@ -225,26 +205,17 @@ namespace VTS.Core {
 
 		#region I/O
 
-		/// <summary>
-		/// Connects to VTube Studio on the current port, executing the provided callbacks during different phases of the connection lifecycle.
-		/// Will first attempt to connect to the designated port. 
-		/// If that fails, it will attempt to find the first port discovered by UDP. 
-		/// If that takes too long and times out, it will attempt to connect to the default port.
-		/// </summary>
-		/// <param name="onConnect">Callback executed upon successful initialization.</param>
-		/// <param name="onDisconnect">Callback executed upon disconnecting from VTS.</param>
-		/// <param name="onError">The Callback executed upon failed initialization.</param>
 		public void Connect(Action onConnect, Action onDisconnect, Action onError) {
 			// If the port we're trying to connect to isn't a known port...
 			if (!(PORTS_BY_IP.ContainsKey(this._ip) && PORTS_BY_IP[this._ip].ContainsKey(this._port))) {
 				// First try to connect to the port we proclaim...
 				ConnectImpl(this._port, onConnect, onDisconnect, () => {
 					// If that fails, let's try the first port we can find on UDP!
-					Debug.Log(string.Format("Unable to connect to VTube Studio port {0}, waiting for port discovery...", this._port));
+					LOGGER.Log(string.Format("Unable to connect to VTube Studio port {0}, waiting for port discovery...", this._port));
 					// Create a callback that will forcibly try to connect to the default port, if we cannot discover a port in time.
 					this._portDiscoveryTimer = DEFAULT_PORT_DISCOVERY_TIMEOUT;
 					this._onPortDiscoveryTimeout = () => {
-						Debug.LogError(string.Format("Wait for port discovery has timed out. Finally, attempting connection on default port {1}.", this._port, DEFAULT_PORT));
+						LOGGER.LogError(string.Format("Wait for port discovery has timed out. Finally, attempting connection on default port {1}.", this._port, DEFAULT_PORT));
 						ClearConnectionCallbacks();
 						ConnectImpl(DEFAULT_PORT, onConnect, onDisconnect, onError);
 					};
@@ -273,9 +244,6 @@ namespace VTS.Core {
 			}
 		}
 
-		/// <summary>
-		/// Disconnects from VTube Studio.
-		/// </summary>
 		public void Disconnect() {
 			if (this._ws != null) {
 				ClearConnectionCallbacks();
@@ -299,7 +267,7 @@ namespace VTS.Core {
 					this._ws.Send(output);
 				}
 				catch (Exception e) {
-					Debug.LogError(e);
+					LOGGER.LogError(e.ToString());
 					VTSErrorData error = new VTSErrorData();
 					error.data.errorID = ErrorID.InternalServerError;
 					error.data.message = e.Message;

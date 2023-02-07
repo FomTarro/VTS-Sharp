@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 using UnityEngine;
 using WebSocketSharp;
 
-namespace VTS.Networking.Impl {
+namespace VTS {
 
     public class WebSocketSharpImpl : IWebSocket {
         private static UTF8Encoding ENCODER = new UTF8Encoding();
