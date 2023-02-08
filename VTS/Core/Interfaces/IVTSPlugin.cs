@@ -25,6 +25,10 @@ namespace VTS {
 		/// <value></value>
 		bool IsAuthenticated { get; }
 
+		IJsonUtility JsonUtility { get; }
+		ITokenStorage TokenStorage { get; }
+		IVTSLogger Logger { get; }
+
 		/// <summary>
 		/// Adds a custom parameter to the currently loaded VTS model.
 		/// 

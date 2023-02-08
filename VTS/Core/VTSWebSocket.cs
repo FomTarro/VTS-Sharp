@@ -56,6 +56,9 @@ namespace VTS.Core {
 			ProcessResponses();
 			CheckPorts();
 			UpdatePortDiscoveryTimeout(timeDelta);
+			if(this._ws != null){
+				this._ws.Update(timeDelta);
+			}
 		}
 
         public void Dispose(){

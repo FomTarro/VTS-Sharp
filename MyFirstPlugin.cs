@@ -7,14 +7,14 @@ public class MyFirstPlugin : VTSPlugin {
 	void Start() {
 		// Everything you need to get started!
 		Initialize(
-			new WebSocketSharpImpl(),
-			new JsonUtilityImpl(),
+			new WebSocketSharpImpl(this.Logger),
+			new JsonUtilityUnityImpl(),
 			new TokenStorageImpl(Application.persistentDataPath),
 			// onConnect
-			() => { Debug.Log("Connected!"); },
+			() => { this.Logger.Log("Connected!"); },
 			// onDisconnect
-			() => { Debug.LogWarning("Disconnected!"); },
+			() => { this.Logger.LogWarning("Disconnected!"); },
 			// onError
-			() => { Debug.LogError("Error!"); });
+			() => { this.Logger.LogError("Error!"); });
 	}
 }

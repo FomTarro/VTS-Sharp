@@ -150,6 +150,17 @@ Deserializes a JSON string into an object of the specified type. Takes the follo
 Converts an object into a JSON string. Takes the following args:
 * `object obj`: The object to serialized.
 
+
+## `interface IVTSLogger`
+
+### Methods
+#### `void Log`
+* `string message`: The message to log.
+#### `void LogWarning`
+* `string message`: The warning to log.
+#### `void LogError`
+* `string message`: The error to log.
+
 # Acknowledgements
 
 ## [DenchiSoft](https://github.com/DenchiSoft/VTubeStudio)

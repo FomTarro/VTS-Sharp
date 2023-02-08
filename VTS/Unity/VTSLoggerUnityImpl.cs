@@ -2,7 +2,7 @@
 
 namespace VTS.Unity {
 
-	public class VTSLoggerImpl : IVTSLogger {
+	public class VTSLoggerUnityImpl : IVTSLogger {
 		public void Log(string message) {
 			Debug.Log(message);
 		}

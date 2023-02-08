@@ -4,6 +4,7 @@ using System.Text;
 namespace VTS {
     
 	public class TokenStorageImpl : ITokenStorage {
+		
 		private static readonly UTF8Encoding ENCODER = new UTF8Encoding();
 		private string _fileName = "token.json";
 		private string _path = "";

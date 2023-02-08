@@ -6,9 +6,6 @@
 	public interface IWebSocket {
 		/// <summary>
 		/// Fetches the next response to process.
-		/// 
-		/// Because Unity can only do most tasks on the main thread, 
-		/// response payloads will be fetched with this method via a poller in the Update lifecycle method.
 		/// </summary>
 		/// <value></value>
 		string GetNextResponse();
@@ -42,5 +39,13 @@
 		/// </summary>
 		/// <param name="message">The payload to send.</param>
 		void Send(string message);
+		/// <summary>
+		/// Method that is called by the system once per tick, to process incoming events.
+		/// 
+		//	For systems like Unity, which can only do most tasks on the main thread, 
+		/// this method will be invoked via a poller in the Update MonoBehaviour lifecycle method.
+		/// </summary>
+		/// <param name="timeDelta">The time since the last update tick.</param>
+		void Update(float timeDelta);
 	}
 }

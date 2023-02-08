@@ -15,7 +15,7 @@ namespace VTS.Unity {
 		private VTS.Core.VTSPlugin Plugin {
 			get {
 				if (this._plugin == null) {
-					this._plugin = new VTS.Core.VTSPlugin(this.Socket, this.PluginName, this.PluginAuthor, this.PluginIcon, new VTSLoggerImpl());
+					this._plugin = new VTS.Core.VTSPlugin(this.Socket, this.PluginName, this.PluginAuthor, this.PluginIcon, this._logger);
 				}
 				return this._plugin;
 			}
@@ -46,6 +46,11 @@ namespace VTS.Unity {
 		}
 
 		public bool IsAuthenticated { get { return this.Plugin.IsAuthenticated; } }
+
+		public IJsonUtility JsonUtility { get { return this._plugin.JsonUtility; } }
+		public ITokenStorage TokenStorage { get { return this._plugin.TokenStorage; } }
+		private IVTSLogger _logger = new VTSLoggerUnityImpl();
+		public IVTSLogger Logger { get { return this._logger; } }
 
 		#endregion
 
@@ -182,7 +187,7 @@ namespace VTS.Unity {
 		}
 
 		public void GetExpressionStateList(Action<VTSExpressionStateData> onSuccess, Action<VTSErrorData> onError) {
-			this.GetExpressionStateList(onSuccess, onError);
+			this.Plugin.GetExpressionStateList(onSuccess, onError);
 		}
 
 		public void SetExpressionState(string expression, bool active, Action<VTSExpressionActivationData> onSuccess, Action<VTSErrorData> onError) {

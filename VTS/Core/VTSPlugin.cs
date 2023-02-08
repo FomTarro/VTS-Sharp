@@ -18,8 +18,12 @@ namespace VTS.Core {
 		private string _token = null;
 
 		private ITokenStorage _tokenStorage;
+		public ITokenStorage TokenStorage { get { return this._tokenStorage; } }
 		private IJsonUtility _jsonUtility;
+		public IJsonUtility JsonUtility { get { return this._jsonUtility; } }
 		private IVTSLogger _logger;
+		public IVTSLogger Logger { get { return this._logger; } }
+		
 		private IVTSWebSocket _socket;
 		public IVTSWebSocket Socket { get { return this._socket; } }
 
@@ -35,6 +39,7 @@ namespace VTS.Core {
 
 		public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onConnect, Action onDisconnect, Action onError) {
 			this._tokenStorage = tokenStorage;
+			this._jsonUtility = jsonUtility;
 			this.Socket.Initialize(webSocket, jsonUtility, this._logger);
 			Action onCombinedConnect = () => {
 				this.Socket.ResubscribeToEvents();
@@ -228,8 +233,13 @@ namespace VTS.Core {
 
 		public void TintArtMesh(ColorTint tint, float mixWithSceneLightingColor, ArtMeshMatcher matcher, Action<VTSColorTintData> onSuccess, Action<VTSErrorData> onError) {
 			VTSColorTintData request = new VTSColorTintData();
-			ArtMeshColorTint colorTint = new ArtMeshColorTint();
-			colorTint.mixWithSceneLightingColor = System.Math.Min(1, System.Math.Max(mixWithSceneLightingColor, 0));
+			ArtMeshColorTint colorTint = new ArtMeshColorTint(){
+				colorR = tint.colorR,
+				colorG = tint.colorG,
+				colorB = tint.colorB,
+				colorA = tint.colorA,
+				mixWithSceneLightingColor = System.Math.Min(1, System.Math.Max(mixWithSceneLightingColor, 0))
+			};
 			request.data.colorTint = colorTint;
 			request.data.artMeshMatcher = matcher;
 			this.Socket.Send<VTSColorTintData, VTSColorTintData>(request, onSuccess, onError);

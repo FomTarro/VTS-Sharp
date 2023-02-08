@@ -1,5 +1,8 @@
 ﻿namespace VTS {
 
+	/// <summary>
+	/// Interface for providing an Auth Token Storage implementation.
+	/// </summary>
 	public interface ITokenStorage {
 		/// <summary>
 		/// Loads the auth token.

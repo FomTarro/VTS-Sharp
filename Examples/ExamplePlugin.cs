@@ -32,19 +32,19 @@ namespace VTS.Examples {
 			this._connectionLight.color = Color.yellow;
 			this._connectionText.text = "Connecting...";
 			// Debug.Log(JsonUtility.ToJson(new VTSItemMoveOptions{itemInstanceID = "Hello", timeInSeconds = 5f}));
-			Initialize(new WebSocketSharpImpl(), new JsonUtilityImpl(), new TokenStorageImpl(Application.persistentDataPath),
+			Initialize(new WebSocketSharpImpl(this.Logger), new JsonUtilityUnityImpl(), new TokenStorageImpl(Application.persistentDataPath),
 			() => {
-				Debug.Log("Connected!");
+				this.Logger.Log("Connected!");
 				this._connectionLight.color = Color.green;
 				this._connectionText.text = "Connected!";
 			},
 			() => {
-				Debug.LogWarning("Disconnected!");
+				this.Logger.LogWarning("Disconnected!");
 				this._connectionLight.color = Color.gray;
 				this._connectionText.text = "Disconnected.";
 			},
 			() => {
-				Debug.LogError("Error!");
+				this.Logger.LogError("Error!");
 				this._connectionLight.color = Color.red;
 				this._connectionText.text = "Error!";
 			});
@@ -52,7 +52,7 @@ namespace VTS.Examples {
 
 		public void PrintAPIStats() {
 			GetStatistics(
-				(r) => { _text.text = new JsonUtilityImpl().ToJson(r); },
+				(r) => { _text.text = new JsonUtilityUnityImpl().ToJson(r); },
 				(e) => { _text.text = e.data.message; }
 			);
 		}
@@ -60,14 +60,14 @@ namespace VTS.Examples {
 		public void PrintCurentModelHotkeys() {
 			GetHotkeysInCurrentModel(
 				null,
-				(r) => { _text.text = new JsonUtilityImpl().ToJson(r); },
+				(r) => { _text.text = new JsonUtilityUnityImpl().ToJson(r); },
 				(e) => { _text.text = e.data.message; }
 			);
 		}
 
 		public void PrintScreenColorData() {
 			GetSceneColorOverlayInfo(
-				(r) => { _text.text = new JsonUtilityImpl().ToJson(r); },
+				(r) => { _text.text = new JsonUtilityUnityImpl().ToJson(r); },
 				(e) => { _text.text = e.data.message; }
 			);
 		}
@@ -79,7 +79,7 @@ namespace VTS.Examples {
 				_color,
 				0.0f,
 				matcher,
-				(r) => { _text.text = new JsonUtilityImpl().ToJson(r); },
+				(r) => { _text.text = new JsonUtilityUnityImpl().ToJson(r); },
 				(e) => { _text.text = e.data.message; }
 			);
 		}
@@ -91,11 +91,11 @@ namespace VTS.Examples {
 		public void ActivateExpression(string expressionName) {
 			GetExpressionStateList(
 				(r) => {
-					_text.text = new JsonUtilityImpl().ToJson(r);
+					_text.text = new JsonUtilityUnityImpl().ToJson(r);
 					ExpressionData expression = new List<ExpressionData>(r.data.expressions).Find((e) => { return e.file.ToLower().Contains(expressionName.ToLower()); });
 					if (expression != null) {
 						SetExpressionState(expression.file, true,
-							(x) => { _text.text = new JsonUtilityImpl().ToJson(x); },
+							(x) => { _text.text = new JsonUtilityUnityImpl().ToJson(x); },
 							(e2) => { _text.text = e2.data.message; });
 					}
 					else {
@@ -108,7 +108,7 @@ namespace VTS.Examples {
 
 		public void GetPhysicsData() {
 			GetCurrentModelPhysics(
-				(r) => { _text.text = new JsonUtilityImpl().ToJson(r); },
+				(r) => { _text.text = new JsonUtilityUnityImpl().ToJson(r); },
 				(e) => { _text.text = e.data.message; }
 			);
 		}
@@ -116,10 +116,10 @@ namespace VTS.Examples {
 		public void GetArtMeshes() {
 			this.RequestArtMeshSelection("", "", 2, new List<string>(),
 			(s) => {
-				this._text.text = new JsonUtilityImpl().ToJson(s);
+				this._text.text = new JsonUtilityUnityImpl().ToJson(s);
 			},
 			(e) => {
-				this._text.text = new JsonUtilityImpl().ToJson(e);
+				this._text.text = new JsonUtilityUnityImpl().ToJson(e);
 			});
 		}
 

@@ -4,6 +4,10 @@ using System.Collections.Generic;
 namespace VTS {
 
 	public interface IVTSWebSocket {
+		/// <summary>
+		/// The port number of the socket.
+		/// </summary>
+		/// <value></value>
 		int Port { get; }
 		/// <summary>
 		/// Connects to VTube Studio on the current port, executing the provided callbacks during different phases of the connection lifecycle.
@@ -19,6 +23,9 @@ namespace VTS {
 		/// Disconnects from VTube Studio.
 		/// </summary>
 		void Disconnect();
+		/// <summary>
+		/// Disposes of the socket.
+		/// </summary>
 		void Dispose();
 		/// <summary>
 		/// Returns a map of ports available to the current IP Address. Indexed by port number.
@@ -27,9 +34,29 @@ namespace VTS {
 		Dictionary<int, VTSStateBroadcastData> GetPorts();
 		void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, IVTSLogger logger);
 		void ResubscribeToEvents();
+		/// <summary>
+		/// Sends a payload of type T, expecting a response of type K. 
+		/// </summary>
+		/// <param name="request">The request payload.</param>
+		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		/// <typeparam name="T">The request type.</typeparam>
+		/// <typeparam name="K">The response type.</typeparam>
+		/// <returns></returns>
 		void Send<T, K>(T request, Action<K> onSuccess, Action<VTSErrorData> onError)
 			where T : VTSMessageData
 			where K : VTSMessageData;
+		/// <summary>
+		/// Sends an event subscription payload of type T, expecting a response of type K.
+		/// </summary>
+		/// <param name="request">The subscription request payload.</param>
+		/// <param name="onEvent">Callback executed upon receiving an event.</param>
+		/// <param name="onSubscribe">Callback executed upon subscribing.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		/// <param name="resubscribe">Callback that executes a resubscription.</param>
+		/// <typeparam name="T">The request type.</typeparam>
+		/// <typeparam name="K">The response type.</typeparam>
+		/// <returns></returns>
 		void SendEventSubscription<T, K>(T request, Action<K> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError, Action resubscribe)
 			where T : VTSEventSubscriptionRequestData
 			where K : VTSEventData;

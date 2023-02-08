@@ -1,6 +1,7 @@
 ﻿namespace VTS.Unity {
     
-	public class JsonUtilityImpl : IJsonUtility {
+	public class JsonUtilityUnityImpl : IJsonUtility {
+		
 		public T FromJson<T>(string json) {
 			if (IsMessageType(json, "HotkeysInCurrentModelResponse")) {
 				json = ReplaceStringWithEnum<HotkeyAction>(json, "type");

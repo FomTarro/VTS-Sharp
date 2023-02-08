@@ -5,9 +5,9 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using UnityEngine;
 
 namespace VTS {
+
 	/// <summary>
 	/// Basic Websocket implementation. 
 	/// 
@@ -28,8 +28,11 @@ namespace VTS {
 		private System.Action _onReconnect = () => { };
 		private System.Action _onDisconnect = () => { };
 
+		private IVTSLogger _logger;
+
 		#region  Lifecycle
-		public WebSocketImpl() {
+		public WebSocketImpl(IVTSLogger logger) {
+			_logger = logger;
 			_receiveQueue = new ConcurrentQueue<string>();
 			_sendQueue = new ConcurrentQueue<ArraySegment<byte>>();
 		}
@@ -63,13 +66,13 @@ namespace VTS {
 
 				this._onReconnect = onConnect;
 				this._onDisconnect = onDisconnect;
-				Debug.Log("Connecting to: " + serverUri);
+				this._logger.Log("Connecting to: " + serverUri);
 				await this._ws.ConnectAsync(serverUri, token);
 				while (IsConnecting()) {
-					Debug.Log("Waiting to connect...");
+					this._logger.Log("Waiting to connect...");
 					await Task.Delay(10);
 				}
-				Debug.Log("Connect status: " + this._ws.State);
+				this._logger.Log("Connect status: " + this._ws.State);
 				if (this._ws.State == WebSocketState.Open) {
 					onConnect();
 				}
@@ -78,7 +81,7 @@ namespace VTS {
 				}
 			}
 			catch (Exception e) {
-				Debug.LogError(e);
+				this._logger.LogError(e.ToString());
 				onError();
 			}
 		}
@@ -87,7 +90,7 @@ namespace VTS {
 			this._onDisconnect();
 			Start(this._url, this._onReconnect, this._onDisconnect, async () => {
 				// keep retrying 
-				Debug.LogError("Reconnect failed, trying again!");
+				this._logger.LogError("Reconnect failed, trying again!");
 				await Task.Delay(2);
 				Reconnect();
 			});
@@ -99,7 +102,7 @@ namespace VTS {
 		}
 
 		private void Dispose() {
-			Debug.LogWarning("Disposing of socket...");
+			this._logger.LogWarning("Disposing of socket...");
 			this._tokenSource.Cancel();
 		}
 		#endregion
@@ -123,7 +126,7 @@ namespace VTS {
 		}
 
 		private async void RunSend(ClientWebSocket socket, CancellationToken token) {
-			Debug.Log("WebSocket Message Sender looping.");
+			this._logger.Log("WebSocket Message Sender looping.");
 			ArraySegment<byte> msg;
 			// int counter = 0;
 			while (!token.IsCancellationRequested) {
@@ -137,7 +140,7 @@ namespace VTS {
 						await socket.SendAsync(msg, WebSocketMessageType.Text, true /* is last part of message */, token);
 					}
 					catch (Exception e) {
-						Debug.LogError(e);
+						this._logger.LogError(e.ToString());
 						// put unsent messages back on the queue
 						if (msg != null) {
 							_sendQueue.Enqueue(msg);
@@ -145,7 +148,7 @@ namespace VTS {
 						if (e is WebSocketException
 						|| e is System.IO.IOException
 						|| e is System.Net.Sockets.SocketException) {
-							Debug.LogWarning("Socket exception occured, reconnecting...");
+							this._logger.LogWarning("Socket exception occured, reconnecting...");
 							Reconnect();
 						}
 					}
@@ -187,7 +190,7 @@ namespace VTS {
 		}
 
 		private async void RunReceive(ClientWebSocket socket, CancellationToken token) {
-			Debug.Log("WebSocket Message Receiver looping.");
+			this._logger.Log("WebSocket Message Receiver looping.");
 			string result;
 			while (!token.IsCancellationRequested) {
 				result = await Receive(socket, token);
@@ -209,6 +212,10 @@ namespace VTS {
 				}
 			}
 			return readString;
+		}
+
+		public void Update(float timeDelta) {
+			// nothing to do here
 		}
 	}
 }
