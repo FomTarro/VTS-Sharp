@@ -2,9 +2,9 @@
 using System.Text;
 
 namespace VTS {
-    
+
 	public class TokenStorageImpl : ITokenStorage {
-		
+
 		private static readonly UTF8Encoding ENCODER = new UTF8Encoding();
 		private string _fileName = "token.json";
 		private string _path = "";
@@ -12,6 +12,7 @@ namespace VTS {
 		public TokenStorageImpl(string root) {
 			this._path = Path.Combine(root, this._fileName);
 		}
+
 		public string LoadToken() {
 			if (File.Exists(this._path)) {
 				return File.ReadAllText(this._path);

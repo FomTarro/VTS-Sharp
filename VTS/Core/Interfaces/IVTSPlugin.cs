@@ -25,8 +25,20 @@ namespace VTS {
 		/// <value></value>
 		bool IsAuthenticated { get; }
 
+		/// <summary>
+		/// The underlying Json Utility implementation.
+		/// </summary>
+		/// <value></value>
 		IJsonUtility JsonUtility { get; }
+		/// <summary>
+		/// The underlying Token Storage implementation.
+		/// </summary>
+		/// <value></value>
 		ITokenStorage TokenStorage { get; }
+		/// <summary>
+		/// The underlying Logger implementation.
+		/// </summary>
+		/// <value></value>
 		IVTSLogger Logger { get; }
 
 		/// <summary>
@@ -217,13 +229,13 @@ namespace VTS {
 		/// <summary>
 		/// Selects the Websocket, JSON utility, and Token Storage implementations, then attempts to Authenticate the plugin.
 		/// </summary>
-		/// <param name="webSocket">The websocket implementation.</param>
+		/// <param name="webSocket">The WebSocket implementation.</param>
 		/// <param name="jsonUtility">The JSON serializer/deserializer implementation.</param>
 		/// <param name="tokenStorage">The Token Storage implementation.</param>
 		/// <param name="onConnect">Callback executed upon successful initialization.</param>
 		/// <param name="onDisconnect">Callback executed upon disconnecting from VTS.</param>
-		/// <param name="onError">The Callback executed upon failed initialization.</param>
-		void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onConnect, Action onDisconnect, Action onError);
+		/// <param name="onError">Callback executed upon failed initialization.</param>
+		void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onConnect, Action onDisconnect, Action<VTSErrorData> onError);
 		/// <summary>
 		/// Sends a list of parameter names and corresponding values to assign to them.
 		/// 
@@ -532,5 +544,10 @@ namespace VTS {
 		/// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing from the event.</param>
 		/// <param name="onError">Callback executed upon receiving an error.</param>
 		void UnsubscribeFromTrackingEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Method that is to be called by the system once per tick.
+		/// </summary>
+		/// <param name="timeDelta">The time since the last update tick, in seconds.</param>
+		void Tick(float timeDelta);
 	}
 }

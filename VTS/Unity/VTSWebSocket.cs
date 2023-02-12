@@ -15,17 +15,17 @@ namespace VTS.Unity {
 			}
 		}
 
-		public int Port => this.Socket.Port;
+		public int Port { get { return this.Socket.Port; } }
 
-		private void Update() {
-			this.Socket.Update(Time.deltaTime);
+		public void Tick(float timeDelta){
+			this.Socket.Tick(timeDelta);
 		}
 
 		private void OnDestroy() {
 			Dispose();
 		}
 
-		public void Connect(Action onConnect, Action onDisconnect, Action onError) {
+		public void Connect(Action onConnect, Action onDisconnect, Action<Exception> onError) {
 			this.Socket.Connect(onConnect, onDisconnect, onError);
 		}
 

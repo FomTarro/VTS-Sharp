@@ -5,15 +5,16 @@ using System.Text.RegularExpressions;
 namespace VTS.Core {
 
 	public class VTSPlugin : IVTSPlugin {
+
 		private string _pluginName;
-		public string PluginName => this._pluginName;
+		public string PluginName { get { return this._pluginName; } }
 		private string _pluginAuthor;
-		public string PluginAuthor => this._pluginAuthor;
+		public string PluginAuthor { get { return this._pluginName; } }
 		private string _pluginIcon;
-		public string PluginIcon => this._pluginIcon;
+		public string PluginIcon { get { return this._pluginIcon; } }
 
 		private bool _isAuthenticated = false;
-		public bool IsAuthenticated => this._isAuthenticated;
+		public bool IsAuthenticated { get { return this._isAuthenticated; } }
 
 		private string _token = null;
 
@@ -23,24 +24,24 @@ namespace VTS.Core {
 		public IJsonUtility JsonUtility { get { return this._jsonUtility; } }
 		private IVTSLogger _logger;
 		public IVTSLogger Logger { get { return this._logger; } }
-		
+
 		private IVTSWebSocket _socket;
 		public IVTSWebSocket Socket { get { return this._socket; } }
 
-		public VTSPlugin(IVTSWebSocket socket, string pluginName, string pluginAuthor, string pluginIcon, IVTSLogger logger) {
+		public VTSPlugin(IVTSWebSocket socket, IVTSLogger logger, string pluginName, string pluginAuthor, string pluginIcon) {
 			this._socket = socket;
+			this._logger = logger;
 			this._pluginName = pluginName;
 			this._pluginAuthor = pluginAuthor;
 			this._pluginIcon = pluginIcon;
-			this._logger = logger;
 		}
 
 		#region Initialization
 
-		public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onConnect, Action onDisconnect, Action onError) {
+		public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onConnect, Action onDisconnect, Action<VTSErrorData> onError) {
 			this._tokenStorage = tokenStorage;
 			this._jsonUtility = jsonUtility;
-			this.Socket.Initialize(webSocket, jsonUtility, this._logger);
+			this.Socket.Initialize(webSocket, this._jsonUtility, this._logger);
 			Action onCombinedConnect = () => {
 				this.Socket.ResubscribeToEvents();
 				onConnect();
@@ -68,15 +69,24 @@ namespace VTS.Core {
 				this._isAuthenticated = false;
 				onDisconnect();
 			},
-			() => {
+			(e) => {
+				VTSErrorData error = new VTSErrorData();
+				error.data.errorID = ErrorID.InternalServerError;
+				error.data.message = e.Message;
 				this._isAuthenticated = false;
-				onError();
+				onError(error);
 			});
 		}
 
 		public void Disconnect() {
 			if (this.Socket != null) {
 				this.Socket.Disconnect();
+			}
+		}
+
+		public void Tick(float timeDelta){
+			if (this.Socket != null) {
+				this.Socket.Tick(timeDelta);
 			}
 		}
 
@@ -100,7 +110,7 @@ namespace VTS.Core {
 			}
 		}
 
-		private void Reauthenticate(Action onConnect, Action onError) {
+		private void Reauthenticate(Action onConnect, Action<VTSErrorData> onError) {
 			// Debug.LogWarning("Token expired, acquiring new token...");
 			this._isAuthenticated = false;
 			this._tokenStorage.DeleteToken();
@@ -111,7 +121,7 @@ namespace VTS.Core {
 				},
 				(t) => {
 					this._isAuthenticated = false;
-					onError();
+					onError(t);
 				}
 			);
 		}
@@ -233,7 +243,7 @@ namespace VTS.Core {
 
 		public void TintArtMesh(ColorTint tint, float mixWithSceneLightingColor, ArtMeshMatcher matcher, Action<VTSColorTintData> onSuccess, Action<VTSErrorData> onError) {
 			VTSColorTintData request = new VTSColorTintData();
-			ArtMeshColorTint colorTint = new ArtMeshColorTint(){
+			ArtMeshColorTint colorTint = new ArtMeshColorTint() {
 				colorR = tint.colorR,
 				colorG = tint.colorG,
 				colorB = tint.colorB,
@@ -409,9 +419,7 @@ namespace VTS.Core {
 			this.Socket.Send<VTSItemMoveRequestData, VTSItemMoveResponseData>(request, onSuccess, onError);
 		}
 
-		public void RequestArtMeshSelection(string textOverride, string helpOverride, int count,
-			ICollection<string> activeArtMeshes,
-			Action<VTSArtMeshSelectionResponseData> onSuccess, Action<VTSErrorData> onError) {
+		public void RequestArtMeshSelection(string textOverride, string helpOverride, int count, ICollection<string> activeArtMeshes, Action<VTSArtMeshSelectionResponseData> onSuccess, Action<VTSErrorData> onError) {
 			VTSArtMeshSelectionRequestData request = new VTSArtMeshSelectionRequestData();
 			request.data.textOverride = textOverride;
 			request.data.helpOverride = helpOverride;
@@ -419,7 +427,6 @@ namespace VTS.Core {
 			string[] array = new string[activeArtMeshes.Count];
 			activeArtMeshes.CopyTo(array, 0);
 			request.data.activeArtMeshes = array;
-
 			this.Socket.Send<VTSArtMeshSelectionRequestData, VTSArtMeshSelectionResponseData>(request, onSuccess, onError);
 		}
 
@@ -502,6 +509,14 @@ namespace VTS.Core {
 
 		#region Helper Methods 
 
+		/// <summary>
+		/// Static VTS API callback method which does nothing. Saves you from needing to make a new inline function each time.
+		/// </summary>
+		/// <param name="response"></param>
+		public static void DoNothingCallback(VTSMessageData response) {
+			// Do nothing!
+		}
+
 		private static string InjectParameterModeToString(VTSInjectParameterMode mode) {
 			if (mode == VTSInjectParameterMode.ADD) {
 				return "add";
@@ -532,14 +547,6 @@ namespace VTS.Core {
 				return "zip";
 			}
 			return "linear";
-		}
-
-		/// <summary>
-		/// Static VTS API callback method which does nothing. Saves you from needing to make a new inline function each time.
-		/// </summary>
-		/// <param name="response"></param>
-		public static void DoNothingCallback(VTSMessageData response) {
-			// Do nothing!
 		}
 
 		private static Regex ALPHANUMERIC = new Regex(@"\W|");

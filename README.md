@@ -1,5 +1,5 @@
-# VTS-Sharp
-A Unity C# client interface for creating VTube Studio Plugins with the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio)!
+# VTS-Sharp v2.0.0
+A C# client interface for creating VTube Studio Plugins with the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio), for use in Unity and other C# runtime environments!
  
 ## About
 This library is maintained by Tom "Skeletom" Farro. If you need to contact him, the best way to do so is via [Twitter](https://www.twitter.com/fomtarro) or by leaving an issue ticket on this repo.
@@ -19,6 +19,9 @@ Because this library simply acts as an client interface for the official API, pl
  
 ## Design Pattern and Considerations
  
+### Packages
+As of version 2.0.0, the library has been split into two packages/namespaces: `VTS.Core` and `VTS.Unity`. The `VTS.Core` package contains everything needed to build a plugin in any C# runtime environment, with no engine-specific code. The `VTS.Unity` package provides Unity-specific wrappers for the core classes, allowing you to easily build a plugin as a Unity GameObject, following the original design of this library. If you are not looking to use Unity for your project, you can completely discard the `VTS.Unity` package. However, if you *are* using Unity for your project, you will need both the `VTS.Core` and `VTS.Unity` packages.
+
 ### Swappable Components
 In order to afford the most flexibility (and to be as decoupled from Unity as possible), the underlying components of the [`VTSPlugin`](#class-vtsplugin) are all defined as interfaces. This allows you to swap out the built-in implementations with more robust or platform-compliant ones. By default, the `MyFirstPlugin` class features working implemntations of all needed components, but if you want, you can pass in your own implementations via the [`Initialize`](#void-initialize) method.
 
@@ -54,8 +57,8 @@ Upon successfully subscribing to the event in VTube Studio, the `onSubscribe` ca
 The name of this plugin. Required for authorization purposes.
 #### `string PluginAuthor`
 The name of this plugin's author. Required for authorization purposes.
-#### `Texture2D PluginIcon`
-The icon of this for this plugin. Optional, must be exactly 128*128 pixels in size.
+#### `string PluginIcon`
+The icon of this for this plugin, as a base64 string. Optional, must be exactly 128*128 pixels in size.
 #### `VTSWebSocket Socket`
 The underlying WebSocket for connecting to VTS.
 #### `ITokenStorage TokenStorage`
@@ -65,21 +68,25 @@ Is the plugin currently authenticated?
 
 ### Methods
 #### `void Initialize`
-Connects to Vtube Studio, authenticates the plugin, and also selects the Websocket, JSON utility, and Token Storage implementations. Takes the following args:
-* `IWebSocket webSocket`: The websocket implementation.
+Connects to VTube Studio, authenticates the plugin, and also selects the WebSocket, JSON Utility, and Token Storage implementations. Takes the following args:
+* `IWebSocket webSocket`: The WebSocket implementation.
 * `IJsonUtility jsonUtility`: The JSON serializer/deserializer implementation.
 * `ITokenStorage tokenStorage`: The Token Storage implementation.
 * `Action onConnect`: Callback executed upon successful initialization.
 * `Action onDisconnect`: Callback executed upon disconnecting from VTS (accidental or otherwise).
-* `Action onError`: The Callback executed upon failed initialization.
+* `Action<VTSErrorData> onError`: Callback executed upon failed initialization.
 
 The plugin will attempt to intelligently choose a port to connect to, using the following criteria:
-* It will first attempt to connect to the designated port (8001 by default, can be manusally set with [SetPort](#bool-setport)). 
+* It will first attempt to connect to the designated port (8001 by default, can be manually set with [SetPort](#bool-setport)). 
 * If that fails, it will attempt to connect to the first port discovered by UDP. 
 * If that takes too long and times out, it will attempt to connect to the default port (8001).
 
 #### `void Disconnect`
 Disconnects from VTube Studio. Will fire the onDisconnect callback set via the Initialize method.
+
+### `void Tick`
+Method that is to be called by the system once per tick. Takes the following args:
+* `float timeDelta`: The time since the last system tick, in seconds.
 
 #### `Dictionary<int, VTSStateBroadcastData> GetPorts`
 Generates a dictionary indexed by port number containing information about all available VTube Studio ports.
@@ -103,7 +110,7 @@ If the IP Address is changed while an active connection exists, you will need to
 
 Request methods can be inferred from the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio).
 
-### `VTube Studio API Events`
+#### `VTube Studio API Events`
 
 Event subscription methods can be inferred from the [official VTube Studio Event Subscription API](https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md).
 
@@ -117,7 +124,7 @@ Connects to the given URL and executes the relevant callback on completion. Take
 * `string URL`: URL to connect to.
 * `Action onConnect`: Callback executed upon connecting to the URL.
 * `Action onDisconnect`: Callback executed upon disconnecting from the URL (accidental or otherwise).
-* `Action onError`: Callback executed upon receiving an error.
+* `Action onError<Exception>`: Callback executed upon receiving an error.
 #### `void Stop`
 Closes the websocket. Executes the `onDisconnect` callback as specified in the `Start` method call.
 #### `bool IsConnecting`
@@ -127,17 +134,6 @@ Has the socket successfully connected?
 #### `void Send` 
 Send a payload to the websocket server. Takes the following args:
 * `string message`: The payload to send.
-
-## `interface ITokenStorage`
-
-### Methods
-#### `string LoadToken` 
-Loads the auth token.
-#### `void SaveToken` 
-Saves an auth token. Takes the following args:
-* `string token`: The token to save.
-#### `void DeleteToken` 
-Deletes the auth token.
 
 ## `interface IJsonUtility`
 
@@ -150,6 +146,16 @@ Deserializes a JSON string into an object of the specified type. Takes the follo
 Converts an object into a JSON string. Takes the following args:
 * `object obj`: The object to serialized.
 
+## `interface ITokenStorage`
+
+### Methods
+#### `string LoadToken` 
+Loads the auth token.
+#### `void SaveToken` 
+Saves an auth token. Takes the following args:
+* `string token`: The token to save.
+#### `void DeleteToken` 
+Deletes the auth token.
 
 ## `interface IVTSLogger`
 
@@ -167,7 +173,10 @@ Converts an object into a JSON string. Takes the following args:
 None of this would be possible without Denchi's tireless work on VTube Studio itself. 
 
 ## [WebSocketSharp](https://github.com/sta/websocket-sharp)
-An implementation of Websocket using WebSocketSharp has been included for use, adhering to the [library's MIT license](https://github.com/sta/websocket-sharp/blob/master/LICENSE.txt).
+An implementation of IWebSocket using WebSocketSharp has been included for use, adhering to the [library's MIT license](https://github.com/sta/websocket-sharp/blob/master/LICENSE.txt).
+
+## [Newtonsoft JSON.NET](https://www.newtonsoft.com/json)
+An implementation of IJsonUtility using Newtonsoft's JSON.NET has been included for use, adhering to the [library's MIT license](https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md).
 
 # Made With VTS-Sharp
 

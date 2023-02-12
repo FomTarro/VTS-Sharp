@@ -15,7 +15,7 @@ namespace VTS.Unity {
 		private VTS.Core.VTSPlugin Plugin {
 			get {
 				if (this._plugin == null) {
-					this._plugin = new VTS.Core.VTSPlugin(this.Socket, this.PluginName, this.PluginAuthor, this.PluginIcon, this._logger);
+					this._plugin = new VTS.Core.VTSPlugin(this.Socket, this.Logger, this.PluginName, this.PluginAuthor, this.PluginIcon);
 				}
 				return this._plugin;
 			}
@@ -47,8 +47,8 @@ namespace VTS.Unity {
 
 		public bool IsAuthenticated { get { return this.Plugin.IsAuthenticated; } }
 
-		public IJsonUtility JsonUtility { get { return this._plugin.JsonUtility; } }
-		public ITokenStorage TokenStorage { get { return this._plugin.TokenStorage; } }
+		public IJsonUtility JsonUtility { get { return this.Plugin.JsonUtility; } }
+		public ITokenStorage TokenStorage { get { return this.Plugin.TokenStorage; } }
 		private IVTSLogger _logger = new VTSLoggerUnityImpl();
 		public IVTSLogger Logger { get { return this._logger; } }
 
@@ -56,12 +56,16 @@ namespace VTS.Unity {
 
 		#region Initialization
 
-		public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onConnect, Action onDisconnect, Action onError) {
+		public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onConnect, Action onDisconnect, Action<VTSErrorData> onError) {
 			this.Plugin.Initialize(webSocket, jsonUtility, tokenStorage, onConnect, onDisconnect, onError);
 		}
 
 		public void Disconnect() {
 			this.Plugin.Disconnect();
+		}
+
+		public void Tick(float timeDelta) {
+			this.Plugin.Tick(timeDelta);
 		}
 
 		#endregion
@@ -301,6 +305,14 @@ namespace VTS.Unity {
 
 		#region Helper Methods
 
+		/// <summary>
+		/// Static VTS API callback method which does nothing. Saves you from needing to make a new inline function each time.
+		/// </summary>
+		/// <param name="messageData">The message to ignore.</param>
+		public static void DoNothingCallback(VTSMessageData messageData) {
+			// DO NOTHING!
+		}
+
 		private static string EncodeIcon(Texture2D icon) {
 			try {
 				if (icon.width != 128 && icon.height != 128) {
@@ -313,10 +325,6 @@ namespace VTS.Unity {
 				Debug.LogError(e);
 			}
 			return null;
-		}
-
-		public static void DoNothingCallback(VTSMessageData messageData) {
-			// DO NOTHING!
 		}
 
 		/// <summary>

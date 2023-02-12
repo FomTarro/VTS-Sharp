@@ -1,4 +1,6 @@
-﻿namespace VTS.Unity {
+﻿using UnityEngine;
+
+namespace VTS.Unity {
     
 	public class JsonUtilityUnityImpl : IJsonUtility {
 		
@@ -9,11 +11,11 @@
 			else if (IsMessageType(json, "APIError")) {
 				json = ReplaceStringWithEnum<ErrorID>(json, "type");
 			}
-			return UnityEngine.JsonUtility.FromJson<T>(json);
+			return JsonUtility.FromJson<T>(json);
 		}
 
 		public string ToJson(object obj) {
-			string json = UnityEngine.JsonUtility.ToJson(obj);
+			string json = JsonUtility.ToJson(obj);
 			return RemoveNullProps(json);
 		}
 

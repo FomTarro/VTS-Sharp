@@ -28,11 +28,14 @@ namespace VTS.Examples {
 			Connect();
 		}
 
+		private void Update(){
+			Tick(Time.deltaTime);
+		}
+
 		public void Connect() {
 			this._connectionLight.color = Color.yellow;
 			this._connectionText.text = "Connecting...";
-			// Debug.Log(JsonUtility.ToJson(new VTSItemMoveOptions{itemInstanceID = "Hello", timeInSeconds = 5f}));
-			Initialize(new WebSocketSharpImpl(this.Logger), new JsonUtilityUnityImpl(), new TokenStorageImpl(Application.persistentDataPath),
+			Initialize(new WebSocketSharpImpl(this.Logger), new NewtonsoftJsonUtilityImpl(), new TokenStorageImpl(Application.persistentDataPath),
 			() => {
 				this.Logger.Log("Connected!");
 				this._connectionLight.color = Color.green;
@@ -43,8 +46,8 @@ namespace VTS.Examples {
 				this._connectionLight.color = Color.gray;
 				this._connectionText.text = "Disconnected.";
 			},
-			() => {
-				this.Logger.LogError("Error!");
+			(error) => {
+				this.Logger.LogError("Error! - " + error.data.message);
 				this._connectionLight.color = Color.red;
 				this._connectionText.text = "Error!";
 			});

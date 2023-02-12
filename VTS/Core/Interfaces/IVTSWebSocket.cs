@@ -18,7 +18,7 @@ namespace VTS {
 		/// <param name="onConnect">Callback executed upon successful initialization.</param>
 		/// <param name="onDisconnect">Callback executed upon disconnecting from VTS.</param>
 		/// <param name="onError">The Callback executed upon failed initialization.</param>
-		void Connect(Action onConnect, Action onDisconnect, Action onError);
+		void Connect(Action onConnect, Action onDisconnect, Action<Exception> onError);
 		/// <summary>
 		/// Disconnects from VTube Studio.
 		/// </summary>
@@ -74,5 +74,10 @@ namespace VTS {
 		/// <param name="port">The port to connect to.</param>
 		/// <returns>True if the port is a valid VTube Studio port, False otherwise.</returns>
 		bool SetPort(int port);
+		/// <summary>
+		/// Method that is to be called by the system once per tick.
+		/// </summary>
+		/// <param name="timeDelta">The time since the last update tick, in seconds.</param>
+		void Tick(float timeDelta);
 	}
 }

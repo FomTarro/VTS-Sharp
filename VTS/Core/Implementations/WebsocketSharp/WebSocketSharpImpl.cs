@@ -13,9 +13,9 @@ namespace VTS {
         private ConcurrentQueue<Action> _responseQueue = new ConcurrentQueue<Action>();
         private bool _attemptReconnect = false;
 
-        private System.Action _onConnect = () => {};
-        private System.Action _onDisconnect = () => {};
-        private System.Action _onError = () => {};
+        private Action _onConnect = () => {};
+        private Action _onDisconnect = () => {};
+        private Action<Exception> _onError = (e) => {};
         private string _url = "";
         private IVTSLogger _logger;
 
@@ -44,7 +44,7 @@ namespace VTS {
             this._socket.SendAsync(message, (success) => {});
         }
 
-        public void Start(string URL, Action onConnect, Action onDisconnect, Action onError) {
+        public void Start(string URL, Action onConnect, Action onDisconnect, Action<Exception> onError) {
             this._url = URL;
             // WebSocket oldSocket = this._socket;
             // if(this._socket != null){
@@ -91,7 +91,7 @@ namespace VTS {
                     if(e != null){
                         this._logger.LogError(string.Format("'{0}', {1}", e.Message, e.Exception));
                     }
-                    this._onError();
+                    this._onError(e.Exception);
                 });
             };
             this._socket.OnClose += (sender, e) => { 
@@ -102,7 +102,7 @@ namespace VTS {
                         this._onDisconnect();
                     }else{
                         this._logger.LogError(msg);
-                        this._onError();
+                        this._onError(new Exception(msg));
                         if(this._attemptReconnect){
                             Reconnect();
                         }
@@ -124,7 +124,7 @@ namespace VTS {
             Start(this._url, this._onConnect, this._onDisconnect, this._onError);
         }
 
-        public void Update(float timeDelta){
+        public void Tick(float timeDelta){
             do{
                 System.Action action = null;
                 if(this._responseQueue.Count > 0 && _responseQueue.TryDequeue(out action)){

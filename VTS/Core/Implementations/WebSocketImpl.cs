@@ -25,8 +25,8 @@ namespace VTS {
 		private ConcurrentQueue<string> _receiveQueue { get; }
 		private ConcurrentQueue<ArraySegment<byte>> _sendQueue { get; }
 		private CancellationTokenSource _tokenSource;
-		private System.Action _onReconnect = () => { };
-		private System.Action _onDisconnect = () => { };
+		private Action _onReconnect = () => { };
+		private Action _onDisconnect = () => { };
 
 		private IVTSLogger _logger;
 
@@ -41,7 +41,7 @@ namespace VTS {
 			this.Dispose();
 		}
 
-		public async void Start(string URL, System.Action onConnect, System.Action onDisconnect, System.Action onError) {
+		public async void Start(string URL, Action onConnect, Action onDisconnect, Action<Exception> onError) {
 			try {
 				// Cancel all existing tasks
 				if (this._tokenSource != null) {
@@ -77,18 +77,18 @@ namespace VTS {
 					onConnect();
 				}
 				else {
-					onError();
+					onError(new Exception("Unable to open socket connection."));
 				}
 			}
 			catch (Exception e) {
 				this._logger.LogError(e.ToString());
-				onError();
+				onError(e);
 			}
 		}
 
 		private void Reconnect() {
 			this._onDisconnect();
-			Start(this._url, this._onReconnect, this._onDisconnect, async () => {
+			Start(this._url, this._onReconnect, this._onDisconnect, async (e) => {
 				// keep retrying 
 				this._logger.LogError("Reconnect failed, trying again!");
 				await Task.Delay(2);
@@ -214,7 +214,7 @@ namespace VTS {
 			return readString;
 		}
 
-		public void Update(float timeDelta) {
+		public void Tick(float timeDelta) {
 			// nothing to do here
 		}
 	}

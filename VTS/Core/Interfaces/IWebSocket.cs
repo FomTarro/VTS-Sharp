@@ -1,4 +1,6 @@
-﻿namespace VTS {
+﻿using System;
+
+namespace VTS {
 
 	/// <summary>
 	/// Interface for providing a websocket implementation.
@@ -17,7 +19,7 @@
 		/// <param name="onDisconnect">Callback executed upon disconnecting from the URL.</param>
 		/// <param name="onError">Callback executed upon receiving an error.</param>
 		/// <returns></returns>
-		void Start(string URL, System.Action onConnect, System.Action onDisconnect, System.Action onError);
+		void Start(string URL, Action onConnect, Action onDisconnect, Action<Exception> onError);
 		/// <summary>
 		/// Closes the websocket.
 		/// 
@@ -45,7 +47,7 @@
 		//	For systems like Unity, which can only do most tasks on the main thread, 
 		/// this method will be invoked via a poller in the Update MonoBehaviour lifecycle method.
 		/// </summary>
-		/// <param name="timeDelta">The time since the last update tick.</param>
-		void Update(float timeDelta);
+		/// <param name="timeDelta">The time since the last update tick, in seconds.</param>
+		void Tick(float timeDelta);
 	}
 }
