@@ -163,9 +163,11 @@ Deletes the auth token.
 #### `void Log`
 * `string message`: The message to log.
 #### `void LogWarning`
-* `string message`: The warning to log.
+* `string warning`: The warning to log.
 #### `void LogError`
 * `string message`: The error to log.
+#### `void LogError`
+* `Exception error`: The exception to log.
 
 # Acknowledgements
 

@@ -5,9 +5,8 @@ using UnityEngine;
 namespace VTS.Unity {
 
 	/// <summary>
-	/// The base class for VTS plugin creation.
+	/// The base class for VTS plugin creation in Unity.
 	/// </summary>
-	[RequireComponent(typeof(VTS.Unity.VTSWebSocket))]
 	public abstract class VTSPlugin : MonoBehaviour, IVTSPlugin {
 
 		#region Properties
@@ -15,7 +14,7 @@ namespace VTS.Unity {
 		private VTS.Core.VTSPlugin Plugin {
 			get {
 				if (this._plugin == null) {
-					this._plugin = new VTS.Core.VTSPlugin(this.Socket, this.Logger, this.PluginName, this.PluginAuthor, this.PluginIcon);
+					this._plugin = new VTS.Core.VTSPlugin(this.Logger, this.PluginName, this.PluginAuthor, this.PluginIcon);
 				}
 				return this._plugin;
 			}
@@ -29,27 +28,19 @@ namespace VTS.Unity {
 		public string PluginAuthor { get { return this._pluginAuthor; } }
 		[SerializeField]
 		protected Texture2D _pluginIcon = null;
-		public string PluginIcon { get { return EncodeIcon(this._pluginIcon); } }
+		public string PluginIcon { get { return EncodeIcon(this._pluginIcon, this.Logger); } }
 
-		private VTS.Unity.VTSWebSocket _socket = null;
 		/// <summary>
 		/// The underlying WebSocket for connecting to VTS.
 		/// </summary>
 		/// <value></value>
-		protected VTS.Unity.VTSWebSocket Socket {
-			get {
-				if (this._socket == null) {
-					this._socket = GetComponent<VTS.Unity.VTSWebSocket>();
-				}
-				return this._socket;
-			}
-		}
+		protected IVTSWebSocket Socket { get { return this.Plugin.Socket; } }
 
 		public bool IsAuthenticated { get { return this.Plugin.IsAuthenticated; } }
 
 		public IJsonUtility JsonUtility { get { return this.Plugin.JsonUtility; } }
 		public ITokenStorage TokenStorage { get { return this.Plugin.TokenStorage; } }
-		private IVTSLogger _logger = new VTSLoggerUnityImpl();
+		private IVTSLogger _logger = new UnityVTSLoggerImpl();
 		public IVTSLogger Logger { get { return this._logger; } }
 
 		#endregion
@@ -313,16 +304,16 @@ namespace VTS.Unity {
 			// DO NOTHING!
 		}
 
-		private static string EncodeIcon(Texture2D icon) {
+		private static string EncodeIcon(Texture2D icon, IVTSLogger logger) {
 			try {
 				if (icon.width != 128 && icon.height != 128) {
-					Debug.LogWarning("Icon resolution must be exactly 128*128 pixels!");
+					logger.LogWarning("Icon resolution must be exactly 128*128 pixels!");
 					return null;
 				}
 				return Convert.ToBase64String(icon.EncodeToPNG());
 			}
 			catch (Exception e) {
-				Debug.LogError(e);
+				logger.LogError(e);
 			}
 			return null;
 		}

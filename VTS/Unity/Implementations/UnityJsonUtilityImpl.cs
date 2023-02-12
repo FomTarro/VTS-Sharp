@@ -2,7 +2,7 @@
 
 namespace VTS.Unity {
     
-	public class JsonUtilityUnityImpl : IJsonUtility {
+	public class UnityJsonUtilityImpl : IJsonUtility {
 		
 		public T FromJson<T>(string json) {
 			if (IsMessageType(json, "HotkeysInCurrentModelResponse")) {

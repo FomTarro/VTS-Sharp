@@ -1,4 +1,6 @@
-﻿namespace VTS {
+﻿using System;
+
+namespace VTS {
 
 	public class DoNothingVTSLoggerImpl : IVTSLogger {
 
@@ -7,6 +9,10 @@
 		}
 
 		public void LogError(string error) {
+			// Do Nothing
+		}
+		
+		public void LogError(Exception error) {
 			// Do Nothing
 		}
 

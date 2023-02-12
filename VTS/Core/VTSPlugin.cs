@@ -28,8 +28,8 @@ namespace VTS.Core {
 		private IVTSWebSocket _socket;
 		public IVTSWebSocket Socket { get { return this._socket; } }
 
-		public VTSPlugin(IVTSWebSocket socket, IVTSLogger logger, string pluginName, string pluginAuthor, string pluginIcon) {
-			this._socket = socket;
+		public VTSPlugin(IVTSLogger logger, string pluginName, string pluginAuthor, string pluginIcon) {
+			this._socket = new VTSWebSocket();
 			this._logger = logger;
 			this._pluginName = pluginName;
 			this._pluginAuthor = pluginAuthor;

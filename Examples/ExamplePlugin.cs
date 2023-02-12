@@ -55,7 +55,7 @@ namespace VTS.Examples {
 
 		public void PrintAPIStats() {
 			GetStatistics(
-				(r) => { _text.text = new JsonUtilityUnityImpl().ToJson(r); },
+				(r) => { _text.text = this.JsonUtility.ToJson(r); },
 				(e) => { _text.text = e.data.message; }
 			);
 		}
@@ -63,14 +63,14 @@ namespace VTS.Examples {
 		public void PrintCurentModelHotkeys() {
 			GetHotkeysInCurrentModel(
 				null,
-				(r) => { _text.text = new JsonUtilityUnityImpl().ToJson(r); },
+				(r) => { _text.text = this.JsonUtility.ToJson(r); },
 				(e) => { _text.text = e.data.message; }
 			);
 		}
 
 		public void PrintScreenColorData() {
 			GetSceneColorOverlayInfo(
-				(r) => { _text.text = new JsonUtilityUnityImpl().ToJson(r); },
+				(r) => { _text.text = this.JsonUtility.ToJson(r); },
 				(e) => { _text.text = e.data.message; }
 			);
 		}
@@ -82,7 +82,7 @@ namespace VTS.Examples {
 				_color,
 				0.0f,
 				matcher,
-				(r) => { _text.text = new JsonUtilityUnityImpl().ToJson(r); },
+				(r) => { _text.text = this.JsonUtility.ToJson(r); },
 				(e) => { _text.text = e.data.message; }
 			);
 		}
@@ -94,11 +94,11 @@ namespace VTS.Examples {
 		public void ActivateExpression(string expressionName) {
 			GetExpressionStateList(
 				(r) => {
-					_text.text = new JsonUtilityUnityImpl().ToJson(r);
+					_text.text = this.JsonUtility.ToJson(r);
 					ExpressionData expression = new List<ExpressionData>(r.data.expressions).Find((e) => { return e.file.ToLower().Contains(expressionName.ToLower()); });
 					if (expression != null) {
 						SetExpressionState(expression.file, true,
-							(x) => { _text.text = new JsonUtilityUnityImpl().ToJson(x); },
+							(x) => { _text.text = this.JsonUtility.ToJson(x); },
 							(e2) => { _text.text = e2.data.message; });
 					}
 					else {
@@ -111,7 +111,7 @@ namespace VTS.Examples {
 
 		public void GetPhysicsData() {
 			GetCurrentModelPhysics(
-				(r) => { _text.text = new JsonUtilityUnityImpl().ToJson(r); },
+				(r) => { _text.text = this.JsonUtility.ToJson(r); },
 				(e) => { _text.text = e.data.message; }
 			);
 		}
@@ -119,10 +119,10 @@ namespace VTS.Examples {
 		public void GetArtMeshes() {
 			this.RequestArtMeshSelection("", "", 2, new List<string>(),
 			(s) => {
-				this._text.text = new JsonUtilityUnityImpl().ToJson(s);
+				this._text.text = this.JsonUtility.ToJson(s);
 			},
 			(e) => {
-				this._text.text = new JsonUtilityUnityImpl().ToJson(e);
+				this._text.text = this.JsonUtility.ToJson(e);
 			});
 		}
 
@@ -162,7 +162,7 @@ namespace VTS.Examples {
 				values,
 				VTSInjectParameterMode.ADD,
 				(r) => { },
-				(e) => { print(e.data.message); }
+				(e) => { this.Logger.LogError(e.data.message); }
 			);
 		}
 
