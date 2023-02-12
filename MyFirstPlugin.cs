@@ -17,8 +17,4 @@ public class MyFirstPlugin : VTSPlugin {
 			// onError
 			(error) => { this.Logger.LogError("Error! - " + error.data.message); });
 	}
-
-	private void Update(){
-		Tick(Time.deltaTime);
-	}
 }

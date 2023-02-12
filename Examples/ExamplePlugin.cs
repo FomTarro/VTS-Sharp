@@ -28,10 +28,6 @@ namespace VTS.Examples {
 			Connect();
 		}
 
-		private void Update(){
-			Tick(Time.deltaTime);
-		}
-
 		public void Connect() {
 			this._connectionLight.color = Color.yellow;
 			this._connectionText.text = "Connecting...";

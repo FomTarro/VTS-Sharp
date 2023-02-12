@@ -544,10 +544,5 @@ namespace VTS {
 		/// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing from the event.</param>
 		/// <param name="onError">Callback executed upon receiving an error.</param>
 		void UnsubscribeFromTrackingEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError);
-		/// <summary>
-		/// Method that is to be called by the system once per tick.
-		/// </summary>
-		/// <param name="timeDelta">The time since the last update tick, in seconds.</param>
-		void Tick(float timeDelta);
 	}
 }

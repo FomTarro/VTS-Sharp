@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace VTS.Core {
 
-	public class VTSPlugin : IVTSPlugin {
+	public class VTSPlugin : IVTSPlugin, IDisposable {
 
 		private string _pluginName;
 		public string PluginName { get { return this._pluginName; } }
@@ -28,12 +31,27 @@ namespace VTS.Core {
 		private IVTSWebSocket _socket;
 		public IVTSWebSocket Socket { get { return this._socket; } }
 
+		private CancellationTokenSource _cancelToken;
+		private Task _tickLoop = null;
+		
+
 		public VTSPlugin(IVTSLogger logger, string pluginName, string pluginAuthor, string pluginIcon) {
 			this._socket = new VTSWebSocket();
 			this._logger = logger;
 			this._pluginName = pluginName;
 			this._pluginAuthor = pluginAuthor;
 			this._pluginIcon = pluginIcon;
+			this._cancelToken = new CancellationTokenSource();
+			this._tickLoop = TickLoop(this._cancelToken.Token);
+		}
+
+		~VTSPlugin(){
+			Dispose();
+		}
+
+		public void Dispose() {
+			this.Logger.Log(string.Format("Disposing of VTS Plugin: {0}...", this.PluginName));
+			this._cancelToken.Cancel();
 		}
 
 		#region Initialization
@@ -84,10 +102,20 @@ namespace VTS.Core {
 			}
 		}
 
-		public void Tick(float timeDelta){
+		private void Tick(float timeDelta){
 			if (this.Socket != null) {
 				this.Socket.Tick(timeDelta);
 			}
+		}
+
+		private async Task TickLoop(CancellationToken token) {
+			this.Logger.Log(string.Format("Starting VTS Plugin processor for plugin: {0}...", this.PluginName));
+			while(!token.IsCancellationRequested){
+				// TODO: make this interval configurable
+				Tick(0.1f);
+				await Task.Delay(100);
+			}
+			this.Logger.Log(string.Format("Ending VTS Plugin processor for plugin: {0}...", this.PluginName));
 		}
 
 		#endregion

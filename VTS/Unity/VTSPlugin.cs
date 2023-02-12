@@ -55,10 +55,6 @@ namespace VTS.Unity {
 			this.Plugin.Disconnect();
 		}
 
-		public void Tick(float timeDelta) {
-			this.Plugin.Tick(timeDelta);
-		}
-
 		#endregion
 
 		#region Port Discovery

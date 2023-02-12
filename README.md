@@ -84,10 +84,6 @@ The plugin will attempt to intelligently choose a port to connect to, using the 
 #### `void Disconnect`
 Disconnects from VTube Studio. Will fire the onDisconnect callback set via the Initialize method.
 
-### `void Tick`
-Method that is to be called by the system once per tick. Takes the following args:
-* `float timeDelta`: The time since the last system tick, in seconds.
-
 #### `Dictionary<int, VTSStateBroadcastData> GetPorts`
 Generates a dictionary indexed by port number containing information about all available VTube Studio ports.
 
