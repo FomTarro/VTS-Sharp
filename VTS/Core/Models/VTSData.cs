@@ -154,7 +154,6 @@ namespace VTS {
 			public int numberOfTextures;
 			public int textureResolution;
 			public ModelPosition modelPosition;
-
 		}
 	}
 
