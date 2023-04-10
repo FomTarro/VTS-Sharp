@@ -263,7 +263,6 @@ namespace VTS.Unity {
 			this.Plugin.UnsubscribeFromBackgroundChangedEvent(onUnsubscribe, onError);
 		}
 
-
 		public void SubscribeToModelConfigChangedEvent(Action<VTSModelConfigChangedEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
 			this.Plugin.SubscribeToModelConfigChangedEvent(onEvent, onSubscribe, onError);
 		}

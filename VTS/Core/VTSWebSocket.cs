@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace VTS.Core {
 	
+	/// <summary>
+	/// The wrapper class for websocket operations between the plugin and VTS.
+	/// </summary>
 	public class VTSWebSocket : IVTSWebSocket {
 
 		// Dependencies

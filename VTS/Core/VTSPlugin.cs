@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace VTS.Core {
 
+	/// <summary>
+	/// The base class for VTS plugin creation in any C# runtime.
+	/// </summary>
 	public class VTSPlugin : IVTSPlugin, IDisposable {
 
 		private string _pluginName;

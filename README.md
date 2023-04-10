@@ -4,26 +4,24 @@ A C# client interface for creating VTube Studio Plugins with the [official VTube
 ## About
 This library is maintained by Tom "Skeletom" Farro. If you need to contact him, the best way to do so is via [Twitter](https://www.twitter.com/fomtarro) or by leaving an issue ticket on this repo.
 
+
 If you're more of an email-oriented person, you can contact his support email: [tom@skeletom.net](mailto:tom@skeletom.net).
+
 
 This library can also be found on the [Unity Asset Store](https://assetstore.unity.com/packages/tools/integration/vts-sharp-203218), but this repo will always be the most up-to-date version.
  
 ## Usage
-In order to start making a plugin, simply make a class which extends `VTSPlugin`. In your class, call the [`Initialize`](#void-initialize) method. Pass in your preferred implementations of a [JSON utility](#interface-ijsonutility), of a [websocket](#interface-iwebsocket), and of a [mechanism to store the authorization token](#interface-itokenstorage). Specify what happens on a successful or unsuccessful initialization. That's it. In fact, these steps are all done for you already, out of the box, in the `MyFirstPlugin` class! From there, you can call any method found in the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio).
+In order to start making a plugin, first [check to see which packages from this library you need for your project based on your C# environment](#packages). Then, simply make a class which extends `VTSPlugin`. In your class, call the [`Initialize`](#void-initialize) method. Pass in your preferred implementations of a [JSON utility](#interface-ijsonutility), of a [websocket](#interface-iwebsocket), and of a [mechanism to store the authorization token](#interface-itokenstorage). Specify what happens on a successful or unsuccessful initialization. That's it. In fact, if you're using Unity, these steps are all done for you already, out of the box, in the `MyFirstPlugin` class found in the `Examples/Unity` folder! From there, you can call any method found in the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio).
  
-You can find an example of custom plugin creation in the `Examples` folder, which also includes default implementations of the aforementioned initialization dependencies. 
 
 You can find a video tutorial that demonstrates [how to get started in under 90 seconds here](https://www.youtube.com/watch?v=lUGeMEVzjAU).
  
 Because this library simply acts as an client interface for the official API, please check out the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio) for in-depth explanations about the API functionality.
- 
+
 ## Design Pattern and Considerations
  
-### Packages
-As of version 2.0.0, the library has been split into two packages/namespaces: `VTS.Core` and `VTS.Unity`. The `VTS.Core` package contains everything needed to build a plugin in any C# runtime environment, with no engine-specific code. The `VTS.Unity` package provides Unity-specific wrappers for the core classes, allowing you to easily build a plugin as a Unity GameObject, following the original design of this library. If you are not looking to use Unity for your project, you can completely discard the `VTS.Unity` package. However, if you *are* using Unity for your project, you will need both the `VTS.Core` and `VTS.Unity` packages.
-
 ### Swappable Components
-In order to afford the most flexibility (and to be as decoupled from Unity as possible), the underlying components of the [`VTSPlugin`](#class-vtsplugin) are all defined as interfaces. This allows you to swap out the built-in implementations with more robust or platform-compliant ones. By default, the `MyFirstPlugin` class features working implemntations of all needed components, but if you want, you can pass in your own implementations via the [`Initialize`](#void-initialize) method.
+In order to afford the most flexibility (and to be as decoupled from Unity as possible), the underlying components of the [`VTSPlugin`](#class-vtsplugin) are all defined as interfaces. This allows you to swap out the built-in implementations with more robust or platform-compliant ones. By default, the `MyFirstPlugin` class features working implementations of all needed components, but if you want, you can pass in your own implementations via the [`Initialize`](#void-initialize) method.
 
 ### Asynchronous Design
 Because the VTube Studio API is websocket-based, all calls to it are inherently asynchronous. Therefore, this library follows a callback-based design pattern.
@@ -32,25 +30,47 @@ Take, for example, the following method signature, found in the [`VTSPlugin`](#c
 ```
 void GetAPIState(Action<VTSStateData> onSuccess, Action<VTSErrorData> onError)
 ```
-The method accepts two callbacks, `onSuccess` and `onError`, but does not return a value. 
+The method accepts two callbacks, `onSuccess` and `onError`, but does not return a value.
 
-Upon the request being processed by VTube Studio, 
+
+Upon the request being processed by VTube Studio,
 one of these two callbacks will be invoked, depending on if the request was successful or not. The callback accepts in a single, strongly-typed argument reflecting the response payload. You can find what to expect in each payload class in the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio).
 
-This library also supports the [VTube Studio Event Subscription API](https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md). With this feature, you can subscribe to various events to make sure your plugin gets a message when something happens in VTube Studio. Event Subscription follows a similar asynchronous design pattern. 
+
+This library also supports the [VTube Studio Event Subscription API](https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md). With this feature, you can subscribe to various events to make sure your plugin gets a message when something happens in VTube Studio. Event Subscription follows a similar asynchronous design pattern.
 Take, for example, the following method signature, found in the [`VTSPlugin`](#class-vtsplugin) class:
 
+
 ```
- void SubscribeToTestEvent(VTSTestEventConfigOptions config, Action<VTSTestEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError)
+void SubscribeToTestEvent(VTSTestEventConfigOptions config, Action<VTSTestEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError)
 ```
 The method accepts an optional configuration class, and three callbacks, `onEvent`, `onSubscribe` and `onError`, but does not return a value.
 
 
-Upon successfully subscribing to the event in VTube Studio, the `onSubscribe` callback will be invoked, and then `onEvent` will be invoked any time VTube Studio publishes an event of that type. If the subscription fails for any reason, `onError` will be invoked. 
+Upon successfully subscribing to the event in VTube Studio, the `onSubscribe` callback will be invoked, and then `onEvent` will be invoked any time VTube Studio publishes an event of that type. If the subscription fails for any reason, `onError` will be invoked.
+
+## What Changed in 2.0.0?
+
+### Packages
+As of version 2.0.0, the library has been split into two folders/packages: `VTS/Core` and `VTS/Unity`. The `VTS/Core` folder contains everything needed to build a plugin in any C# runtime environment, with no engine-specific code. The `VTS/Unity` folder contains Unity-specific wrappers for the core classes, allowing you to easily build a plugin as a Unity GameObject, following the original design of this library. If you are not looking to use Unity for your project, you can completely discard the `VTS/Unity` folder. However, if you *are* using Unity for your project, you will need both the `VTS/Core` and `VTS/Unity` folders.
+ 
+### Migrating from 1.x.x to 2.x.x
+As of version 2.0.0, a few fundamental and breaking changes have been introduced in the interest of decoupling the library from Unity. If you are updating your project from using a 1.x.x version of the library to using a 2.x.x version of the library, please completely delete the library from your project, and re-import it wile being aware of the following changes:
+
+* Namespaces have been totally reorganized. The three remaining namespaces are `VTS`, `VTS.Core` and `VTS.Unity`. For Unity applications, you will only need `VTS` and `VTS.Unity`. For non-Unity applications, you will only need `VTS` and `VTS.Core`.
+* The `VTSWebSocket` MonoBehaviour class has been totally removed. You may safely remove it from any game objects. This class now exists as a pure C# equivalent
+* Several of the built-in dependencies of the `Initialize` method have changed in various ways:
+    * `IWebSocket` now requires a `Logger`, ex `new WebSocketSharpImpl(this.Logger)`
+    * `IJsonUtility` now has a `NewtonsoftJsonUtilityImpl` implementation that is suitable for all uses leveraging the much more robust Newtonsoft JSON library.
+    * The existing `ITokenStorage` implementation `TokenStorageImpl` now requires a root path passed in via the constructor. For Unity applications, you likely want to use `Application.persistentDataPath`.
+    * `onError` callback method now accepts an `VTSErrorData` argument.
+
+
 
 # API
 
 ## `class VTSPlugin`
+
 
 ### Properties
 #### `string PluginName`
@@ -63,8 +83,11 @@ The icon of this for this plugin, as a base64 string. Optional, must be exactly 
 The underlying WebSocket for connecting to VTS.
 #### `ITokenStorage TokenStorage`
 The underlying Token Storage mechanism for connecting to VTS.
+### `IVTSLogger Logger`
+The underlying Logger implementation.
 #### `bool IsAuthenticated`
 Is the plugin currently authenticated?
+
 
 ### Methods
 #### `void Initialize`
@@ -76,44 +99,59 @@ Connects to VTube Studio, authenticates the plugin, and also selects the WebSock
 * `Action onDisconnect`: Callback executed upon disconnecting from VTS (accidental or otherwise).
 * `Action<VTSErrorData> onError`: Callback executed upon failed initialization.
 
+
 The plugin will attempt to intelligently choose a port to connect to, using the following criteria:
-* It will first attempt to connect to the designated port (8001 by default, can be manually set with [SetPort](#bool-setport)). 
-* If that fails, it will attempt to connect to the first port discovered by UDP. 
+* It will first attempt to connect to the designated port (8001 by default, can be manually set with [SetPort](#bool-setport)).
+* If that fails, it will attempt to connect to the first port discovered by UDP.
 * If that takes too long and times out, it will attempt to connect to the default port (8001).
+
 
 #### `void Disconnect`
 Disconnects from VTube Studio. Will fire the onDisconnect callback set via the Initialize method.
 
+
 #### `Dictionary<int, VTSStateBroadcastData> GetPorts`
 Generates a dictionary indexed by port number containing information about all available VTube Studio ports.
 
+
 For more info, see [API Server Discovery (UDP) on the official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio#api-server-discovery-udp).
 
+
 #### `bool SetPort`
-Sets the connection port to the given number. Returns true if the number is a valid VTube Studio port, returns false otherwise. 
+Sets the connection port to the given number. Returns true if the number is a valid VTube Studio port, returns false otherwise.
+
+
 
 
 If the port number is changed while an active connection exists, you will need to reconnect. Takes the following args:
-* `int port` The port number to set. 
+* `int port` The port number to set.
+
 
 #### `bool SetIPAddress`
 Sets the connection IP address to the given string. Returns true if the string is a valid IP Address format, returns false otherwise.
 
+
 If the IP Address is changed while an active connection exists, you will need to reconnect. Takes the following args:
 * `string ipString` The string form of the IP address, in dotted-quad notation for IPv4.
 
+
 #### `VTube Studio API Requests`
+
 
 Request methods can be inferred from the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio).
 
+
 #### `VTube Studio API Events`
+
 
 Event subscription methods can be inferred from the [official VTube Studio Event Subscription API](https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md).
 
+
 ## `interface IWebSocket`
 
+
 ### Methods
-#### `string GetNextResponse` 
+#### `string GetNextResponse`
 Fetches the next response to process.
 #### `void Start`
 Connects to the given URL and executes the relevant callback on completion. Takes the following args:
@@ -125,13 +163,15 @@ Connects to the given URL and executes the relevant callback on completion. Take
 Closes the websocket. Executes the `onDisconnect` callback as specified in the `Start` method call.
 #### `bool IsConnecting`
 Is the socket in the process of connecting?
-#### `bool IsConnectionOpen` 
+#### `bool IsConnectionOpen`
 Has the socket successfully connected?
-#### `void Send` 
+#### `void Send`
 Send a payload to the websocket server. Takes the following args:
 * `string message`: The payload to send.
 
+
 ## `interface IJsonUtility`
+
 
 ### Methods
 #### `T FromJson<T>`
@@ -140,45 +180,60 @@ Deserializes a JSON string into an object of the specified type. Takes the follo
 * `string json`: The JSON string.
 #### `string ToJson`
 Converts an object into a JSON string. Takes the following args:
-* `object obj`: The object to serialized.
+* `object obj`: The object to serialize.
+
 
 ## `interface ITokenStorage`
 
+
 ### Methods
-#### `string LoadToken` 
+#### `string LoadToken`
 Loads the auth token.
-#### `void SaveToken` 
+#### `void SaveToken`
 Saves an auth token. Takes the following args:
 * `string token`: The token to save.
-#### `void DeleteToken` 
+#### `void DeleteToken`
 Deletes the auth token.
+
 
 ## `interface IVTSLogger`
 
+
 ### Methods
 #### `void Log`
+Logs a message. Takes the following args:
 * `string message`: The message to log.
 #### `void LogWarning`
+Logs a warning. Takes the following args:
 * `string warning`: The warning to log.
 #### `void LogError`
-* `string message`: The error to log.
+Logs an error. Takes the following args:
+* `string error`: The error to log.
 #### `void LogError`
+Logs an error. Takes the following args:
 * `Exception error`: The exception to log.
+
 
 # Acknowledgements
 
+
 ## [DenchiSoft](https://github.com/DenchiSoft/VTubeStudio)
-None of this would be possible without Denchi's tireless work on VTube Studio itself. 
+None of this would be possible without Denchi's tireless work on VTube Studio itself.
+
 
 ## [WebSocketSharp](https://github.com/sta/websocket-sharp)
 An implementation of IWebSocket using WebSocketSharp has been included for use, adhering to the [library's MIT license](https://github.com/sta/websocket-sharp/blob/master/LICENSE.txt).
 
+
 ## [Newtonsoft JSON.NET](https://www.newtonsoft.com/json)
 An implementation of IJsonUtility using Newtonsoft's JSON.NET has been included for use, adhering to the [library's MIT license](https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md).
 
+
 # Made With VTS-Sharp
 
+
 Below is a list of some plugins which were made using this library! If you have made something you would like included on this list, please [send Tom a message](#about).
+
 
 | Plugin | Developer | Explanation |
 | --- | --- | --- |
