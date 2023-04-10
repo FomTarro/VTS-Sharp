@@ -105,7 +105,6 @@ The plugin will attempt to intelligently choose a port to connect to, using the 
 * If that fails, it will attempt to connect to the first port discovered by UDP.
 * If that takes too long and times out, it will attempt to connect to the default port (8001).
 
-
 #### `void Disconnect`
 Disconnects from VTube Studio. Will fire the onDisconnect callback set via the Initialize method.
 
@@ -116,12 +115,8 @@ Generates a dictionary indexed by port number containing information about all a
 
 For more info, see [API Server Discovery (UDP) on the official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio#api-server-discovery-udp).
 
-
 #### `bool SetPort`
 Sets the connection port to the given number. Returns true if the number is a valid VTube Studio port, returns false otherwise.
-
-
-
 
 If the port number is changed while an active connection exists, you will need to reconnect. Takes the following args:
 * `int port` The port number to set.
@@ -130,20 +125,14 @@ If the port number is changed while an active connection exists, you will need t
 #### `bool SetIPAddress`
 Sets the connection IP address to the given string. Returns true if the string is a valid IP Address format, returns false otherwise.
 
-
 If the IP Address is changed while an active connection exists, you will need to reconnect. Takes the following args:
 * `string ipString` The string form of the IP address, in dotted-quad notation for IPv4.
 
 
 #### `VTube Studio API Requests`
-
-
 Request methods can be inferred from the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio).
 
-
 #### `VTube Studio API Events`
-
-
 Event subscription methods can be inferred from the [official VTube Studio Event Subscription API](https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md).
 
 
@@ -158,7 +147,7 @@ Connects to the given URL and executes the relevant callback on completion. Take
 * `string URL`: URL to connect to.
 * `Action onConnect`: Callback executed upon connecting to the URL.
 * `Action onDisconnect`: Callback executed upon disconnecting from the URL (accidental or otherwise).
-* `Action onError<Exception>`: Callback executed upon receiving an error.
+* `Action<Exception> onError`: Callback executed upon receiving an error.
 #### `void Stop`
 Closes the websocket. Executes the `onDisconnect` callback as specified in the `Start` method call.
 #### `bool IsConnecting`
