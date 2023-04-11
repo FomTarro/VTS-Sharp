@@ -14,7 +14,7 @@ namespace VTS.Unity {
 		private VTS.Core.VTSPlugin Plugin {
 			get {
 				if (this._plugin == null) {
-					this._plugin = new VTS.Core.VTSPlugin(this.Logger, this.PluginName, this.PluginAuthor, this.PluginIcon);
+					this._plugin = new VTS.Core.VTSPlugin(this.Logger, 100, this.PluginName, this.PluginAuthor, this.PluginIcon);
 				}
 				return this._plugin;
 			}

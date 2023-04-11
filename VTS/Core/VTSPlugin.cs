@@ -35,11 +35,21 @@ namespace VTS.Core {
 
 		private CancellationTokenSource _cancelToken;
 		private Task _tickLoop = null;
+		private readonly int _tickInterval = 100;
 		
 
-		public VTSPlugin(IVTSLogger logger, string pluginName, string pluginAuthor, string pluginIcon) {
+		/// <summary>
+		/// Creates a new VTSPlugin.
+		/// </summary>
+		/// <param name="logger">The logger implementation</param>
+		/// <param name="updateIntervalMs">The number of milliseconds between each update cycle of the plugin.</param>
+		/// <param name="pluginName">The plugin name.</param>
+		/// <param name="pluginAuthor">The plugin author/</param>
+		/// <param name="pluginIcon">The plugin icon, encoded as a base64 string. Must be 128*128 pixels exactly.</param>
+		public VTSPlugin(IVTSLogger logger, int updateIntervalMs, string pluginName, string pluginAuthor, string pluginIcon) {
 			this._socket = new VTSWebSocket();
 			this._logger = logger;
+			this._tickInterval = updateIntervalMs;
 			this._pluginName = pluginName;
 			this._pluginAuthor = pluginAuthor;
 			this._pluginIcon = pluginIcon;
@@ -111,11 +121,11 @@ namespace VTS.Core {
 		}
 
 		private async Task TickLoop(CancellationToken token) {
+			float intervalInSeconds = ((float)this._tickInterval)/1000f;
 			this.Logger.Log(string.Format("Starting VTS Plugin processor for plugin: {0}...", this.PluginName));
 			while(!token.IsCancellationRequested){
-				// TODO: make this interval configurable
-				Tick(0.1f);
-				await Task.Delay(100);
+				Tick(intervalInSeconds);
+				await Task.Delay(this._tickInterval);
 			}
 			this.Logger.Log(string.Format("Ending VTS Plugin processor for plugin: {0}...", this.PluginName));
 		}
