@@ -36,7 +36,7 @@ namespace VTS.Core {
 		private CancellationTokenSource _cancelToken;
 		private Task _tickLoop = null;
 		private readonly int _tickInterval = 100;
-		
+
 
 		/// <summary>
 		/// Creates a new VTSPlugin.
@@ -57,7 +57,7 @@ namespace VTS.Core {
 			this._tickLoop = TickLoop(this._cancelToken.Token);
 		}
 
-		~CoreVTSPlugin(){
+		~CoreVTSPlugin() {
 			Dispose();
 		}
 
@@ -114,16 +114,16 @@ namespace VTS.Core {
 			}
 		}
 
-		private void Tick(float timeDelta){
+		private void Tick(float timeDelta) {
 			if (this.Socket != null) {
 				this.Socket.Tick(timeDelta);
 			}
 		}
 
 		private async Task TickLoop(CancellationToken token) {
-			float intervalInSeconds = ((float)this._tickInterval)/1000f;
+			float intervalInSeconds = ((float)this._tickInterval) / 1000f;
 			this.Logger.Log(string.Format("Starting VTS Plugin processor for plugin: {0}...", this.PluginName));
-			while(!token.IsCancellationRequested){
+			while (!token.IsCancellationRequested) {
 				Tick(intervalInSeconds);
 				await Task.Delay(this._tickInterval);
 			}

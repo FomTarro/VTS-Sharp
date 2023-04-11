@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace VTS.Core {
-	
+
 	/// <summary>
 	/// The wrapper class for websocket operations between the plugin and VTS.
 	/// </summary>
@@ -58,15 +58,15 @@ namespace VTS.Core {
 			ProcessResponses();
 			CheckPorts();
 			UpdatePortDiscoveryTimeout(timeDelta);
-			if(this._ws != null){
+			if (this._ws != null) {
 				this._ws.Tick(timeDelta);
 			}
 		}
 
-        public void Dispose(){
-            GLOBAL_PORT_DISCOVERY_EVENT -= OnPortDiscovered;
-		    Disconnect();
-        }
+		public void Dispose() {
+			GLOBAL_PORT_DISCOVERY_EVENT -= OnPortDiscovered;
+			Disconnect();
+		}
 
 		#endregion
 

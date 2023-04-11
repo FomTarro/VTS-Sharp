@@ -2,9 +2,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using VTS.Core;
-using VTS.Unity;
 
-namespace VTS.Examples {
+namespace VTS.Unity.Examples {
 
 	public class ExamplePlugin : UnityVTSPlugin {
 		[SerializeField]

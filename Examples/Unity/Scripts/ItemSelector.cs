@@ -1,9 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using VTS.Core;
 
-namespace VTS.Examples {
+namespace VTS.Unity.Examples {
     public class ItemSelector : RefreshableDropdown
     {
         public ExamplePlugin _plugin = null;

@@ -1,5 +1,5 @@
 ﻿namespace VTS.Core {
-	
+
 	/// <summary>
 	/// Interface for providing a JSON Serializer/Deserializer implementation.
 	/// </summary>

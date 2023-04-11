@@ -2,7 +2,7 @@
 using UnityEngine;
 using VTS.Core;
 
-namespace VTS.Examples {
+namespace VTS.Unity.Examples {
     public class ExpressionSelector : RefreshableDropdown
     {
         public ExamplePlugin _plugin = null;

@@ -2,9 +2,9 @@
 using VTS.Core;
 
 namespace VTS.Unity {
-    
+
 	public class UnityJsonUtilityImpl : IJsonUtility {
-		
+
 		public T FromJson<T>(string json) {
 			if (IsMessageType(json, "HotkeysInCurrentModelResponse")) {
 				json = ReplaceStringWithEnum<HotkeyAction>(json, "type");
