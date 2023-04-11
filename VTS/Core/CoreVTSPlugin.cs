@@ -9,7 +9,7 @@ namespace VTS.Core {
 	/// <summary>
 	/// The base class for VTS plugin creation in any C# runtime.
 	/// </summary>
-	public class VTSCorePlugin : IVTSPlugin, IDisposable {
+	public class CoreVTSPlugin : IVTSPlugin, IDisposable {
 
 		private string _pluginName;
 		public string PluginName { get { return this._pluginName; } }
@@ -46,7 +46,7 @@ namespace VTS.Core {
 		/// <param name="pluginName">The plugin name.</param>
 		/// <param name="pluginAuthor">The plugin author/</param>
 		/// <param name="pluginIcon">The plugin icon, encoded as a base64 string. Must be 128*128 pixels exactly.</param>
-		public VTSCorePlugin(IVTSLogger logger, int updateIntervalMs, string pluginName, string pluginAuthor, string pluginIcon) {
+		public CoreVTSPlugin(IVTSLogger logger, int updateIntervalMs, string pluginName, string pluginAuthor, string pluginIcon) {
 			this._socket = new VTSWebSocket();
 			this._logger = logger;
 			this._tickInterval = updateIntervalMs;
@@ -57,7 +57,7 @@ namespace VTS.Core {
 			this._tickLoop = TickLoop(this._cancelToken.Token);
 		}
 
-		~VTSCorePlugin(){
+		~CoreVTSPlugin(){
 			Dispose();
 		}
 

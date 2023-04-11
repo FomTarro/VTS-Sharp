@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace VTS.Core {
 
+	/// <summary>
+	/// Interface for providing Plugin implementation.
+	/// </summary>
 	public interface IVTSPlugin {
 		/// <summary>
 		/// The name of this plugin. Required for authorization purposes.

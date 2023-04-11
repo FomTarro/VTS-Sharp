@@ -2,7 +2,7 @@
 using VTS.Core;
 using VTS.Unity;
 
-public class MyFirstPlugin : VTSPlugin {
+public class MyFirstPlugin : UnityVTSPlugin {
 	// Start is called before the first frame update
 	private void Start() {
 		// Everything you need to get started!

@@ -8,14 +8,14 @@ namespace VTS.Unity {
 	/// <summary>
 	/// The base class for VTS plugin creation in Unity.
 	/// </summary>
-	public abstract class VTSPlugin : MonoBehaviour, IVTSPlugin {
+	public abstract class UnityVTSPlugin : MonoBehaviour, IVTSPlugin {
 
 		#region Properties
-		private VTSCorePlugin _plugin;
-		private VTSCorePlugin Plugin {
+		private CoreVTSPlugin _plugin;
+		private CoreVTSPlugin Plugin {
 			get {
 				if (this._plugin == null) {
-					this._plugin = new VTSCorePlugin(this.Logger, 100, this.PluginName, this.PluginAuthor, this.PluginIcon);
+					this._plugin = new CoreVTSPlugin(this.Logger, 100, this.PluginName, this.PluginAuthor, this.PluginIcon);
 				}
 				return this._plugin;
 			}

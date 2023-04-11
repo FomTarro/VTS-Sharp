@@ -14,8 +14,8 @@ This library can also be found on the [Unity Asset Store](https://assetstore.uni
 ## Usage
 In order to start making a plugin, follow these simple steps:
 1. [Check to see which packages from this library you need for your project based on your C# environment](#packages). 
-    * If you are using Unity, make a class which extends `VTS.Unity.VTSPlugin`. 
-    * If you are using any other C# environment, make a class which extends `VTS.Core.VTSCorePlugin`, or which has one as a member variable. 
+    * If you are using Unity, make a class which extends `VTS.Unity.UnityVTSPlugin`. 
+    * If you are using any other C# environment, make a class which extends `VTS.Core.CoreVTSPlugin`, or which has one as a member variable. 
 2. In your class, call the [`Initialize`](#void-initialize) method on the plugin, which will attempt to connect to VTube Studio and authenticate the plugin. 
     
     This method has you pass in your preferred implementations of:
@@ -81,8 +81,8 @@ As of version 2.0.0, a few fundamental and breaking changes have been introduced
 ## `interface IVTSPlugin`
 
 ### Provided Implementations
-* `VTS.Core.VTSCorePlugin`
-* `VTS.Unity.VTSPlugin`
+* `VTS.Core.CoreVTSPlugin`
+* `VTS.Unity.UnityVTSPlugin`
 
 ### Properties
 #### `string PluginName`

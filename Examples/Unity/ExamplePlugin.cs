@@ -6,7 +6,7 @@ using VTS.Unity;
 
 namespace VTS.Examples {
 
-	public class ExamplePlugin : VTSPlugin {
+	public class ExamplePlugin : UnityVTSPlugin {
 		[SerializeField]
 		private Text _text = null;
 
