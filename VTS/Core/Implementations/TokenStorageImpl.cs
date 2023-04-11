@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 
-namespace VTS {
+namespace VTS.Core {
 
 	public class TokenStorageImpl : ITokenStorage {
 

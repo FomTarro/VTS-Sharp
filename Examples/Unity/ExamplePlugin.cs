@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using VTS.Core;
 using VTS.Unity;
 
 namespace VTS.Examples {

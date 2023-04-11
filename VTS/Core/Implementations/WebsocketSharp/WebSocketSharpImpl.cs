@@ -3,7 +3,7 @@ using System.Text;
 using System.Collections.Concurrent;
 using WebSocketSharp;
 
-namespace VTS {
+namespace VTS.Core {
 
     public class WebSocketSharpImpl : IWebSocket {
         private static UTF8Encoding ENCODER = new UTF8Encoding();

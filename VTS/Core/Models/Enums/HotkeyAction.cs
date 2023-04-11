@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VTS {
+namespace VTS.Core {
 	/// <summary>
 	/// Enum for the actions that can be triggered by hotkeys.
 	/// </summary>

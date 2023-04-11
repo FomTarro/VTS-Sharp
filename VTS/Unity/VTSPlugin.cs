@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using VTS.Core;
 
 namespace VTS.Unity {
 
@@ -10,11 +11,11 @@ namespace VTS.Unity {
 	public abstract class VTSPlugin : MonoBehaviour, IVTSPlugin {
 
 		#region Properties
-		private VTS.Core.VTSPlugin _plugin;
-		private VTS.Core.VTSPlugin Plugin {
+		private VTSCorePlugin _plugin;
+		private VTSCorePlugin Plugin {
 			get {
 				if (this._plugin == null) {
-					this._plugin = new VTS.Core.VTSPlugin(this.Logger, 100, this.PluginName, this.PluginAuthor, this.PluginIcon);
+					this._plugin = new VTSCorePlugin(this.Logger, 100, this.PluginName, this.PluginAuthor, this.PluginIcon);
 				}
 				return this._plugin;
 			}

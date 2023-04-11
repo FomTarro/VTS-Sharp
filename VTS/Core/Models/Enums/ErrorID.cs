@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VTS {
+namespace VTS.Core {
 	/// <summary>
 	/// Enum for API-related errors.
 	/// </summary>

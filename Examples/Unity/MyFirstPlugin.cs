@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using VTS;
+using VTS.Core;
 using VTS.Unity;
 
 public class MyFirstPlugin : VTSPlugin {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VTS {
+namespace VTS.Core {
 
 	/// <summary>
 	/// Interface for providing a logging implementation.

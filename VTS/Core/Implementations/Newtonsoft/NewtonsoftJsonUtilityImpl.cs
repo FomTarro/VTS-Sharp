@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace VTS {
+namespace VTS.Core {
 
 	public class NewtonsoftJsonUtilityImpl : IJsonUtility {
         private StringEnumConverter _converter = new StringEnumConverter();

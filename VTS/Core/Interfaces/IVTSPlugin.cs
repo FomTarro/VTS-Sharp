@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace VTS {
+namespace VTS.Core {
 
 	public interface IVTSPlugin {
 		/// <summary>

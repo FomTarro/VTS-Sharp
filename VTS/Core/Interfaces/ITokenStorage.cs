@@ -1,4 +1,4 @@
-﻿namespace VTS {
+﻿namespace VTS.Core {
 
 	/// <summary>
 	/// Interface for providing an Auth Token Storage implementation.
