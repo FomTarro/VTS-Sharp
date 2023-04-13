@@ -69,6 +69,7 @@ As of version 2.0.0, the library has been split into two folders/packages: `VTS/
 As of version 2.0.0, a few fundamental and breaking changes have been introduced in the interest of decoupling the library from Unity. If you are updating your project from using a 1.x.x version of the library to using a 2.x.x version of the library, please completely remove the library from your project, and re-import it while being aware of the following changes:
 
 * Namespaces have been totally reorganized. The two remaining namespaces are `VTS.Core` and `VTS.Unity`. These correspond to the aformentioned [packages](#packages).
+* The `VTSPlugin` MonoBehaviour class has been renamed to `UnityVTSPlugin`, and moved into the `VTS.Unity` namespace. As such, please update your plugin classes to extend `VTS.Unity.UnityVTSPlugin`.
 * The `VTSWebSocket` MonoBehaviour class has been totally removed. You may safely remove it from any game objects. This class now exists as a pure C# equivalent.
 * Several of the built-in dependencies of the `Initialize` method have changed in various ways:
     * The `IJsonUtility` interface now has a `NewtonsoftJsonUtilityImpl` implementation that is suitable for all uses, leveraging the much more robust [Newtonsoft JSON library](#newtonsoft-jsonnet).
