@@ -329,7 +329,12 @@ namespace VTS.Unity {
 		/// <param name="color">The color to convert</param>
 		/// <returns></returns>
 		public static Color32 ColorTintToColor(ColorTint color) {
-			return new Color32(color.colorR, color.colorG, color.colorB, color.colorA);
+			return new Color32(
+				color.colorR, 
+				color.colorG, 
+				color.colorB, 
+				color.colorA
+			);
 		}
 
 		/// <summary>

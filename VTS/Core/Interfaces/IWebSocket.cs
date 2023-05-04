@@ -43,9 +43,6 @@ namespace VTS.Core {
 		void Send(string message);
 		/// <summary>
 		/// Method that is called by the system once per tick, to process incoming events.
-		/// 
-		//	For systems like Unity, which can only do most tasks on the main thread, 
-		/// this method will be invoked via a poller in the Update MonoBehaviour lifecycle method.
 		/// </summary>
 		/// <param name="timeDelta">The time since the last update tick, in seconds.</param>
 		void Tick(float timeDelta);
