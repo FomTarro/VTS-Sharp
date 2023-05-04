@@ -267,25 +267,6 @@ namespace VTS.Core {
 		public byte colorG;
 		public byte colorB;
 		public byte colorA;
-
-		/// <summary>
-		/// Converts the color into a Unity color struct.
-		/// </summary>
-		/// <returns></returns>
-		public UnityEngine.Color32 ToColor32() {
-			return new UnityEngine.Color32(colorR, colorG, colorB, colorA);
-		}
-
-		/// <summary>
-		/// Loads color data from a Unity color struct
-		/// </summary>
-		/// <param name="color"></param>
-		public void FromColor32(UnityEngine.Color32 color) {
-			this.colorA = color.a;
-			this.colorB = color.b;
-			this.colorG = color.g;
-			this.colorR = color.r;
-		}
 	}
 
 	[System.Serializable]

@@ -11,27 +11,17 @@ namespace VTS.Core {
 	/// </summary>
 	public class CoreVTSPlugin : IVTSPlugin, IDisposable {
 
-		private string _pluginName;
-		public string PluginName { get { return this._pluginName; } }
-		private string _pluginAuthor;
-		public string PluginAuthor { get { return this._pluginName; } }
-		private string _pluginIcon;
-		public string PluginIcon { get { return this._pluginIcon; } }
+		public string PluginName { get; private set; }
+		public string PluginAuthor { get; private set; }
+		public string PluginIcon { get; private set; }
 
-		private bool _isAuthenticated = false;
-		public bool IsAuthenticated { get { return this._isAuthenticated; } }
-
+		public bool IsAuthenticated {  get; private set; }
 		private string _token = null;
 
-		private ITokenStorage _tokenStorage;
-		public ITokenStorage TokenStorage { get { return this._tokenStorage; } }
-		private IJsonUtility _jsonUtility;
-		public IJsonUtility JsonUtility { get { return this._jsonUtility; } }
-		private IVTSLogger _logger;
-		public IVTSLogger Logger { get { return this._logger; } }
-
-		private IVTSWebSocket _socket;
-		public IVTSWebSocket Socket { get { return this._socket; } }
+		public ITokenStorage TokenStorage { get; private set; }
+		public IJsonUtility JsonUtility { get; private set; }
+		public IVTSLogger Logger { get; private set; }
+		public IVTSWebSocket Socket { get; private set; }
 
 		private CancellationTokenSource _cancelToken;
 		private Task _tickLoop = null;
@@ -47,13 +37,13 @@ namespace VTS.Core {
 		/// <param name="pluginAuthor">The plugin author/</param>
 		/// <param name="pluginIcon">The plugin icon, encoded as a base64 string. Must be 128*128 pixels exactly.</param>
 		public CoreVTSPlugin(IVTSLogger logger, int updateIntervalMs, string pluginName, string pluginAuthor, string pluginIcon) {
-			this._socket = new VTSWebSocket();
-			this._logger = logger;
-			this._tickInterval = updateIntervalMs;
-			this._pluginName = pluginName;
-			this._pluginAuthor = pluginAuthor;
-			this._pluginIcon = pluginIcon;
+			this.Socket = new VTSWebSocket();
+			this.Logger = logger;
+			this.PluginName = pluginName;
+			this.PluginAuthor = pluginAuthor;
+			this.PluginIcon = pluginIcon;
 			this._cancelToken = new CancellationTokenSource();
+			this._tickInterval = updateIntervalMs;
 			this._tickLoop = TickLoop(this._cancelToken.Token);
 		}
 
@@ -69,9 +59,9 @@ namespace VTS.Core {
 		#region Initialization
 
 		public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onConnect, Action onDisconnect, Action<VTSErrorData> onError) {
-			this._tokenStorage = tokenStorage;
-			this._jsonUtility = jsonUtility;
-			this.Socket.Initialize(webSocket, this._jsonUtility, this._logger);
+			this.TokenStorage = tokenStorage;
+			this.JsonUtility = jsonUtility;
+			this.Socket.Initialize(webSocket, this.JsonUtility, this.Logger);
 			Action onCombinedConnect = () => {
 				this.Socket.ResubscribeToEvents();
 				onConnect();
@@ -84,7 +74,7 @@ namespace VTS.Core {
 							Reauthenticate(onCombinedConnect, onError);
 						}
 						else {
-							this._isAuthenticated = true;
+							this.IsAuthenticated = true;
 							onCombinedConnect();
 						}
 					},
@@ -96,14 +86,14 @@ namespace VTS.Core {
 				);
 			},
 			() => {
-				this._isAuthenticated = false;
+				this.IsAuthenticated = false;
 				onDisconnect();
 			},
 			(e) => {
 				VTSErrorData error = new VTSErrorData();
 				error.data.errorID = ErrorID.InternalServerError;
 				error.data.message = e.Message;
-				this._isAuthenticated = false;
+				this.IsAuthenticated = false;
 				onError(error);
 			});
 		}
@@ -135,9 +125,9 @@ namespace VTS.Core {
 		#region Authentication
 
 		private void Authenticate(Action<VTSAuthData> onSuccess, Action<VTSErrorData> onError) {
-			this._isAuthenticated = false;
-			if (this._tokenStorage != null) {
-				this._token = this._tokenStorage.LoadToken();
+			this.IsAuthenticated = false;
+			if (this.TokenStorage != null) {
+				this._token = this.TokenStorage.LoadToken();
 				if (String.IsNullOrEmpty(this._token)) {
 					GetToken(onSuccess, onError);
 				}
@@ -152,15 +142,15 @@ namespace VTS.Core {
 
 		private void Reauthenticate(Action onConnect, Action<VTSErrorData> onError) {
 			// Debug.LogWarning("Token expired, acquiring new token...");
-			this._isAuthenticated = false;
-			this._tokenStorage.DeleteToken();
+			this.IsAuthenticated = false;
+			this.TokenStorage.DeleteToken();
 			Authenticate(
 				(t) => {
-					this._isAuthenticated = true;
+					this.IsAuthenticated = true;
 					onConnect();
 				},
 				(t) => {
-					this._isAuthenticated = false;
+					this.IsAuthenticated = false;
 					onError(t);
 				}
 			);
@@ -174,8 +164,8 @@ namespace VTS.Core {
 			this.Socket.Send<VTSAuthData, VTSAuthData>(tokenRequest,
 			(a) => {
 				this._token = a.data.authenticationToken;
-				if (this._tokenStorage != null) {
-					this._tokenStorage.SaveToken(this._token);
+				if (this.TokenStorage != null) {
+					this.TokenStorage.SaveToken(this._token);
 				}
 				UseToken(onSuccess, onError);
 			},
