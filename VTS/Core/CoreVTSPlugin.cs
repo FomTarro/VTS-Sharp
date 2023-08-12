@@ -46,7 +46,7 @@ namespace VTS.Core {
 			this._tickInterval = updateIntervalMs;
 			this._tickLoop = TickLoop(this._cancelToken.Token);
 
-			if (pluginName.Length is < 3 or > 32 || pluginAuthor.Length is < 3 or > 32)
+			if (pluginName.Length < 3 || pluginName.Length > 32 || pluginAuthor.Length < 3 || pluginAuthor.Length > 32)
 				throw new Exception("Plugin name and plugin author must both be between 3 and 32 characters.");
 		}
 
@@ -103,13 +103,13 @@ namespace VTS.Core {
 
 		public Task InitializeAsync(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onDisconnect)
 		{
-			var tcs = new TaskCompletionSource();
+			var tcs = new TaskCompletionSource<object?>();
 
 			Initialize(
 				webSocket,
 				jsonUtility,
 				tokenStorage,
-				() => tcs.SetResult(),
+				() => tcs.SetResult(null),
 				onDisconnect,
 				error => tcs.SetException(error.ToException())
 			);

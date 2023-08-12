@@ -1,27 +1,29 @@
-﻿using VTS.Core;
+﻿using System.Threading.Tasks;
+using VTS.Core;
 
-namespace VTS.NonUnity;
-
-public static class MyFirstPlugin
+namespace VTS.NonUnity
 {
-    public static async Task Main(string[] args)
+    public static class MyFirstPlugin
     {
-        var logger = new ConsoleVTSLoggerImpl();
-        var websocket = new WebSocketNetCoreImpl(logger);
-        var jsonUtility = new NewtonsoftJsonUtilityImpl();
-        var tokenStorage = new TokenStorageImpl("");
-
-        var plugin = new CoreVTSPlugin(logger, 100, "My first plugin", "My Name", "");
-
-        try
+        public static async Task Main(string[] args)
         {
-            await plugin.InitializeAsync(websocket, jsonUtility, tokenStorage, () => logger.LogWarning("Disconnected!"));
+            var logger = new ConsoleVTSLoggerImpl();
+            var websocket = new WebSocketNetCoreImpl(logger);
+            var jsonUtility = new NewtonsoftJsonUtilityImpl();
+            var tokenStorage = new TokenStorageImpl("");
 
-            logger.Log("Connected!");
-        }
-        catch (VTSException e)
-        {
-            logger.LogError(e);
+            var plugin = new CoreVTSPlugin(logger, 100, "My first plugin", "My Name", "");
+
+            try
+            {
+                await plugin.InitializeAsync(websocket, jsonUtility, tokenStorage, () => logger.LogWarning("Disconnected!"));
+
+                logger.Log("Connected!");
+            }
+            catch (VTSException e)
+            {
+                logger.LogError(e);
+            }
         }
     }
 }
