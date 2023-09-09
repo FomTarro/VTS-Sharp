@@ -11,4 +11,4 @@ See: https://docs.unity3d.com/Manual/SpecialFolders.html
 1. Open VTS-Sharp.sln in an IDE of your choice
 2. Build the project
 3. A NuGet package (VTS-Sharp.*.nupkg) will be generated inside [bin/Debug](bin/Debug).
-4. Upload it on https://www.nuget.org/
+4. Upload it on https://www.nuget.org/packages/manage/upload
