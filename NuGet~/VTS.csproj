@@ -11,7 +11,7 @@
         <Description>C# Library for interacting with the VTube Studio API</Description>
         <PackageProjectUrl>https://github.com/FomTarro/VTS-Sharp</PackageProjectUrl>
         <RepositoryUrl>https://github.com/FomTarro/VTS-Sharp</RepositoryUrl>
-        <RepositoryType>Public</RepositoryType>
+        <RepositoryType>git</RepositoryType>
         <Company>VTS-Sharp</Company>
         <Product>VTS-Sharp</Product>
         <PackageReadmeFile>README.md</PackageReadmeFile>
