@@ -103,7 +103,7 @@ namespace VTS.Core {
 
 		public Task InitializeAsync(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onDisconnect)
 		{
-			var tcs = new TaskCompletionSource<object?>();
+			var tcs = new TaskCompletionSource<object>();
 
 			Initialize(
 				webSocket,

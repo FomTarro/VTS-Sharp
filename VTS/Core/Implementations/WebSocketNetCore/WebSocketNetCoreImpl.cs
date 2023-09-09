@@ -11,7 +11,7 @@ namespace VTS.Core
     {
         private static readonly UTF8Encoding Encoder = new UTF8Encoding();
 
-        private ClientWebSocket? _socket;
+        private ClientWebSocket _socket;
         private readonly ConcurrentQueue<string> _intakeQueue;
         private readonly ConcurrentQueue<Action> _responseQueue;
         private bool _attemptReconnect;
@@ -33,23 +33,24 @@ namespace VTS.Core
         public string GetNextResponse()
         {
             _intakeQueue.TryDequeue(out var response);
-            return response!;
+            return response;
         }
 
         public bool IsConnecting()
         {
-            return _socket is { State: WebSocketState.Connecting };
+            return _socket?.State == WebSocketState.Connecting;
         }
 
         public bool IsConnectionOpen()
         {
-            return _socket is { State: WebSocketState.Open };
+            return _socket?.State == WebSocketState.Open;
         }
 
         public void Send(string message)
         {
             var buffer = Encoder.GetBytes(message);
-            _socket?.SendAsync(new ReadOnlyMemory<byte>(buffer), WebSocketMessageType.Text, true, default)
+            var arraySegment = new ArraySegment<byte>(buffer);
+            _socket?.SendAsync(arraySegment, WebSocketMessageType.Text, true, default)
                 .ConfigureAwait(false)
                 .GetAwaiter()
                 .GetResult();
@@ -96,7 +97,7 @@ namespace VTS.Core
                     {
                         _responseQueue.Enqueue(() =>
                         {
-                            if (result is { buffer: { }, messageType: WebSocketMessageType.Text })
+                            if (result.buffer != null && result.messageType == WebSocketMessageType.Text)
                             {
                                 _intakeQueue.Enqueue(Encoder.GetString(result.buffer));
                             }
@@ -131,7 +132,7 @@ namespace VTS.Core
         public void Stop()
         {
             _attemptReconnect = false;
-            if (_socket is { State: WebSocketState.Open })
+            if (_socket != null && _socket.State == WebSocketState.Open)
             {
                 _socket.Abort();
             }
@@ -169,7 +170,7 @@ internal static class WebSocketExtensions
         byte[] buffer,
         WebSocketMessageType messageType,
         WebSocketCloseStatus? closeStatus,
-        string? closeStatusDescription
+        string closeStatusDescription
         )> ReceiveAsync(this ClientWebSocket client, CancellationToken cancellationToken)
     {
         const int maxFrameSize = 1024 * 1024 * 10; // 10 MB

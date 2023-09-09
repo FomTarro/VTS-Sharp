@@ -17,8 +17,13 @@ namespace VTS.NonUnity
             try
             {
                 await plugin.InitializeAsync(websocket, jsonUtility, tokenStorage, () => logger.LogWarning("Disconnected!"));
-
                 logger.Log("Connected!");
+
+                var apiState = await plugin.GetAPIStateAsync();
+                logger.Log("Using VTubeStudio " + apiState.data.vTubeStudioVersion);
+                
+                var currentModel = await plugin.GetCurrentModelAsync();
+                logger.Log("The current model is: " + currentModel.data.modelName);
             }
             catch (VTSException e)
             {
