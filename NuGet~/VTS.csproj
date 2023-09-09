@@ -16,6 +16,7 @@
         <Product>VTS-Sharp</Product>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Copyright>FomTarro</Copyright>
     </PropertyGroup>
 
     <ItemGroup>
