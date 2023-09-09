@@ -17,6 +17,7 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Copyright>FomTarro</Copyright>
+        <PackageTags>plugin csharp unity dotnet godot-engine vtuber vtube-studio</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>
