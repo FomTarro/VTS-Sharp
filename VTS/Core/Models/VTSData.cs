@@ -29,6 +29,20 @@ namespace VTS.Core {
 	}
 
 	[System.Serializable]
+	public class VTSException : Exception
+	{
+		public VTSErrorData ErrorData { get; }
+
+		public VTSException(VTSErrorData errorData)
+			: base($"Request ID #{errorData.requestID} failed\n" 
+			       + $"ErrorID - {errorData.data.errorID}\n" 
+			       + $"Message - {errorData.data.message}")
+		{
+			ErrorData = errorData;
+		}
+	}
+
+	[System.Serializable]
 	public struct Pair {
 		public float x;
 		public float y;
