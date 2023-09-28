@@ -39,7 +39,14 @@ You can find a video tutorial that demonstrates [how to get started in under 90 
 In order to afford the most flexibility (and to be as decoupled from Unity as possible), the underlying components of the [`VTSPlugin`](#interface-ivtsplugin) are all defined as interfaces. This allows you to swap out the built-in implementations with more robust or platform-compliant ones. By default, the `MyFirstPlugin` class features working implementations of all needed components, but if you want, you can pass in your own implementations via the [`Initialize`](#void-initialize) method.
 
 ### Asynchronous Design
-Because the VTube Studio API is websocket-based, all calls to it are inherently asynchronous. Therefore, this library follows a callback-based design pattern.
+Because the VTube Studio API is websocket-based, all calls to it are inherently asynchronous. As of version 2.1.0, there are now two design patterns included in this library. You can use the one that suits your perferences and needs the best!
+
+#### Async/Await-based Design Pattern
+TODO
+
+#### Callback-based Design Pattern
+The second design pattern revolves around callbacks. This was the original implementation of the library.
+
 Take, for example, the following method signature, found in the [`VTSPlugin`](#interface-ivtsplugin) class:
  
 ```

@@ -1,14 +1,14 @@
 ﻿using System.Threading.Tasks;
 using VTS.Core;
 
-namespace VTS.NonUnity
+namespace VTS.Core.Examples
 {
     public static class MyFirstPlugin
     {
         public static async Task Main(string[] args)
         {
             var logger = new ConsoleVTSLoggerImpl();
-            var websocket = new WebSocketNetCoreImpl(logger);
+            var websocket = new WebSocketImpl(logger);
             var jsonUtility = new NewtonsoftJsonUtilityImpl();
             var tokenStorage = new TokenStorageImpl("");
 

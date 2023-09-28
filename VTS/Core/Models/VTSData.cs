@@ -1685,5 +1685,168 @@ namespace VTS.Core {
 		}
 	}
 
+	// Hotkey Triggered Event
+
+	[System.Serializable]
+	public class VTSHotkeyTriggeredEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+		public VTSHotkeyTriggeredEventSubscriptionRequestData() {
+			this.messageType = "EventSubscriptionRequest";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data : VTSEventSubscriptonData {
+			public VTSHotkeyTriggeredEventConfigOptions config;
+		}
+
+		public override void SetEventName(string eventName) {
+			this.data.eventName = eventName;
+		}
+
+		public override string GetEventName() {
+			return this.data.eventName;
+		}
+
+		public override void SetSubscribed(bool subscribe) {
+			this.data.subscribe = subscribe;
+		}
+
+		public override bool GetSubscribed() {
+			return this.data.subscribe;
+		}
+
+		public override void SetConfig(VTSEventConfigData config) {
+			this.data.config = (VTSHotkeyTriggeredEventConfigOptions)config;
+		}
+	}
+
+	/// <summary>
+	/// A container for providing subscription options for a Hotkey Triggered Event subscription.
+	/// 
+	/// For more info about what each field does, see 
+	/// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#hotkey-triggered">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#hotkey-triggered</a>
+	/// </summary>
+	[System.Serializable]
+	public class VTSHotkeyTriggeredEventConfigOptions : VTSEventConfigData {
+		public VTSHotkeyTriggeredEventConfigOptions() {
+			this.ignoreHotkeysTriggeredByAPI = false;
+		}
+
+		public VTSHotkeyTriggeredEventConfigOptions(bool ignoreHotkeysTriggeredByAPI) {
+			this.ignoreHotkeysTriggeredByAPI = ignoreHotkeysTriggeredByAPI;
+		}
+
+		public string onlyForAction;
+		public bool ignoreHotkeysTriggeredByAPI;
+	}
+
+	[System.Serializable]
+	public class VTSHotkeyTriggeredEventData : VTSEventData {
+		public VTSHotkeyTriggeredEventData() {
+			this.messageType = "HotkeyTriggeredEvent";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public string hotkeyID;
+			public string hotkeyName;
+			public string hotkeyFile;
+			public bool hotkeyTriggeredByAPI;
+			public string modelID;
+			public string modelName;
+			public bool isLive2DItem;
+		}
+	}
+
+	// Model Animation Event
+
+	[System.Serializable]
+	public class VTSModelAnimationEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+		public VTSModelAnimationEventSubscriptionRequestData() {
+			this.messageType = "EventSubscriptionRequest";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data : VTSEventSubscriptonData {
+			public VTSModelAnimationEventConfigOptions config;
+		}
+
+		public override void SetEventName(string eventName) {
+			this.data.eventName = eventName;
+		}
+
+		public override string GetEventName() {
+			return this.data.eventName;
+		}
+
+		public override void SetSubscribed(bool subscribe) {
+			this.data.subscribe = subscribe;
+		}
+
+		public override bool GetSubscribed() {
+			return this.data.subscribe;
+		}
+
+		public override void SetConfig(VTSEventConfigData config) {
+			this.data.config = (VTSModelAnimationEventConfigOptions)config;
+		}
+	}
+
+	/// <summary>
+	/// A container for providing subscription options for a Hotkey Triggered Event subscription.
+	/// 
+	/// For more info about what each field does, see 
+	/// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#hotkey-triggered">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#hotkey-triggered</a>
+	/// </summary>
+	[System.Serializable]
+	public class VTSModelAnimationEventConfigOptions : VTSEventConfigData {
+		public VTSModelAnimationEventConfigOptions() {
+			this.ignoreLive2DItems = false;
+			this.ignoreIdleAnimations = false;
+		}
+
+		public VTSModelAnimationEventConfigOptions(bool ignoreLive2DItems, bool ignoreIdleAnimations) {
+			this.ignoreLive2DItems = ignoreLive2DItems;
+			this.ignoreIdleAnimations = ignoreIdleAnimations;
+		}
+
+		public bool ignoreLive2DItems;
+		public bool ignoreIdleAnimations;
+	}
+
+	[System.Serializable]
+	public class VTSModelAnimationEventData : VTSEventData {
+		public VTSModelAnimationEventData() {
+			this.messageType = "ModelAnimationEvent";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public VTSAnimationEventType animationEventType;
+			public float animationEventTime;
+			public string animationEventData;
+			public string animationName;
+			public float animationLength;
+			public bool isIdleAnimation;
+			public string modelID;
+			public string modelName;
+			public bool isLive2DItem;
+		}
+	}
+
+	[System.Serializable]
+	public enum VTSAnimationEventType {
+		Custom,
+		Start,
+		End,
+	}
+
 	#endregion
 }
