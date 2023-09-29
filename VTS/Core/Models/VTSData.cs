@@ -1193,18 +1193,38 @@ namespace VTS.Core {
 	#region Event API
 
 	[System.Serializable]
-	public abstract class VTSEventSubscriptionRequestData : VTSMessageData {
-		public abstract void SetEventName(string eventName);
-		public abstract string GetEventName();
-		public abstract void SetSubscribed(bool subscribe);
-		public abstract bool GetSubscribed();
-		public abstract void SetConfig(VTSEventConfigData config);
+	public abstract class VTSEventSubscriptionRequestData<K> : VTSMessageData where K : VTSEventConfigData {
+		public Data data;
+
+		[System.Serializable]
+		public class Data : VTSEventSubscriptonData<K> { }
+
+		public void SetEventName(string eventName) {
+			this.data.eventName = eventName;
+		}
+
+		public string GetEventName() {
+			return this.data.eventName;
+		}
+
+		public void SetSubscribed(bool subscribe) {
+			this.data.subscribe = subscribe;
+		}
+
+		public bool GetSubscribed() {
+			return this.data.subscribe;
+		}
+
+		public void SetConfig(VTSEventConfigData config){
+			this.data.config = (K)config;
+		}
 	}
 
 	[System.Serializable]
-	public abstract class VTSEventSubscriptonData {
+	public abstract class VTSEventSubscriptonData<T> where T : VTSEventConfigData {
 		public string eventName;
 		public bool subscribe;
+		public T config;
 	}
 
 	[System.Serializable]
@@ -1231,36 +1251,10 @@ namespace VTS.Core {
 	// Test Event
 
 	[System.Serializable]
-	public class VTSTestEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+	public class VTSTestEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSTestEventConfigOptions> {
 		public VTSTestEventSubscriptionRequestData() {
 			this.messageType = "EventSubscriptionRequest";
 			this.data = new Data();
-		}
-		public Data data;
-
-		[System.Serializable]
-		public class Data : VTSEventSubscriptonData {
-			public VTSTestEventConfigOptions config;
-		}
-
-		public override void SetEventName(string eventName) {
-			this.data.eventName = eventName;
-		}
-
-		public override string GetEventName() {
-			return this.data.eventName;
-		}
-
-		public override void SetSubscribed(bool subscribe) {
-			this.data.subscribe = subscribe;
-		}
-
-		public override bool GetSubscribed() {
-			return this.data.subscribe;
-		}
-
-		public override void SetConfig(VTSEventConfigData config) {
-			this.data.config = (VTSTestEventConfigOptions)config;
 		}
 	}
 
@@ -1300,36 +1294,10 @@ namespace VTS.Core {
 	// Model Loaded Event
 
 	[System.Serializable]
-	public class VTSModelLoadedEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+	public class VTSModelLoadedEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSModelLoadedEventConfigOptions> {
 		public VTSModelLoadedEventSubscriptionRequestData() {
 			this.messageType = "EventSubscriptionRequest";
 			this.data = new Data();
-		}
-		public Data data;
-
-		[System.Serializable]
-		public class Data : VTSEventSubscriptonData {
-			public VTSModelLoadedEventConfigOptions config;
-		}
-
-		public override void SetEventName(string eventName) {
-			this.data.eventName = "ModelLoadedEvent";
-		}
-
-		public override string GetEventName() {
-			return this.data.eventName;
-		}
-
-		public override void SetSubscribed(bool subscribe) {
-			this.data.subscribe = subscribe;
-		}
-
-		public override bool GetSubscribed() {
-			return this.data.subscribe;
-		}
-
-		public override void SetConfig(VTSEventConfigData config) {
-			this.data.config = (VTSModelLoadedEventConfigOptions)config;
 		}
 	}
 
@@ -1365,36 +1333,10 @@ namespace VTS.Core {
 	// Tracking Changed Event
 
 	[System.Serializable]
-	public class VTSTrackingEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+	public class VTSTrackingEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSTrackingEventConfigOptions> {
 		public VTSTrackingEventSubscriptionRequestData() {
 			this.messageType = "EventSubscriptionRequest";
 			this.data = new Data();
-		}
-		public Data data;
-
-		[System.Serializable]
-		public class Data : VTSEventSubscriptonData {
-			public VTSTrackingEventConfigOptions config;
-		}
-
-		public override void SetEventName(string eventName) {
-			this.data.eventName = eventName;
-		}
-
-		public override string GetEventName() {
-			return this.data.eventName;
-		}
-
-		public override void SetSubscribed(bool subscribe) {
-			this.data.subscribe = subscribe;
-		}
-
-		public override bool GetSubscribed() {
-			return this.data.subscribe;
-		}
-
-		public override void SetConfig(VTSEventConfigData config) {
-			this.data.config = (VTSTrackingEventConfigOptions)config;
 		}
 	}
 
@@ -1428,36 +1370,10 @@ namespace VTS.Core {
 	// Background Changed Event
 
 	[System.Serializable]
-	public class VTSBackgroundChangedEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+	public class VTSBackgroundChangedEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSBackgroundChangedEventConfigOptions> {
 		public VTSBackgroundChangedEventSubscriptionRequestData() {
 			this.messageType = "EventSubscriptionRequest";
 			this.data = new Data();
-		}
-		public Data data;
-
-		[System.Serializable]
-		public class Data : VTSEventSubscriptonData {
-			public VTSBackgroundChangedEventConfigOptions config;
-		}
-
-		public override void SetEventName(string eventName) {
-			this.data.eventName = eventName;
-		}
-
-		public override string GetEventName() {
-			return this.data.eventName;
-		}
-
-		public override void SetSubscribed(bool subscribe) {
-			this.data.subscribe = subscribe;
-		}
-
-		public override bool GetSubscribed() {
-			return this.data.subscribe;
-		}
-
-		public override void SetConfig(VTSEventConfigData config) {
-			this.data.config = (VTSBackgroundChangedEventConfigOptions)config;
 		}
 	}
 
@@ -1489,36 +1405,10 @@ namespace VTS.Core {
 	// Model Config Changed Event
 
 	[System.Serializable]
-	public class VTSModelConfigChangedEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+	public class VTSModelConfigChangedEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSModelConfigChangedEventConfigOptions> {
 		public VTSModelConfigChangedEventSubscriptionRequestData() {
 			this.messageType = "EventSubscriptionRequest";
 			this.data = new Data();
-		}
-		public Data data;
-
-		[System.Serializable]
-		public class Data : VTSEventSubscriptonData {
-			public VTSModelConfigChangedEventConfigOptions config;
-		}
-
-		public override void SetEventName(string eventName) {
-			this.data.eventName = eventName;
-		}
-
-		public override string GetEventName() {
-			return this.data.eventName;
-		}
-
-		public override void SetSubscribed(bool subscribe) {
-			this.data.subscribe = subscribe;
-		}
-
-		public override bool GetSubscribed() {
-			return this.data.subscribe;
-		}
-
-		public override void SetConfig(VTSEventConfigData config) {
-			this.data.config = (VTSModelConfigChangedEventConfigOptions)config;
 		}
 	}
 
@@ -1552,36 +1442,10 @@ namespace VTS.Core {
 	// Model Moved Event
 
 	[System.Serializable]
-	public class VTSModelMovedEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+	public class VTSModelMovedEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSModelMovedEventConfigOptions> {
 		public VTSModelMovedEventSubscriptionRequestData() {
 			this.messageType = "EventSubscriptionRequest";
 			this.data = new Data();
-		}
-		public Data data;
-
-		[System.Serializable]
-		public class Data : VTSEventSubscriptonData {
-			public VTSModelMovedEventConfigOptions config;
-		}
-
-		public override void SetEventName(string eventName) {
-			this.data.eventName = eventName;
-		}
-
-		public override string GetEventName() {
-			return this.data.eventName;
-		}
-
-		public override void SetSubscribed(bool subscribe) {
-			this.data.subscribe = subscribe;
-		}
-
-		public override bool GetSubscribed() {
-			return this.data.subscribe;
-		}
-
-		public override void SetConfig(VTSEventConfigData config) {
-			this.data.config = (VTSModelMovedEventConfigOptions)config;
 		}
 	}
 
@@ -1615,36 +1479,10 @@ namespace VTS.Core {
 	// Model Outline Event
 
 	[System.Serializable]
-	public class VTSModelOutlineEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+	public class VTSModelOutlineEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSModelOutlineEventConfigOptions> {
 		public VTSModelOutlineEventSubscriptionRequestData() {
 			this.messageType = "EventSubscriptionRequest";
 			this.data = new Data();
-		}
-		public Data data;
-
-		[System.Serializable]
-		public class Data : VTSEventSubscriptonData {
-			public VTSModelOutlineEventConfigOptions config;
-		}
-
-		public override void SetEventName(string eventName) {
-			this.data.eventName = eventName;
-		}
-
-		public override string GetEventName() {
-			return this.data.eventName;
-		}
-
-		public override void SetSubscribed(bool subscribe) {
-			this.data.subscribe = subscribe;
-		}
-
-		public override bool GetSubscribed() {
-			return this.data.subscribe;
-		}
-
-		public override void SetConfig(VTSEventConfigData config) {
-			this.data.config = (VTSModelOutlineEventConfigOptions)config;
 		}
 	}
 
@@ -1688,36 +1526,10 @@ namespace VTS.Core {
 	// Hotkey Triggered Event
 
 	[System.Serializable]
-	public class VTSHotkeyTriggeredEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+	public class VTSHotkeyTriggeredEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSHotkeyTriggeredEventConfigOptions> {
 		public VTSHotkeyTriggeredEventSubscriptionRequestData() {
 			this.messageType = "EventSubscriptionRequest";
 			this.data = new Data();
-		}
-		public Data data;
-
-		[System.Serializable]
-		public class Data : VTSEventSubscriptonData {
-			public VTSHotkeyTriggeredEventConfigOptions config;
-		}
-
-		public override void SetEventName(string eventName) {
-			this.data.eventName = eventName;
-		}
-
-		public override string GetEventName() {
-			return this.data.eventName;
-		}
-
-		public override void SetSubscribed(bool subscribe) {
-			this.data.subscribe = subscribe;
-		}
-
-		public override bool GetSubscribed() {
-			return this.data.subscribe;
-		}
-
-		public override void SetConfig(VTSEventConfigData config) {
-			this.data.config = (VTSHotkeyTriggeredEventConfigOptions)config;
 		}
 	}
 
@@ -1764,36 +1576,10 @@ namespace VTS.Core {
 	// Model Animation Event
 
 	[System.Serializable]
-	public class VTSModelAnimationEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+	public class VTSModelAnimationEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSModelAnimationEventConfigOptions> {
 		public VTSModelAnimationEventSubscriptionRequestData() {
 			this.messageType = "EventSubscriptionRequest";
 			this.data = new Data();
-		}
-		public Data data;
-
-		[System.Serializable]
-		public class Data : VTSEventSubscriptonData {
-			public VTSModelAnimationEventConfigOptions config;
-		}
-
-		public override void SetEventName(string eventName) {
-			this.data.eventName = eventName;
-		}
-
-		public override string GetEventName() {
-			return this.data.eventName;
-		}
-
-		public override void SetSubscribed(bool subscribe) {
-			this.data.subscribe = subscribe;
-		}
-
-		public override bool GetSubscribed() {
-			return this.data.subscribe;
-		}
-
-		public override void SetConfig(VTSEventConfigData config) {
-			this.data.config = (VTSModelAnimationEventConfigOptions)config;
 		}
 	}
 

@@ -287,7 +287,7 @@ namespace VTS.Core {
 			}
 		}
 
-		public void SendEventSubscription<T, K>(T request, Action<K> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError, Action resubscribe) where T : VTSEventSubscriptionRequestData where K : VTSEventData {
+		public void SendEventSubscription<T, K, V>(T request, Action<K> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError, Action resubscribe) where T : VTSEventSubscriptionRequestData<V> where K : VTSEventData where V: VTSEventConfigData {
 			this.Send<T, VTSEventSubscriptionResponseData>(
 				request,
 				(s) => {

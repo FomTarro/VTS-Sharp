@@ -682,25 +682,25 @@ namespace VTS.Core {
 
 		#region VTS Event Subscription API Wrapper
 
-		private void SubscribeToEvent<T, K>(string eventName, bool subscribed, VTSEventConfigData config, Action<K> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) where T : VTSEventSubscriptionRequestData, new() where K : VTSEventData {
+		private void SubscribeToEvent<T, K, V>(string eventName, bool subscribed, V config, Action<K> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) where T : VTSEventSubscriptionRequestData<V>, new() where K : VTSEventData where V : VTSEventConfigData {
 			T request = new T();
 			request.SetEventName(eventName);
 			request.SetSubscribed(subscribed);
 			if (config != null) {
 				request.SetConfig(config);
 			}
-			this.Socket.SendEventSubscription<T, K>(request, onEvent, onSubscribe, onError, () => {
-				SubscribeToEvent<T, K>(eventName, subscribed, config, onEvent, onSubscribe, onError);
+			this.Socket.SendEventSubscription<T, K, V>(request, onEvent, onSubscribe, onError, () => {
+				SubscribeToEvent<T, K, V>(eventName, subscribed, config, onEvent, onSubscribe, onError);
 			});
 		}
-		public async Task<VTSEventSubscriptionResponseData> SubscribeToEventAsync<T, K>(string eventName, bool subscribed, VTSEventConfigData config, Action<K> onEvent) where T : VTSEventSubscriptionRequestData, new() where K : VTSEventData
+		public async Task<VTSEventSubscriptionResponseData> SubscribeToEventAsync<T, K, V>(string eventName, bool subscribed, V config, Action<K> onEvent) where T : VTSEventSubscriptionRequestData<V>, new() where K : VTSEventData where V : VTSEventConfigData
 		{
-			return await VTSExtensions.Async<string, bool, VTSEventConfigData, Action<K>, VTSEventSubscriptionResponseData, VTSErrorData>(
-				SubscribeToEvent<T, K>, eventName, subscribed, config, onEvent);
+			return await VTSExtensions.Async<string, bool, V, Action<K>, VTSEventSubscriptionResponseData, VTSErrorData>(
+				SubscribeToEvent<T, K, V>, eventName, subscribed, config, onEvent);
 		}
 
 		public void UnsubscribeFromAllEvents(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
-			SubscribeToEvent<VTSTestEventSubscriptionRequestData, VTSTestEventData>(null, false, null, DoNothingCallback, onUnsubscribe, onError);
+			SubscribeToEvent<VTSTestEventSubscriptionRequestData, VTSTestEventData, VTSTestEventConfigOptions>(null, false, null, DoNothingCallback, onUnsubscribe, onError);
 		}
 		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromAllEventsAsync()
 		{
@@ -710,7 +710,7 @@ namespace VTS.Core {
 		// Test Event
 
 		public void SubscribeToTestEvent(VTSTestEventConfigOptions config, Action<VTSTestEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
-			SubscribeToEvent<VTSTestEventSubscriptionRequestData, VTSTestEventData>("TestEvent", true, config, onEvent, onSubscribe, onError);
+			SubscribeToEvent<VTSTestEventSubscriptionRequestData, VTSTestEventData, VTSTestEventConfigOptions>("TestEvent", true, config, onEvent, onSubscribe, onError);
 		}
 		public async Task<VTSEventSubscriptionResponseData> SubscribeToTestEventAsync(VTSTestEventConfigOptions config, Action<VTSTestEventData> onEvent)
 		{
@@ -719,7 +719,7 @@ namespace VTS.Core {
 		}
 
 		public void UnsubscribeFromTestEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
-			SubscribeToEvent<VTSTestEventSubscriptionRequestData, VTSTestEventData>("TestEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
+			SubscribeToEvent<VTSTestEventSubscriptionRequestData, VTSTestEventData, VTSTestEventConfigOptions>("TestEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
 		}
 		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromTestEventAsync()
 		{
@@ -729,7 +729,7 @@ namespace VTS.Core {
 		// Model Loaded Event
 
 		public void SubscribeToModelLoadedEvent(VTSModelLoadedEventConfigOptions config, Action<VTSModelLoadedEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
-			SubscribeToEvent<VTSModelLoadedEventSubscriptionRequestData, VTSModelLoadedEventData>("ModelLoadedEvent", true, config, onEvent, onSubscribe, onError);
+			SubscribeToEvent<VTSModelLoadedEventSubscriptionRequestData, VTSModelLoadedEventData, VTSModelLoadedEventConfigOptions>("ModelLoadedEvent", true, config, onEvent, onSubscribe, onError);
 		}
 		public async Task<VTSEventSubscriptionResponseData> SubscribeToModelLoadedEventAsync(VTSModelLoadedEventConfigOptions config, Action<VTSModelLoadedEventData> onEvent)
 		{
@@ -738,7 +738,7 @@ namespace VTS.Core {
 		}
 		
 		public void UnsubscribeFromModelLoadedEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
-			SubscribeToEvent<VTSModelLoadedEventSubscriptionRequestData, VTSTestEventData>("ModelLoadedEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
+			SubscribeToEvent<VTSModelLoadedEventSubscriptionRequestData, VTSTestEventData, VTSModelLoadedEventConfigOptions>("ModelLoadedEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
 		}
 		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelLoadedEventAsync()
 		{
@@ -748,7 +748,7 @@ namespace VTS.Core {
 		// Tracking Changed Event
 
 		public void SubscribeToTrackingEvent(Action<VTSTrackingEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
-			SubscribeToEvent<VTSTrackingEventSubscriptionRequestData, VTSTrackingEventData>("TrackingStatusChangedEvent", true, new VTSTrackingEventConfigOptions(), onEvent, onSubscribe, onError);
+			SubscribeToEvent<VTSTrackingEventSubscriptionRequestData, VTSTrackingEventData, VTSTrackingEventConfigOptions>("TrackingStatusChangedEvent", true, new VTSTrackingEventConfigOptions(), onEvent, onSubscribe, onError);
 		}
 		public async Task<VTSEventSubscriptionResponseData> SubscribeToTrackingEventAsync(Action<VTSTrackingEventData> onEvent)
 		{
@@ -757,7 +757,7 @@ namespace VTS.Core {
 		}
 
 		public void UnsubscribeFromTrackingEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
-			SubscribeToEvent<VTSTrackingEventSubscriptionRequestData, VTSTrackingEventData>("TrackingStatusChangedEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
+			SubscribeToEvent<VTSTrackingEventSubscriptionRequestData, VTSTrackingEventData, VTSTrackingEventConfigOptions>("TrackingStatusChangedEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
 		}
 		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromTrackingEventAsync()
 		{
@@ -767,7 +767,7 @@ namespace VTS.Core {
 		// Background Changed Event
 
 		public void SubscribeToBackgroundChangedEvent(Action<VTSBackgroundChangedEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
-			SubscribeToEvent<VTSBackgroundChangedEventSubscriptionRequestData, VTSBackgroundChangedEventData>("BackgroundChangedEvent", true, new VTSBackgroundChangedEventConfigOptions(), onEvent, onSubscribe, onError);
+			SubscribeToEvent<VTSBackgroundChangedEventSubscriptionRequestData, VTSBackgroundChangedEventData, VTSBackgroundChangedEventConfigOptions>("BackgroundChangedEvent", true, new VTSBackgroundChangedEventConfigOptions(), onEvent, onSubscribe, onError);
 		}
 		public async Task<VTSEventSubscriptionResponseData> SubscribeToBackgroundChangedEventAsync(Action<VTSBackgroundChangedEventData> onEvent)
 		{
@@ -776,7 +776,7 @@ namespace VTS.Core {
 		}
 
 		public void UnsubscribeFromBackgroundChangedEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
-			SubscribeToEvent<VTSBackgroundChangedEventSubscriptionRequestData, VTSBackgroundChangedEventData>("BackgroundChangedEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
+			SubscribeToEvent<VTSBackgroundChangedEventSubscriptionRequestData, VTSBackgroundChangedEventData, VTSBackgroundChangedEventConfigOptions>("BackgroundChangedEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
 		}
 		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromBackgroundChangedEventAsync()
 		{
@@ -786,7 +786,7 @@ namespace VTS.Core {
 		// Model Config Changed Event
 
 		public void SubscribeToModelConfigChangedEvent(Action<VTSModelConfigChangedEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
-			SubscribeToEvent<VTSModelConfigChangedEventSubscriptionRequestData, VTSModelConfigChangedEventData>("ModelConfigChangedEvent", true, new VTSModelConfigChangedEventConfigOptions(), onEvent, onSubscribe, onError);
+			SubscribeToEvent<VTSModelConfigChangedEventSubscriptionRequestData, VTSModelConfigChangedEventData, VTSModelConfigChangedEventConfigOptions>("ModelConfigChangedEvent", true, new VTSModelConfigChangedEventConfigOptions(), onEvent, onSubscribe, onError);
 		}
 		public async Task<VTSEventSubscriptionResponseData> SubscribeToModelConfigChangedEventAsync(Action<VTSModelConfigChangedEventData> onEvent)
 		{
@@ -795,7 +795,7 @@ namespace VTS.Core {
 		}
 
 		public void UnsubscribeFromModelConfigChangedEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
-			SubscribeToEvent<VTSModelConfigChangedEventSubscriptionRequestData, VTSModelConfigChangedEventData>("ModelConfigChangedEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
+			SubscribeToEvent<VTSModelConfigChangedEventSubscriptionRequestData, VTSModelConfigChangedEventData, VTSModelConfigChangedEventConfigOptions>("ModelConfigChangedEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
 		}
 		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelConfigChangedEventAsync()
 		{
@@ -805,7 +805,7 @@ namespace VTS.Core {
 		// Model Moved Event
 
 		public void SubscribeToModelMovedEvent(Action<VTSModelMovedEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
-			SubscribeToEvent<VTSModelMovedEventSubscriptionRequestData, VTSModelMovedEventData>("ModelMovedEvent", true, new VTSModelMovedEventConfigOptions(), onEvent, onSubscribe, onError);
+			SubscribeToEvent<VTSModelMovedEventSubscriptionRequestData, VTSModelMovedEventData, VTSModelMovedEventConfigOptions>("ModelMovedEvent", true, new VTSModelMovedEventConfigOptions(), onEvent, onSubscribe, onError);
 		}
 		public async Task<VTSEventSubscriptionResponseData> SubscribeToModelMovedEventAsync(Action<VTSModelMovedEventData> onEvent)
 		{
@@ -814,7 +814,7 @@ namespace VTS.Core {
 		}
 
 		public void UnsubscribeFromModelMovedEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
-			SubscribeToEvent<VTSModelMovedEventSubscriptionRequestData, VTSModelMovedEventData>("ModelMovedEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
+			SubscribeToEvent<VTSModelMovedEventSubscriptionRequestData, VTSModelMovedEventData, VTSModelMovedEventConfigOptions>("ModelMovedEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
 		}
 		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelMovedEventAsync()
 		{
@@ -824,7 +824,7 @@ namespace VTS.Core {
 		// Model Outline Event
 
 		public void SubscribeToModelOutlineEvent(VTSModelOutlineEventConfigOptions config, Action<VTSModelOutlineEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
-			SubscribeToEvent<VTSModelOutlineEventSubscriptionRequestData, VTSModelOutlineEventData>("ModelOutlineEvent", true, config, onEvent, onSubscribe, onError);
+			SubscribeToEvent<VTSModelOutlineEventSubscriptionRequestData, VTSModelOutlineEventData, VTSModelOutlineEventConfigOptions>("ModelOutlineEvent", true, config, onEvent, onSubscribe, onError);
 		}
 		public async Task<VTSEventSubscriptionResponseData> SubscribeToModelOutlineEventAsync(VTSModelOutlineEventConfigOptions config, Action<VTSModelOutlineEventData> onEvent)
 		{
@@ -833,7 +833,7 @@ namespace VTS.Core {
 		}
 
 		public void UnsubscribeFromModelOutlineEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
-			SubscribeToEvent<VTSModelOutlineEventSubscriptionRequestData, VTSModelOutlineEventData>("ModelOutlineEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
+			SubscribeToEvent<VTSModelOutlineEventSubscriptionRequestData, VTSModelOutlineEventData, VTSModelOutlineEventConfigOptions>("ModelOutlineEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
 		}
 		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelOutlineEventAsync()
 		{
@@ -843,7 +843,7 @@ namespace VTS.Core {
 		// Hotkey Triggered Event
 
 		public void SubscribeToHotkeyTriggeredEvent(VTSHotkeyTriggeredEventConfigOptions config, Action<VTSHotkeyTriggeredEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
-			SubscribeToEvent<VTSHotkeyTriggeredEventSubscriptionRequestData, VTSHotkeyTriggeredEventData>("HotkeyTriggeredEvent", true, config, onEvent, onSubscribe, onError);
+			SubscribeToEvent<VTSHotkeyTriggeredEventSubscriptionRequestData, VTSHotkeyTriggeredEventData, VTSHotkeyTriggeredEventConfigOptions>("HotkeyTriggeredEvent", true, config, onEvent, onSubscribe, onError);
 		}
 		public async Task<VTSEventSubscriptionResponseData> SubscribeToHotkeyTriggeredEventAsync(VTSHotkeyTriggeredEventConfigOptions config, Action<VTSHotkeyTriggeredEventData> onEvent)
 		{
@@ -852,7 +852,7 @@ namespace VTS.Core {
 		}
 
 		public void UnsubscribeFromHotkeyTriggeredEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
-			SubscribeToEvent<VTSHotkeyTriggeredEventSubscriptionRequestData, VTSHotkeyTriggeredEventData>("HotkeyTriggeredEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
+			SubscribeToEvent<VTSHotkeyTriggeredEventSubscriptionRequestData, VTSHotkeyTriggeredEventData, VTSHotkeyTriggeredEventConfigOptions>("HotkeyTriggeredEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
 		}
 		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromHotkeyTriggeredEventAsync()
 		{
@@ -862,7 +862,7 @@ namespace VTS.Core {
 		// Animation Event Triggered Event
 
 		public void SubscribeToModelAnimationEvent(VTSModelAnimationEventConfigOptions config, Action<VTSModelAnimationEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
-			SubscribeToEvent<VTSModelAnimationEventSubscriptionRequestData, VTSModelAnimationEventData>("ModelAnimationEvent", true, config, onEvent, onSubscribe, onError);
+			SubscribeToEvent<VTSModelAnimationEventSubscriptionRequestData, VTSModelAnimationEventData, VTSModelAnimationEventConfigOptions>("ModelAnimationEvent", true, config, onEvent, onSubscribe, onError);
 		}
 		public async Task<VTSEventSubscriptionResponseData> SubscribeToModelAnimationEventAsync(VTSModelAnimationEventConfigOptions config, Action<VTSModelAnimationEventData> onEvent)
 		{
@@ -871,7 +871,7 @@ namespace VTS.Core {
 		}
 
 		public void UnsubscribeFromModelAnimationEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
-			SubscribeToEvent<VTSModelAnimationEventSubscriptionRequestData, VTSModelAnimationEventData>("ModelAnimationEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
+			SubscribeToEvent<VTSModelAnimationEventSubscriptionRequestData, VTSModelAnimationEventData, VTSModelAnimationEventConfigOptions>("ModelAnimationEvent", false, null, DoNothingCallback, onUnsubscribe, onError);
 		}
 		public async Task<VTSEventSubscriptionResponseData>  UnsubscribeFromModelAnimationEventAsync()
 		{
