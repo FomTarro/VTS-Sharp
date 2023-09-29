@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.UI;
+
 using VTS.Core;
 
 namespace VTS.Unity.Examples {
@@ -96,8 +98,7 @@ namespace VTS.Unity.Examples {
 						SetExpressionState(expression.file, true,
 							(x) => { _text.text = this.JsonUtility.ToJson(x); },
 							(e2) => { _text.text = e2.data.message; });
-					}
-					else {
+					} else {
 						throw new System.Exception("No Expression with " + expressionName + " in the file name was found.");
 					}
 				},
@@ -148,6 +149,21 @@ namespace VTS.Unity.Examples {
 
 		public void UnsubOutlineEvent() {
 			this.UnsubscribeFromModelOutlineEvent(
+				(s) => { _eventText.text = "[Event Output]"; },
+				(e) => { _eventText.text = e.data.message; });
+		}
+
+		public void SubAnimationEvent() {
+			VTSModelAnimationEventConfigOptions config = new VTSModelAnimationEventConfigOptions();
+			this.SubscribeToModelAnimationEvent(
+				config,
+				(s) => { _eventText.text = string.Format(s.data.animationEventType + " "); },
+				(g) => { this.Logger.Log("Subscribed!"); },
+				(e) => { _eventText.text = e.data.message; });
+		}
+
+		public void UnsubAnimationEvent() {
+			this.UnsubscribeFromModelAnimationEvent(
 				(s) => { _eventText.text = "[Event Output]"; },
 				(e) => { _eventText.text = e.data.message; });
 		}

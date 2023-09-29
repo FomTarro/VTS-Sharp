@@ -1,4 +1,4 @@
-# VTS-Sharp v2.0.1
+# VTS-Sharp v2.1.0
 A C# client interface for creating VTube Studio Plugins with the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio), for use in Unity and other C# runtime environments!
 
 ## IMPORTANT! 
@@ -39,7 +39,14 @@ You can find a video tutorial that demonstrates [how to get started in under 90 
 In order to afford the most flexibility (and to be as decoupled from Unity as possible), the underlying components of the [`VTSPlugin`](#interface-ivtsplugin) are all defined as interfaces. This allows you to swap out the built-in implementations with more robust or platform-compliant ones. By default, the `MyFirstPlugin` class features working implementations of all needed components, but if you want, you can pass in your own implementations via the [`Initialize`](#void-initialize) method.
 
 ### Asynchronous Design
-Because the VTube Studio API is websocket-based, all calls to it are inherently asynchronous. Therefore, this library follows a callback-based design pattern.
+Because the VTube Studio API is websocket-based, all calls to it are inherently asynchronous. As of version 2.1.0, there are now two design patterns included in this library. You can use the one that suits your perferences and needs the best!
+
+This library also supports the [VTube Studio Event Subscription API](https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md). With this feature, you can subscribe to various events to make sure your plugin gets a message when something happens in VTube Studio. Event Subscription follows a similar asynchronous design pattern.
+
+### Callback-based Design Pattern
+The initial implementation of this library revolves around callbacks to achieve asynchronous results.
+
+#### API Calls
 Take, for example, the following method signature, found in the [`VTSPlugin`](#interface-ivtsplugin) class:
  
 ```
@@ -50,7 +57,7 @@ The method accepts two callbacks, `onSuccess` and `onError`, but does not return
 Upon the request being processed by VTube Studio,
 one of these two callbacks will be invoked, depending on if the request was successful or not. The callback accepts in a single, strongly-typed argument reflecting the response payload. You can find what to expect in each payload class in the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio).
 
-This library also supports the [VTube Studio Event Subscription API](https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md). With this feature, you can subscribe to various events to make sure your plugin gets a message when something happens in VTube Studio. Event Subscription follows a similar asynchronous design pattern.
+#### Event Subscription
 Take, for example, the following method signature, found in the [`VTSPlugin`](#interface-ivtsplugin) class:
 
 ```
@@ -59,6 +66,33 @@ void SubscribeToTestEvent(VTSTestEventConfigOptions config, Action<VTSTestEventD
 The method accepts an optional configuration class, and three callbacks, `onEvent`, `onSubscribe` and `onError`, but does not return a value.
 
 Upon successfully subscribing to the event in VTube Studio, the `onSubscribe` callback will be invoked, and then `onEvent` will be invoked any time VTube Studio publishes an event of that type. If the subscription fails for any reason, `onError` will be invoked.
+
+### Async/Await-based Design Pattern
+As of version 2.1.0, the library now supports the `async` and `await` pattern for asynchronous code. 
+
+#### API Calls
+Take, for example, the following method signature, found in the [`VTSPlugin`](#interface-ivtsplugin) class:
+
+```
+async Task<VTSStateData> GetAPIState()
+```
+
+This method will can be called like so:
+```
+var stateData = await plugin.GetApiState();
+```
+
+Upon the request being processed by VTube Studio, the method will resolve into a payload of `VTSStateData` if the request was successful, or it will throw a `VTSException` if the request failed for any reason.
+
+#### Event Subscription
+Take, for example, the following method signature, found in the [`VTSPlugin`](#interface-ivtsplugin) class:
+
+```
+async Task<VTSEventSubscriptionResponseData> SubscribeToTestEvent(VTSTestEventConfigOptions config, Action<VTSTestEventData> onEvent)
+```
+The method accepts an optional configuration class, and one callback, `onEvent`.
+
+Upon successfully subscribing to the event in VTube Studio, the method will resolve into a payload of `VTSEventSubscriptionResponseData` and then `onEvent` will be invoked any time VTube Studio publishes an event of that type. If the subscription fails for any reason, a `VTSException` will be thrown.
 
 ## What Changed in 2.0.0?
 
@@ -119,6 +153,15 @@ The plugin will attempt to intelligently choose a port to connect to, using the 
 * If that fails, it will attempt to connect to the first port discovered by UDP.
 * If that takes too long and times out, it will attempt to connect to the default port (8001).
 
+#### `Task InitializeAsync`
+Connects to VTube Studio, authenticates the plugin, and also selects the WebSocket, JSON Utility, and Token Storage implementations. Takes the following args:
+* `IWebSocket webSocket`: The WebSocket implementation.
+* `IJsonUtility jsonUtility`: The JSON serializer/deserializer implementation.
+* `ITokenStorage tokenStorage`: The Token Storage implementation.
+* `Action onDisconnect`: Callback executed upon disconnecting from VTS (accidental or otherwise).
+
+If this method fails to execute, it will throw a `VTSException`.
+
 #### `void Disconnect`
 Disconnects from VTube Studio. Will fire the onDisconnect callback set via the Initialize method.
 
@@ -150,7 +193,7 @@ Event subscription methods can be inferred from the [official VTube Studio Event
 
 ### Provided Implementations
 * `VTS.Core.WebSocketSharpImpl`
-* `VTS.Core.WebSocketImpl` (deprecated)
+* `VTS.Core.WebSocketImpl`
 
 ### Methods
 #### `string GetNextResponse`

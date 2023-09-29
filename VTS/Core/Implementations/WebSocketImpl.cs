@@ -1,221 +1,175 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.IO;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace VTS.Core {
+    public class WebSocketImpl : IWebSocket {
+        private static readonly UTF8Encoding Encoder = new UTF8Encoding();
 
-	/// <summary>
-	/// Basic Websocket implementation. 
-	/// 
-	/// It is strongly recommended that you replace this with a more robust solution, such as WebsocketSharp.
-	/// </summary>
-	public class WebSocketImpl : IWebSocket {
-		private static UTF8Encoding ENCODER = new UTF8Encoding();
-		private const UInt64 MAX_READ_SIZE = 1 * 1024 * 1024;
+        private ClientWebSocket _socket;
+        private readonly ConcurrentQueue<string> _intakeQueue;
+        private readonly ConcurrentQueue<Action> _responseQueue;
+        private bool _attemptReconnect;
 
-		// WebSocket
-		private ClientWebSocket _ws = new ClientWebSocket();
-		private string _url = null;
+        private Action _onConnect = () => { };
+        private Action _onDisconnect = () => { };
+        private Action<Exception> _onError = (e) => { };
 
-		// Queues
-		private ConcurrentQueue<string> _receiveQueue { get; }
-		private ConcurrentQueue<ArraySegment<byte>> _sendQueue { get; }
-		private CancellationTokenSource _tokenSource;
-		private Action _onReconnect = () => { };
-		private Action _onDisconnect = () => { };
+        private string _url = "";
+        private readonly IVTSLogger _logger;
 
-		private IVTSLogger _logger;
+        public WebSocketImpl(IVTSLogger logger) {
+            _logger = logger;
+            _intakeQueue = new ConcurrentQueue<string>();
+            _responseQueue = new ConcurrentQueue<Action>();
+        }
 
-		#region  Lifecycle
-		public WebSocketImpl(IVTSLogger logger) {
-			_logger = logger;
-			_receiveQueue = new ConcurrentQueue<string>();
-			_sendQueue = new ConcurrentQueue<ArraySegment<byte>>();
-		}
+        public string GetNextResponse() {
+            _intakeQueue.TryDequeue(out var response);
+            return response;
+        }
 
-		~WebSocketImpl() {
-			this.Dispose();
-		}
+        public bool IsConnecting() {
+            return _socket?.State == WebSocketState.Connecting;
+        }
 
-		public async void Start(string URL, Action onConnect, Action onDisconnect, Action<Exception> onError) {
-			try {
-				// Cancel all existing tasks
-				if (this._tokenSource != null) {
-					_tokenSource.Cancel();
-				}
+        public bool IsConnectionOpen() {
+            return _socket?.State == WebSocketState.Open;
+        }
 
-				// Make fresh socket
-				this._url = URL;
-				Uri serverUri = new Uri(URL);
-				this._ws = new ClientWebSocket();
-				this._ws.Options.KeepAliveInterval = new TimeSpan(0, 0, 10);
+        public void Send(string message) {
+            var buffer = Encoder.GetBytes(message);
+            var arraySegment = new ArraySegment<byte>(buffer);
+            _socket?.SendAsync(arraySegment, WebSocketMessageType.Text, true, default)
+                .ConfigureAwait(false)
+                .GetAwaiter()
+                .GetResult();
+        }
 
-				// Make new Cancellation token
-				this._tokenSource = new CancellationTokenSource();
-				CancellationToken token = _tokenSource.Token;
+        public void Start(string url, Action onConnect, Action onDisconnect, Action<Exception> onError) {
+            _url = url;
+            _socket = new ClientWebSocket();
+            _logger.Log($"Attempting to connect to {_url}");
+            _socket.Options.KeepAliveInterval = TimeSpan.FromSeconds(10);
+            _onConnect = onConnect;
+            _onDisconnect = onDisconnect;
+            _onError = onError;
 
-				// Start new tasks
-				Task send = new Task(() => RunSend(this._ws, token), token);
-				send.Start();
-				Task receive = new Task(() => RunReceive(this._ws, token), token);
-				receive.Start();
+            Task.Run<Task>(async () => {
+                try {
+                    await _socket.ConnectAsync(new Uri(_url), CancellationToken.None);
+                } catch (Exception e) {
+                    _responseQueue.Enqueue(() => {
+                        _logger.LogError($"[{_url}] - Socket error...");
+                        _logger.LogError($"'{e.Message}', {e}");
+                        _onError(e);
+                    });
+                    return;
+                }
 
-				this._onReconnect = onConnect;
-				this._onDisconnect = onDisconnect;
-				this._logger.Log("Connecting to: " + serverUri);
-				await this._ws.ConnectAsync(serverUri, token);
-				while (IsConnecting()) {
-					this._logger.Log("Waiting to connect...");
-					await Task.Delay(10);
-				}
-				this._logger.Log("Connect status: " + this._ws.State);
-				if (this._ws.State == WebSocketState.Open) {
-					onConnect();
-				}
-				else {
-					onError(new Exception("Unable to open socket connection."));
-				}
-			}
-			catch (Exception e) {
-				this._logger.LogError(e.ToString());
-				onError(e);
-			}
-		}
+                _responseQueue.Enqueue(() => {
+                    _onConnect();
+                    _logger.Log($"[{_url}] - Socket open!");
+                    _attemptReconnect = true;
+                });
 
-		private void Reconnect() {
-			this._onDisconnect();
-			Start(this._url, this._onReconnect, this._onDisconnect, async (e) => {
-				// keep retrying 
-				this._logger.LogError("Reconnect failed, trying again!");
-				await Task.Delay(2);
-				Reconnect();
-			});
-		}
+                while (true) {
+                    var result = await _socket.ReceiveAsync(CancellationToken.None);
+                    if (result.closeStatus == null) {
+                        _responseQueue.Enqueue(() => {
+                            if (result.buffer != null && result.messageType == WebSocketMessageType.Text) {
+                                _intakeQueue.Enqueue(Encoder.GetString(result.buffer));
+                            }
+                        });
+                    } else {
+                        _responseQueue.Enqueue(() => {
+                            var msg =
+                                $"[{_url}] - Socket closing: {result.closeStatus}, '{result.closeStatusDescription}', {result.closeStatus == WebSocketCloseStatus.NormalClosure}";
+                            if (result.closeStatus == WebSocketCloseStatus.NormalClosure) {
+                                _logger.Log(msg);
+                                _onDisconnect();
+                            } else {
+                                _logger.LogError(msg);
+                                _onError(new Exception(msg));
+                                if (_attemptReconnect) {
+                                    Reconnect();
+                                }
+                            }
+                        });
+                    }
+                }
+            }, CancellationToken.None);
+        }
 
-		public void Stop() {
-			this.Dispose();
-			this._onDisconnect();
-		}
+        public void Stop() {
+            _attemptReconnect = false;
+            if (_socket != null && _socket.State == WebSocketState.Open) {
+                _socket.Abort();
+            }
+        }
 
-		private void Dispose() {
-			this._logger.LogWarning("Disposing of socket...");
-			this._tokenSource.Cancel();
-		}
-		#endregion
+        private void Reconnect() {
+            Start(_url, _onConnect, _onDisconnect, _onError);
+        }
 
-		#region Status
-		public bool IsConnecting() {
-			return this._ws != null && this._ws.State == WebSocketState.Connecting;
-		}
+        public void Tick(float timeDelta) {
+            do {
+                if (_responseQueue.IsEmpty || !_responseQueue.TryDequeue(out var action))
+                    continue;
 
-		public bool IsConnectionOpen() {
-			return this._ws != null && this._ws.State == WebSocketState.Open && !this.IsConnecting();
-		}
-		#endregion
+                try {
+                    action();
+                } catch (Exception e) {
+                    _logger.LogError($"Socket error: {e.StackTrace}");
+                }
+            } while (!_responseQueue.IsEmpty);
+        }
+    }
+}
 
-		#region Send
-		public void Send(string message) {
-			byte[] buffer = ENCODER.GetBytes(message);
-			// Debug.Log("Message to queue for send: " + buffer.Length + ", message: " + message);
-			ArraySegment<byte> sendBuf = new ArraySegment<byte>(buffer);
-			_sendQueue.Enqueue(sendBuf);
-		}
 
-		private async void RunSend(ClientWebSocket socket, CancellationToken token) {
-			this._logger.Log("WebSocket Message Sender looping.");
-			ArraySegment<byte> msg;
-			// int counter = 0;
-			while (!token.IsCancellationRequested) {
-				if (!this._sendQueue.IsEmpty && this.IsConnectionOpen() && _sendQueue.TryDequeue(out msg)) {
-					try {
-						// counter++;
-						// if(counter >= 1000){
-						//     counter = 0;
-						//     throw new WebSocketException("CHAOS MONKEY");
-						// }
-						await socket.SendAsync(msg, WebSocketMessageType.Text, true /* is last part of message */, token);
-					}
-					catch (Exception e) {
-						this._logger.LogError(e.ToString());
-						// put unsent messages back on the queue
-						if (msg != null) {
-							_sendQueue.Enqueue(msg);
-						}
-						if (e is WebSocketException
-						|| e is System.IO.IOException
-						|| e is System.Net.Sockets.SocketException) {
-							this._logger.LogWarning("Socket exception occured, reconnecting...");
-							Reconnect();
-						}
-					}
-				}
-				await Task.Delay(2);
-			}
-		}
-		#endregion
+internal static class WebSocketExtensions {
+    public static async Task<(
+        byte[] buffer,
+        WebSocketMessageType messageType,
+        WebSocketCloseStatus? closeStatus,
+        string closeStatusDescription
+        )> ReceiveAsync(this ClientWebSocket client, CancellationToken cancellationToken) {
+        const int maxFrameSize = 1024 * 1024 * 10; // 10 MB
+        const int bufferSize = 1024; // 1 KB
+        var buffer = new byte[bufferSize];
+        var offset = 0;
+        var free = buffer.Length;
 
-		#region Receive
+        while (true) {
+            var result = await client.ReceiveAsync(new ArraySegment<byte>(buffer, offset, free), cancellationToken);
+            offset += result.Count;
+            free -= result.Count;
 
-		public string GetNextResponse() {
-			string data = null;
-			this._receiveQueue.TryDequeue(out data);
-			return data;
-		}
+            if (result.EndOfMessage || result.CloseStatus != null) {
+                return (buffer, result.MessageType, result.CloseStatus, result.CloseStatusDescription);
+            }
 
-		private async Task<string> Receive(ClientWebSocket socket, CancellationToken token, UInt64 maxSize = MAX_READ_SIZE) {
-			// A read buffer, and a memory stream to stuff unknown number of chunks into:
-			byte[] buf = new byte[4 * 1024];
-			MemoryStream ms = new MemoryStream();
-			ArraySegment<byte> arrayBuf = new ArraySegment<byte>(buf);
-			WebSocketReceiveResult chunkResult = null;
-			if (IsConnectionOpen()) {
-				do {
-					chunkResult = await socket.ReceiveAsync(arrayBuf, token);
-					ms.Write(arrayBuf.Array, arrayBuf.Offset, chunkResult.Count);
-					if ((UInt64)(chunkResult.Count) > MAX_READ_SIZE) {
-						Console.Error.WriteLine("Warning: Message is bigger than expected!");
-					}
-				} while (!chunkResult.EndOfMessage);
-				ms.Seek(0, SeekOrigin.Begin);
-				// Looking for UTF-8 JSON type messages.
-				if (chunkResult.MessageType == WebSocketMessageType.Text) {
-					return StreamToString(ms, Encoding.UTF8);
-				}
-			}
-			return "";
-		}
+            if (free == 0) {
+                // No free space
+                // Resize the outgoing buffer
+                var newSize = buffer.Length + bufferSize;
 
-		private async void RunReceive(ClientWebSocket socket, CancellationToken token) {
-			this._logger.Log("WebSocket Message Receiver looping.");
-			string result;
-			while (!token.IsCancellationRequested) {
-				result = await Receive(socket, token);
-				if (result != null && result.Length > 0) {
-					_receiveQueue.Enqueue(result);
-				}
-				else {
-					await Task.Delay(50);
-				}
-			}
-		}
-		#endregion
+                // Check if the new size exceeds a limit
+                // It should suit the data it receives
+                // This limit however has a max value of 2 billion bytes (2 GB)
+                if (newSize > maxFrameSize) {
+                    throw new Exception("Maximum size exceeded");
+                }
 
-		private static string StreamToString(MemoryStream ms, Encoding encoding) {
-			string readString = "";
-			if (encoding == Encoding.UTF8) {
-				using (var reader = new StreamReader(ms, encoding)) {
-					readString = reader.ReadToEnd();
-				}
-			}
-			return readString;
-		}
-
-		public void Tick(float timeDelta) {
-			// nothing to do here
-		}
-	}
+                var newBuffer = new byte[newSize];
+                Array.Copy(buffer, 0, newBuffer, 0, offset);
+                buffer = newBuffer;
+                free = buffer.Length - offset;
+            }
+        }
+    }
 }

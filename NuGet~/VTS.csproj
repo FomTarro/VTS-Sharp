@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageId>VTS-Sharp</PackageId>
+        <Version>2.0.1</Version>
+        <Title>VTS-Sharp</Title>
+        <Authors>FomTarro</Authors>
+        <Description>C# Library for interacting with the VTube Studio API</Description>
+        <PackageProjectUrl>https://github.com/FomTarro/VTS-Sharp</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/FomTarro/VTS-Sharp</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <Company>VTS-Sharp</Company>
+        <Product>VTS-Sharp</Product>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Copyright>FomTarro</Copyright>
+        <PackageTags>plugin csharp unity dotnet godot-engine vtuber vtube-studio</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+        <PackageReference Include="WebSocket4Net" Version="0.15.2" />
+        <PackageReference Include="WebSocketSharp" Version="1.0.3-rc11" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="..\**\*.cs" Exclude="**\Unity\**;Examples\**;NuGet~\**">
+            <Visible>true</Visible>
+        </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="..\README.md" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+
+    <PropertyGroup>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);1591</NoWarn>
+    </PropertyGroup>
+</Project>

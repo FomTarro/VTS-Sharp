@@ -1,23 +1,24 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Text;
+
 using WebSocketSharp;
 
 namespace VTS.Core {
 
 	public class WebSocketSharpImpl : IWebSocket {
-		private static UTF8Encoding ENCODER = new UTF8Encoding();
+		private static readonly UTF8Encoding ENCODER = new UTF8Encoding();
 
 		private WebSocket _socket;
-		private ConcurrentQueue<string> _intakeQueue = new ConcurrentQueue<string>();
-		private ConcurrentQueue<Action> _responseQueue = new ConcurrentQueue<Action>();
+		private readonly ConcurrentQueue<string> _intakeQueue = new ConcurrentQueue<string>();
+		private readonly ConcurrentQueue<Action> _responseQueue = new ConcurrentQueue<Action>();
 		private bool _attemptReconnect = false;
 
 		private Action _onConnect = () => { };
 		private Action _onDisconnect = () => { };
 		private Action<Exception> _onError = (e) => { };
 		private string _url = "";
-		private IVTSLogger _logger;
+		private readonly IVTSLogger _logger;
 
 		public WebSocketSharpImpl(IVTSLogger logger) {
 			this._logger = logger;
@@ -100,8 +101,7 @@ namespace VTS.Core {
 					if (e.WasClean) {
 						this._logger.Log(msg);
 						this._onDisconnect();
-					}
-					else {
+					} else {
 						this._logger.LogError(msg);
 						this._onError(new Exception(msg));
 						if (this._attemptReconnect) {
@@ -131,8 +131,7 @@ namespace VTS.Core {
 				if (this._responseQueue.Count > 0 && _responseQueue.TryDequeue(out action)) {
 					try {
 						action();
-					}
-					catch (Exception e) {
+					} catch (Exception e) {
 						this._logger.LogError(String.Format("Socket error: {0}", e.StackTrace));
 					}
 				}

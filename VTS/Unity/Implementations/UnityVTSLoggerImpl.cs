@@ -1,5 +1,7 @@
 ﻿using System;
+
 using UnityEngine;
+
 using VTS.Core;
 
 namespace VTS.Unity {

@@ -57,9 +57,10 @@ namespace VTS.Core {
 		/// <typeparam name="T">The request type.</typeparam>
 		/// <typeparam name="K">The response type.</typeparam>
 		/// <returns></returns>
-		void SendEventSubscription<T, K>(T request, Action<K> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError, Action resubscribe)
-			where T : VTSEventSubscriptionRequestData
-			where K : VTSEventData;
+		void SendEventSubscription<T, K, V>(T request, Action<K> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError, Action resubscribe)
+			where T : VTSEventSubscriptionRequestData<V>
+			where K : VTSEventData
+			where V : VTSEventConfigData;
 		/// <summary>
 		/// Sets the connection IP address to the given string. Returns true if the string is a valid IP Address format, returns false otherwise.
 		/// If the IP Address is changed while an active connection exists, you will need to reconnect.

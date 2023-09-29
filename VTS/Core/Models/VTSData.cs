@@ -29,6 +29,18 @@ namespace VTS.Core {
 	}
 
 	[System.Serializable]
+	public class VTSException : Exception {
+		public VTSErrorData ErrorData { get; }
+
+		public VTSException(VTSErrorData errorData)
+			: base($"Request ID #{errorData.requestID} failed\n"
+				   + $"ErrorID - {errorData.data.errorID}\n"
+				   + $"Message - {errorData.data.message}") {
+			ErrorData = errorData;
+		}
+	}
+
+	[System.Serializable]
 	public struct Pair {
 		public float x;
 		public float y;
@@ -1179,18 +1191,31 @@ namespace VTS.Core {
 	#region Event API
 
 	[System.Serializable]
-	public abstract class VTSEventSubscriptionRequestData : VTSMessageData {
-		public abstract void SetEventName(string eventName);
-		public abstract string GetEventName();
-		public abstract void SetSubscribed(bool subscribe);
-		public abstract bool GetSubscribed();
-		public abstract void SetConfig(VTSEventConfigData config);
+	public abstract class VTSEventSubscriptionRequestData<K> : VTSMessageData where K : VTSEventConfigData {
+		public Data data = new Data();
+		new public string messageType = "EventSubscriptionRequest";
+
+		[System.Serializable]
+		public class Data : VTSEventSubscriptonData<K> { }
+
+		public void SetSubscribed(bool subscribe) {
+			this.data.subscribe = subscribe;
+		}
+
+		public bool GetSubscribed() {
+			return this.data.subscribe;
+		}
+
+		public void SetConfig(VTSEventConfigData config) {
+			this.data.config = (K)config;
+		}
 	}
 
 	[System.Serializable]
-	public abstract class VTSEventSubscriptonData {
+	public abstract class VTSEventSubscriptonData<T> where T : VTSEventConfigData {
 		public string eventName;
 		public bool subscribe;
+		public T config;
 	}
 
 	[System.Serializable]
@@ -1214,39 +1239,21 @@ namespace VTS.Core {
 		}
 	}
 
+	// Unsubscribe 
+
+	[System.Serializable]
+	public class VTSUnsubscribeFromAllRequestData : VTSEventSubscriptionRequestData<VTSTestEventConfigOptions> {
+		public VTSUnsubscribeFromAllRequestData() {
+			this.data.eventName = null;
+		}
+	}
+
 	// Test Event
 
 	[System.Serializable]
-	public class VTSTestEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+	public class VTSTestEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSTestEventConfigOptions> {
 		public VTSTestEventSubscriptionRequestData() {
-			this.messageType = "EventSubscriptionRequest";
-			this.data = new Data();
-		}
-		public Data data;
-
-		[System.Serializable]
-		public class Data : VTSEventSubscriptonData {
-			public VTSTestEventConfigOptions config;
-		}
-
-		public override void SetEventName(string eventName) {
-			this.data.eventName = eventName;
-		}
-
-		public override string GetEventName() {
-			return this.data.eventName;
-		}
-
-		public override void SetSubscribed(bool subscribe) {
-			this.data.subscribe = subscribe;
-		}
-
-		public override bool GetSubscribed() {
-			return this.data.subscribe;
-		}
-
-		public override void SetConfig(VTSEventConfigData config) {
-			this.data.config = (VTSTestEventConfigOptions)config;
+			this.data.eventName = "TestEvent";
 		}
 	}
 
@@ -1286,36 +1293,9 @@ namespace VTS.Core {
 	// Model Loaded Event
 
 	[System.Serializable]
-	public class VTSModelLoadedEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+	public class VTSModelLoadedEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSModelLoadedEventConfigOptions> {
 		public VTSModelLoadedEventSubscriptionRequestData() {
-			this.messageType = "EventSubscriptionRequest";
-			this.data = new Data();
-		}
-		public Data data;
-
-		[System.Serializable]
-		public class Data : VTSEventSubscriptonData {
-			public VTSModelLoadedEventConfigOptions config;
-		}
-
-		public override void SetEventName(string eventName) {
 			this.data.eventName = "ModelLoadedEvent";
-		}
-
-		public override string GetEventName() {
-			return this.data.eventName;
-		}
-
-		public override void SetSubscribed(bool subscribe) {
-			this.data.subscribe = subscribe;
-		}
-
-		public override bool GetSubscribed() {
-			return this.data.subscribe;
-		}
-
-		public override void SetConfig(VTSEventConfigData config) {
-			this.data.config = (VTSModelLoadedEventConfigOptions)config;
 		}
 	}
 
@@ -1351,36 +1331,9 @@ namespace VTS.Core {
 	// Tracking Changed Event
 
 	[System.Serializable]
-	public class VTSTrackingEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+	public class VTSTrackingEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSTrackingEventConfigOptions> {
 		public VTSTrackingEventSubscriptionRequestData() {
-			this.messageType = "EventSubscriptionRequest";
-			this.data = new Data();
-		}
-		public Data data;
-
-		[System.Serializable]
-		public class Data : VTSEventSubscriptonData {
-			public VTSTrackingEventConfigOptions config;
-		}
-
-		public override void SetEventName(string eventName) {
-			this.data.eventName = eventName;
-		}
-
-		public override string GetEventName() {
-			return this.data.eventName;
-		}
-
-		public override void SetSubscribed(bool subscribe) {
-			this.data.subscribe = subscribe;
-		}
-
-		public override bool GetSubscribed() {
-			return this.data.subscribe;
-		}
-
-		public override void SetConfig(VTSEventConfigData config) {
-			this.data.config = (VTSTrackingEventConfigOptions)config;
+			this.data.eventName = "TrackingStatusChangedEvent";
 		}
 	}
 
@@ -1414,36 +1367,9 @@ namespace VTS.Core {
 	// Background Changed Event
 
 	[System.Serializable]
-	public class VTSBackgroundChangedEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+	public class VTSBackgroundChangedEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSBackgroundChangedEventConfigOptions> {
 		public VTSBackgroundChangedEventSubscriptionRequestData() {
-			this.messageType = "EventSubscriptionRequest";
-			this.data = new Data();
-		}
-		public Data data;
-
-		[System.Serializable]
-		public class Data : VTSEventSubscriptonData {
-			public VTSBackgroundChangedEventConfigOptions config;
-		}
-
-		public override void SetEventName(string eventName) {
-			this.data.eventName = eventName;
-		}
-
-		public override string GetEventName() {
-			return this.data.eventName;
-		}
-
-		public override void SetSubscribed(bool subscribe) {
-			this.data.subscribe = subscribe;
-		}
-
-		public override bool GetSubscribed() {
-			return this.data.subscribe;
-		}
-
-		public override void SetConfig(VTSEventConfigData config) {
-			this.data.config = (VTSBackgroundChangedEventConfigOptions)config;
+			this.data.eventName = "BackgroundChangedEvent";
 		}
 	}
 
@@ -1475,36 +1401,9 @@ namespace VTS.Core {
 	// Model Config Changed Event
 
 	[System.Serializable]
-	public class VTSModelConfigChangedEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+	public class VTSModelConfigChangedEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSModelConfigChangedEventConfigOptions> {
 		public VTSModelConfigChangedEventSubscriptionRequestData() {
-			this.messageType = "EventSubscriptionRequest";
-			this.data = new Data();
-		}
-		public Data data;
-
-		[System.Serializable]
-		public class Data : VTSEventSubscriptonData {
-			public VTSModelConfigChangedEventConfigOptions config;
-		}
-
-		public override void SetEventName(string eventName) {
-			this.data.eventName = eventName;
-		}
-
-		public override string GetEventName() {
-			return this.data.eventName;
-		}
-
-		public override void SetSubscribed(bool subscribe) {
-			this.data.subscribe = subscribe;
-		}
-
-		public override bool GetSubscribed() {
-			return this.data.subscribe;
-		}
-
-		public override void SetConfig(VTSEventConfigData config) {
-			this.data.config = (VTSModelConfigChangedEventConfigOptions)config;
+			this.data.eventName = "ModelConfigChangedEvent";
 		}
 	}
 
@@ -1538,36 +1437,9 @@ namespace VTS.Core {
 	// Model Moved Event
 
 	[System.Serializable]
-	public class VTSModelMovedEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+	public class VTSModelMovedEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSModelMovedEventConfigOptions> {
 		public VTSModelMovedEventSubscriptionRequestData() {
-			this.messageType = "EventSubscriptionRequest";
-			this.data = new Data();
-		}
-		public Data data;
-
-		[System.Serializable]
-		public class Data : VTSEventSubscriptonData {
-			public VTSModelMovedEventConfigOptions config;
-		}
-
-		public override void SetEventName(string eventName) {
-			this.data.eventName = eventName;
-		}
-
-		public override string GetEventName() {
-			return this.data.eventName;
-		}
-
-		public override void SetSubscribed(bool subscribe) {
-			this.data.subscribe = subscribe;
-		}
-
-		public override bool GetSubscribed() {
-			return this.data.subscribe;
-		}
-
-		public override void SetConfig(VTSEventConfigData config) {
-			this.data.config = (VTSModelMovedEventConfigOptions)config;
+			this.data.eventName = "ModelMovedEvent";
 		}
 	}
 
@@ -1601,36 +1473,9 @@ namespace VTS.Core {
 	// Model Outline Event
 
 	[System.Serializable]
-	public class VTSModelOutlineEventSubscriptionRequestData : VTSEventSubscriptionRequestData {
+	public class VTSModelOutlineEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSModelOutlineEventConfigOptions> {
 		public VTSModelOutlineEventSubscriptionRequestData() {
-			this.messageType = "EventSubscriptionRequest";
-			this.data = new Data();
-		}
-		public Data data;
-
-		[System.Serializable]
-		public class Data : VTSEventSubscriptonData {
-			public VTSModelOutlineEventConfigOptions config;
-		}
-
-		public override void SetEventName(string eventName) {
-			this.data.eventName = eventName;
-		}
-
-		public override string GetEventName() {
-			return this.data.eventName;
-		}
-
-		public override void SetSubscribed(bool subscribe) {
-			this.data.subscribe = subscribe;
-		}
-
-		public override bool GetSubscribed() {
-			return this.data.subscribe;
-		}
-
-		public override void SetConfig(VTSEventConfigData config) {
-			this.data.config = (VTSModelOutlineEventConfigOptions)config;
+			this.data.eventName = "ModelOutlineEvent";
 		}
 	}
 
@@ -1669,6 +1514,115 @@ namespace VTS.Core {
 			public Pair convexHullCenter;
 			public Pair windowSize;
 		}
+	}
+
+	// Hotkey Triggered Event
+
+	[System.Serializable]
+	public class VTSHotkeyTriggeredEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSHotkeyTriggeredEventConfigOptions> {
+		public VTSHotkeyTriggeredEventSubscriptionRequestData() {
+			this.data.eventName = "HotkeyTriggeredEvent";
+		}
+	}
+
+	/// <summary>
+	/// A container for providing subscription options for a Hotkey Triggered Event subscription.
+	/// 
+	/// For more info about what each field does, see 
+	/// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#hotkey-triggered">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#hotkey-triggered</a>
+	/// </summary>
+	[System.Serializable]
+	public class VTSHotkeyTriggeredEventConfigOptions : VTSEventConfigData {
+		public VTSHotkeyTriggeredEventConfigOptions() {
+			this.ignoreHotkeysTriggeredByAPI = false;
+		}
+
+		public VTSHotkeyTriggeredEventConfigOptions(bool ignoreHotkeysTriggeredByAPI) {
+			this.ignoreHotkeysTriggeredByAPI = ignoreHotkeysTriggeredByAPI;
+		}
+
+		public string onlyForAction;
+		public bool ignoreHotkeysTriggeredByAPI;
+	}
+
+	[System.Serializable]
+	public class VTSHotkeyTriggeredEventData : VTSEventData {
+		public VTSHotkeyTriggeredEventData() {
+			this.messageType = "HotkeyTriggeredEvent";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public string hotkeyID;
+			public string hotkeyName;
+			public string hotkeyFile;
+			public bool hotkeyTriggeredByAPI;
+			public string modelID;
+			public string modelName;
+			public bool isLive2DItem;
+		}
+	}
+
+	// Model Animation Event
+
+	[System.Serializable]
+	public class VTSModelAnimationEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSModelAnimationEventConfigOptions> {
+		public VTSModelAnimationEventSubscriptionRequestData() {
+			this.data.eventName = "ModelAnimationEvent";
+		}
+	}
+
+	/// <summary>
+	/// A container for providing subscription options for a Hotkey Triggered Event subscription.
+	/// 
+	/// For more info about what each field does, see 
+	/// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#hotkey-triggered">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#hotkey-triggered</a>
+	/// </summary>
+	[System.Serializable]
+	public class VTSModelAnimationEventConfigOptions : VTSEventConfigData {
+		public VTSModelAnimationEventConfigOptions() {
+			this.ignoreLive2DItems = false;
+			this.ignoreIdleAnimations = false;
+		}
+
+		public VTSModelAnimationEventConfigOptions(bool ignoreLive2DItems, bool ignoreIdleAnimations) {
+			this.ignoreLive2DItems = ignoreLive2DItems;
+			this.ignoreIdleAnimations = ignoreIdleAnimations;
+		}
+
+		public bool ignoreLive2DItems;
+		public bool ignoreIdleAnimations;
+	}
+
+	[System.Serializable]
+	public class VTSModelAnimationEventData : VTSEventData {
+		public VTSModelAnimationEventData() {
+			this.messageType = "ModelAnimationEvent";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public VTSAnimationEventType animationEventType;
+			public float animationEventTime;
+			public string animationEventData;
+			public string animationName;
+			public float animationLength;
+			public bool isIdleAnimation;
+			public string modelID;
+			public string modelName;
+			public bool isLive2DItem;
+		}
+	}
+
+	[System.Serializable]
+	public enum VTSAnimationEventType {
+		Custom,
+		Start,
+		End,
 	}
 
 	#endregion
