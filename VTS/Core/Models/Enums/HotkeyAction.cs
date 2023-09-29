@@ -5,7 +5,8 @@ namespace VTS.Core {
 	/// Enum for the actions that can be triggered by hotkeys.
 	/// </summary>
 	[Serializable]
-	public enum HotkeyAction {
+	public enum HotkeyAction
+	{
 		Unset = -1,                       // Unset.
 		TriggerAnimation = 0,             // Play an animation.
 		ChangeIdleAnimation = 1,          // Change the idle animation.
@@ -24,6 +25,7 @@ namespace VTS.Core {
 		DownloadRandomWorkshopItem = 14,  // Downloads a random item from the Steam Workshop and attempts to load it into the scene.
 		ExecuteItemAction = 15,           // Executes a hotkey in the given Live2D item.
 		ArtMeshColorPreset = 16,          // Loads the recorded ArtMesh multiply/screen color preset.
-		ToggleTracker = 17                // Toggles the tracking on/off. Can be webcam or USB/WiFi connected phone.
+		ToggleTracker = 17,               // Toggles the tracking on/off. Can be webcam or USB/WiFi connected phone.
+		ToggleTwitchFeature = 18          // Toggles a Twitch feature (for example Emote Dropper) on/off.
 	}
 }

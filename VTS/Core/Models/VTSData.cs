@@ -1194,18 +1194,11 @@ namespace VTS.Core {
 
 	[System.Serializable]
 	public abstract class VTSEventSubscriptionRequestData<K> : VTSMessageData where K : VTSEventConfigData {
-		public Data data;
+		public Data data = new Data();
+		new public string messageType = "EventSubscriptionRequest";
 
 		[System.Serializable]
 		public class Data : VTSEventSubscriptonData<K> { }
-
-		public void SetEventName(string eventName) {
-			this.data.eventName = eventName;
-		}
-
-		public string GetEventName() {
-			return this.data.eventName;
-		}
 
 		public void SetSubscribed(bool subscribe) {
 			this.data.subscribe = subscribe;
@@ -1248,13 +1241,21 @@ namespace VTS.Core {
 		}
 	}
 
+	// Unsubscribe 
+		
+	[System.Serializable]
+	public class VTSUnsubscribeFromAllRequestData : VTSEventSubscriptionRequestData<VTSTestEventConfigOptions> {
+		public VTSUnsubscribeFromAllRequestData() {
+			this.data.eventName = null;
+		}
+	}
+
 	// Test Event
 
 	[System.Serializable]
 	public class VTSTestEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSTestEventConfigOptions> {
 		public VTSTestEventSubscriptionRequestData() {
-			this.messageType = "EventSubscriptionRequest";
-			this.data = new Data();
+			this.data.eventName = "TestEvent";
 		}
 	}
 
@@ -1296,8 +1297,7 @@ namespace VTS.Core {
 	[System.Serializable]
 	public class VTSModelLoadedEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSModelLoadedEventConfigOptions> {
 		public VTSModelLoadedEventSubscriptionRequestData() {
-			this.messageType = "EventSubscriptionRequest";
-			this.data = new Data();
+			this.data.eventName = "ModelLoadedEvent";
 		}
 	}
 
@@ -1335,8 +1335,7 @@ namespace VTS.Core {
 	[System.Serializable]
 	public class VTSTrackingEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSTrackingEventConfigOptions> {
 		public VTSTrackingEventSubscriptionRequestData() {
-			this.messageType = "EventSubscriptionRequest";
-			this.data = new Data();
+			this.data.eventName = "TrackingStatusChangedEvent";
 		}
 	}
 
@@ -1372,8 +1371,7 @@ namespace VTS.Core {
 	[System.Serializable]
 	public class VTSBackgroundChangedEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSBackgroundChangedEventConfigOptions> {
 		public VTSBackgroundChangedEventSubscriptionRequestData() {
-			this.messageType = "EventSubscriptionRequest";
-			this.data = new Data();
+			this.data.eventName = "BackgroundChangedEvent";
 		}
 	}
 
@@ -1407,8 +1405,7 @@ namespace VTS.Core {
 	[System.Serializable]
 	public class VTSModelConfigChangedEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSModelConfigChangedEventConfigOptions> {
 		public VTSModelConfigChangedEventSubscriptionRequestData() {
-			this.messageType = "EventSubscriptionRequest";
-			this.data = new Data();
+			this.data.eventName = "ModelConfigChangedEvent";
 		}
 	}
 
@@ -1444,8 +1441,7 @@ namespace VTS.Core {
 	[System.Serializable]
 	public class VTSModelMovedEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSModelMovedEventConfigOptions> {
 		public VTSModelMovedEventSubscriptionRequestData() {
-			this.messageType = "EventSubscriptionRequest";
-			this.data = new Data();
+			this.data.eventName = "ModelMovedEvent";
 		}
 	}
 
@@ -1481,8 +1477,7 @@ namespace VTS.Core {
 	[System.Serializable]
 	public class VTSModelOutlineEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSModelOutlineEventConfigOptions> {
 		public VTSModelOutlineEventSubscriptionRequestData() {
-			this.messageType = "EventSubscriptionRequest";
-			this.data = new Data();
+			this.data.eventName = "ModelOutlineEvent";
 		}
 	}
 
@@ -1528,8 +1523,7 @@ namespace VTS.Core {
 	[System.Serializable]
 	public class VTSHotkeyTriggeredEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSHotkeyTriggeredEventConfigOptions> {
 		public VTSHotkeyTriggeredEventSubscriptionRequestData() {
-			this.messageType = "EventSubscriptionRequest";
-			this.data = new Data();
+			this.data.eventName = "HotkeyTriggeredEvent";
 		}
 	}
 
@@ -1578,8 +1572,7 @@ namespace VTS.Core {
 	[System.Serializable]
 	public class VTSModelAnimationEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSModelAnimationEventConfigOptions> {
 		public VTSModelAnimationEventSubscriptionRequestData() {
-			this.messageType = "EventSubscriptionRequest";
-			this.data = new Data();
+			this.data.eventName = "ModelAnimationEvent";
 		}
 	}
 

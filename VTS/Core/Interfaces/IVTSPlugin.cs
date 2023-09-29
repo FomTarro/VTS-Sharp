@@ -393,6 +393,28 @@ namespace VTS.Core {
 		/// <param name="onError">Callback executed upon receiving an error.</param>
 		void SubscribeToBackgroundChangedEvent(Action<VTSBackgroundChangedEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError);
 		/// <summary>
+		/// Subscribes to the Hotkey Triggered Event.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#hotkey-triggered">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#hotkey-triggered</a>
+		/// </summary>
+		/// <param name="config">Configuration options about the subscription.</param>
+		/// <param name="onEvent">Callback to execute upon receiving an event.</param>
+		/// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void SubscribeToHotkeyTriggeredEvent(VTSHotkeyTriggeredEventConfigOptions config, Action<VTSHotkeyTriggeredEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Subscribes to the Model Animation Event.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#animation-event-triggered">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#animation-event-triggered</a>
+		/// </summary>
+		/// <param name="config">Configuration options about the subscription.</param>
+		/// <param name="onEvent">Callback to execute upon receiving an event.</param>
+		/// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void SubscribeToModelAnimationEvent(VTSModelAnimationEventConfigOptions config, Action<VTSModelAnimationEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError);
+		/// <summary>
 		/// Subscribes to the Model Config Changed Event.
 		/// 
 		/// For more info, see 
@@ -521,7 +543,6 @@ namespace VTS.Core {
 		/// </summary>
 		/// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing from the event.</param>
 		/// <param name="onError">Callback executed upon receiving an error.</param>
-
 		void UnsubscribeFromModelLoadedEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError);
 		/// <summary>
 		/// Unsubscribes from the Model Moved Event.
@@ -547,5 +568,17 @@ namespace VTS.Core {
 		/// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing from the event.</param>
 		/// <param name="onError">Callback executed upon receiving an error.</param>
 		void UnsubscribeFromTrackingEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Unsubscribes from the Hotkey Triggered Event.
+		/// </summary>
+		/// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing from the event.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void UnsubscribeFromHotkeyTriggeredEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Unsubscribes from the Model Animation Event.
+		/// </summary>
+		/// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing from the event.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void UnsubscribeFromModelAnimationEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError);
 	}
 }

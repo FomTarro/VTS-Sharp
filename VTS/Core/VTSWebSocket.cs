@@ -292,11 +292,11 @@ namespace VTS.Core {
 				request,
 				(s) => {
 					// add event or remove event from register
-					if (this._events.ContainsKey(request.GetEventName())) {
-						this._events.Remove(request.GetEventName());
+					if (this._events.ContainsKey(request.data.eventName)) {
+						this._events.Remove(request.data.eventName);
 					}
 					if (request.GetSubscribed()) {
-						this._events.Add(request.GetEventName(), new VTSEventCallbacks((k) => { onEvent((K)k); }, onError, resubscribe));
+						this._events.Add(request.data.eventName, new VTSEventCallbacks((k) => { onEvent((K)k); }, onError, resubscribe));
 					}
 					onSubscribe(s);
 				},
@@ -339,6 +339,12 @@ namespace VTS.Core {
 										break;
 									case "ModelOutlineEvent":
 										this._events[response.messageType].onEvent(this._json.FromJson<VTSModelOutlineEventData>(data));
+										break;
+									case "HotkeyTriggeredEvent":
+										this._events[response.messageType].onEvent(this._json.FromJson<VTSHotkeyTriggeredEventData>(data));
+										break;
+									case "ModelAnimationEvent":
+										this._events[response.messageType].onEvent(this._json.FromJson<VTSModelAnimationEventData>(data));
 										break;
 								}
 							}

@@ -288,6 +288,22 @@ namespace VTS.Unity {
 			this.Plugin.UnsubscribeFromModelOutlineEvent(onUnsubscribe, onError);
 		}
 
+		public void SubscribeToHotkeyTriggeredEvent(VTSHotkeyTriggeredEventConfigOptions config, Action<VTSHotkeyTriggeredEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError){
+			this.Plugin.SubscribeToHotkeyTriggeredEvent(config, onEvent, onSubscribe, onError);
+		}
+
+		public void UnsubscribeFromHotkeyTriggeredEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError){
+			this.Plugin.UnsubscribeFromHotkeyTriggeredEvent(onUnsubscribe, onError);
+		}
+
+		public void SubscribeToModelAnimationEvent(VTSModelAnimationEventConfigOptions config, Action<VTSModelAnimationEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError){
+			this.Plugin.SubscribeToModelAnimationEvent(config, onEvent, onSubscribe, onError);
+		}
+
+		public void UnsubscribeFromModelAnimationEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError){
+			this.Plugin.UnsubscribeFromModelAnimationEvent(onUnsubscribe, onError);
+		}
+
 		#endregion
 
 		#region Helper Methods

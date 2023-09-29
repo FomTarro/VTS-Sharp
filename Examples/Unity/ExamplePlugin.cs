@@ -152,6 +152,21 @@ namespace VTS.Unity.Examples {
 				(e) => { _eventText.text = e.data.message; });
 		}
 
+		public void SubAnimationEvent() {
+			VTSModelAnimationEventConfigOptions config = new VTSModelAnimationEventConfigOptions();
+			this.SubscribeToModelAnimationEvent(
+				config,
+				(s) => { _eventText.text = string.Format(s.data.animationEventType + " "); },
+				(g) => { this.Logger.Log("Subscribed!"); },
+				(e) => { _eventText.text = e.data.message; });
+		}
+
+		public void UnsubAnimationEvent() {
+			this.UnsubscribeFromModelOutlineEvent(
+				(s) => { _eventText.text = "[Event Output]"; },
+				(e) => { _eventText.text = e.data.message; });
+		}
+
 
 		private void SyncValues(VTSParameterInjectionValue[] values) {
 			InjectParameterValues(
