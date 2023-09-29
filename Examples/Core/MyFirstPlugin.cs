@@ -14,10 +14,10 @@ namespace VTS.Core.Examples {
                 await plugin.InitializeAsync(websocket, jsonUtility, tokenStorage, () => logger.LogWarning("Disconnected!"));
                 logger.Log("Connected!");
 
-                var apiState = await plugin.GetAPIStateAsync();
+                var apiState = await plugin.GetAPIState();
                 logger.Log("Using VTubeStudio " + apiState.data.vTubeStudioVersion);
 
-                var currentModel = await plugin.GetCurrentModelAsync();
+                var currentModel = await plugin.GetCurrentModel();
                 logger.Log("The current model is: " + currentModel.data.modelName);
             } catch (VTSException e) {
                 logger.LogError(e);

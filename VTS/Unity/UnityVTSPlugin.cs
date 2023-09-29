@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 using UnityEngine;
 
@@ -13,8 +14,8 @@ namespace VTS.Unity {
 	public abstract class UnityVTSPlugin : MonoBehaviour, IVTSPlugin {
 
 		#region Properties
-		private CoreVTSPlugin _plugin;
-		private CoreVTSPlugin Plugin {
+		private IVTSPlugin _plugin;
+		private IVTSPlugin Plugin {
 			get {
 				if (this._plugin == null) {
 					this._plugin = new CoreVTSPlugin(this.Logger, 100, this.PluginName, this.PluginAuthor, this.PluginIcon);
@@ -37,7 +38,7 @@ namespace VTS.Unity {
 		/// The underlying WebSocket for connecting to VTS.
 		/// </summary>
 		/// <value></value>
-		protected IVTSWebSocket Socket { get { return this.Plugin.Socket; } }
+		public IVTSWebSocket Socket { get { return this.Plugin.Socket; } }
 
 		public bool IsAuthenticated { get { return this.Plugin.IsAuthenticated; } }
 
@@ -52,6 +53,10 @@ namespace VTS.Unity {
 
 		public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onConnect, Action onDisconnect, Action<VTSErrorData> onError) {
 			this.Plugin.Initialize(webSocket, jsonUtility, tokenStorage, onConnect, onDisconnect, onError);
+		}
+
+		public Task InitializeAsync(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onDisconnect) {
+			return this.Plugin.InitializeAsync(webSocket, jsonUtility, tokenStorage, onDisconnect);
 		}
 
 		public void Disconnect() {
@@ -304,6 +309,222 @@ namespace VTS.Unity {
 
 		public void UnsubscribeFromModelAnimationEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
 			this.Plugin.UnsubscribeFromModelAnimationEvent(onUnsubscribe, onError);
+		}
+
+		#endregion
+
+		#region Async/Await Wrappers
+
+		public Task<VTSParameterCreationData> AddCustomParameter(VTSCustomParameter parameter) {
+			return this.Plugin.AddCustomParameter(parameter);
+		}
+
+		public Task<VTSItemAnimationControlResponseData> AnimateItem(string itemInstanceId, VTSItemAnimationControlOptions options) {
+			return this.Plugin.AnimateItem(itemInstanceId, options);
+		}
+
+		public Task<VTSStateData> GetAPIState() {
+			return this.Plugin.GetAPIState();
+		}
+
+		public Task<VTSArtMeshListData> GetArtMeshList() {
+			return this.Plugin.GetArtMeshList();
+		}
+
+		public Task<VTSAvailableModelsData> GetAvailableModels() {
+			return this.Plugin.GetAvailableModels();
+		}
+
+		public Task<VTSCurrentModelData> GetCurrentModel() {
+			return this.Plugin.GetCurrentModel();
+		}
+
+		public Task<VTSCurrentModelPhysicsData> GetCurrentModelPhysics() {
+			return this.Plugin.GetCurrentModelPhysics();
+		}
+
+		public Task<VTSExpressionStateData> GetExpressionStateList() {
+			return this.Plugin.GetExpressionStateList();
+		}
+
+		public Task<VTSFaceFoundData> GetFaceFound() {
+			return this.Plugin.GetFaceFound();
+		}
+
+		public Task<VTSFolderInfoData> GetFolderInfo() {
+			return this.Plugin.GetFolderInfo();
+		}
+
+		public Task<VTSHotkeysInCurrentModelData> GetHotkeysInCurrentModel(string modelId) {
+			return this.Plugin.GetHotkeysInCurrentModel(modelId);
+		}
+
+		public Task<VTSHotkeysInCurrentModelData> GetHotkeysInLive2DItem(string live2DItemFileName) {
+			return this.Plugin.GetHotkeysInLive2DItem(live2DItemFileName);
+		}
+
+		public Task<VTSInputParameterListData> GetInputParameterList() {
+			return this.Plugin.GetInputParameterList();
+		}
+
+		public Task<VTSItemListResponseData> GetItemList(VTSItemListOptions options) {
+			return this.Plugin.GetItemList(options);
+		}
+
+		public Task<VTSLive2DParameterListData> GetLive2DParameterList() {
+			return this.Plugin.GetLive2DParameterList();
+		}
+
+		public Task<VTSParameterValueData> GetParameterValue(string parameterName) {
+			return this.Plugin.GetParameterValue(parameterName);
+		}
+
+		public Task<VTSSceneColorOverlayData> GetSceneColorOverlayInfo() {
+			return this.Plugin.GetSceneColorOverlayInfo();
+		}
+
+		public Task<VTSStatisticsData> GetStatistics() {
+			return this.Plugin.GetStatistics();
+		}
+
+		public Task<VTSInjectParameterData> InjectParameterValues(VTSParameterInjectionValue[] values) {
+			return this.Plugin.InjectParameterValues(values);
+		}
+
+		public Task<VTSInjectParameterData> InjectParameterValues(VTSParameterInjectionValue[] values, VTSInjectParameterMode mode) {
+			return this.Plugin.InjectParameterValues(values, mode);
+		}
+
+		public Task<VTSInjectParameterData> InjectParameterValues(VTSParameterInjectionValue[] values, VTSInjectParameterMode mode, bool faceFound) {
+			return this.Plugin.InjectParameterValues(values, mode, faceFound);
+		}
+
+		public Task<VTSItemLoadResponseData> LoadItem(string fileName, VTSItemLoadOptions options) {
+			return this.Plugin.LoadItem(fileName, options);
+		}
+
+		public Task<VTSModelLoadData> LoadModel(string modelId) {
+			return this.Plugin.LoadModel(modelId);
+		}
+
+		public Task<VTSItemMoveResponseData> MoveItem(VTSItemMoveEntry[] items) {
+			return this.Plugin.MoveItem(items);
+		}
+
+		public Task<VTSMoveModelData> MoveModel(VTSMoveModelData.Data position) {
+			return this.Plugin.MoveModel(position);
+		}
+
+		public Task<VTSParameterDeletionData> RemoveCustomParameter(string parameterName) {
+			return this.Plugin.RemoveCustomParameter(parameterName);
+		}
+
+		public Task<VTSArtMeshSelectionResponseData> RequestArtMeshSelection(string textOverride, string helpOverride, int count, ICollection<string> activeArtMeshes) {
+			return this.Plugin.RequestArtMeshSelection(textOverride, helpOverride, count, activeArtMeshes);
+		}
+
+		public Task<VTSOverrideModelPhysicsData> SetCurrentModelPhysics(VTSPhysicsOverride[] strengthOverrides, VTSPhysicsOverride[] windOverrides) {
+			return this.Plugin.SetCurrentModelPhysics(strengthOverrides, windOverrides);
+		}
+
+		public Task<VTSExpressionActivationData> SetExpressionState(string expression, bool active) {
+			return this.Plugin.SetExpressionState(expression, active);
+		}
+
+		public Task<VTSNDIConfigData> SetNDIConfig(VTSNDIConfigData config) {
+			return this.Plugin.SetNDIConfig(config);
+		}
+
+		public Task<VTSEventSubscriptionResponseData> SubscribeToBackgroundChangedEvent(Action<VTSBackgroundChangedEventData> onEvent) {
+			return this.Plugin.SubscribeToBackgroundChangedEvent(onEvent);
+		}
+
+		public Task<VTSEventSubscriptionResponseData> SubscribeToHotkeyTriggeredEvent(VTSHotkeyTriggeredEventConfigOptions config, Action<VTSHotkeyTriggeredEventData> onEvent) {
+			return this.Plugin.SubscribeToHotkeyTriggeredEvent(config, onEvent);
+		}
+
+		public Task<VTSEventSubscriptionResponseData> SubscribeToModelAnimationEvent(VTSModelAnimationEventConfigOptions config, Action<VTSModelAnimationEventData> onEvent) {
+			return this.Plugin.SubscribeToModelAnimationEvent(config, onEvent);
+		}
+
+		public Task<VTSEventSubscriptionResponseData> SubscribeToModelConfigChangedEvent(Action<VTSModelConfigChangedEventData> onEvent) {
+			return this.Plugin.SubscribeToModelConfigChangedEvent(onEvent);
+		}
+
+		public Task<VTSEventSubscriptionResponseData> SubscribeToModelLoadedEvent(VTSModelLoadedEventConfigOptions config, Action<VTSModelLoadedEventData> onEvent) {
+			return this.Plugin.SubscribeToModelLoadedEvent(config, onEvent);
+		}
+
+		public Task<VTSEventSubscriptionResponseData> SubscribeToModelMovedEvent(Action<VTSModelMovedEventData> onEvent) {
+			return this.Plugin.SubscribeToModelMovedEvent(onEvent);
+		}
+
+		public Task<VTSEventSubscriptionResponseData> SubscribeToModelOutlineEvent(VTSModelOutlineEventConfigOptions config, Action<VTSModelOutlineEventData> onEvent) {
+			return this.Plugin.SubscribeToModelOutlineEvent(config, onEvent);
+		}
+
+		public Task<VTSEventSubscriptionResponseData> SubscribeToTestEvent(VTSTestEventConfigOptions config, Action<VTSTestEventData> onEvent) {
+			return this.Plugin.SubscribeToTestEvent(config, onEvent);
+		}
+
+		public Task<VTSEventSubscriptionResponseData> SubscribeToTrackingEvent(Action<VTSTrackingEventData> onEvent) {
+			return this.Plugin.SubscribeToTrackingEvent(onEvent);
+		}
+
+		public Task<VTSColorTintData> TintArtMesh(ColorTint tint, float mixWithSceneLightingColor, ArtMeshMatcher matcher) {
+			return this.Plugin.TintArtMesh(tint, mixWithSceneLightingColor, matcher);
+		}
+
+		public Task<VTSHotkeyTriggerData> TriggerHotkey(string hotkeyId) {
+			return this.Plugin.TriggerHotkey(hotkeyId);
+		}
+
+		public Task<VTSHotkeyTriggerData> TriggerHotkeyForLive2DItem(string itemInstanceId, string hotkeyId) {
+			return this.Plugin.TriggerHotkeyForLive2DItem(itemInstanceId, hotkeyId);
+		}
+
+		public Task<VTSItemUnloadResponseData> UnloadItem(VTSItemUnloadOptions options) {
+			return this.Plugin.UnloadItem(options);
+		}
+
+		public Task<VTSEventSubscriptionResponseData> UnsubscribeFromAllEvents() {
+			return this.Plugin.UnsubscribeFromAllEvents();
+		}
+
+		public Task<VTSEventSubscriptionResponseData> UnsubscribeFromBackgroundChangedEvent() {
+			return this.Plugin.UnsubscribeFromBackgroundChangedEvent();
+		}
+
+		public Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelConfigChangedEvent() {
+			return this.Plugin.UnsubscribeFromModelConfigChangedEvent();
+		}
+
+		public Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelLoadedEvent() {
+			return this.Plugin.UnsubscribeFromModelLoadedEvent();
+		}
+
+		public Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelMovedEvent() {
+			return this.Plugin.UnsubscribeFromModelMovedEvent();
+		}
+
+		public Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelOutlineEvent() {
+			return this.Plugin.UnsubscribeFromModelOutlineEvent();
+		}
+
+		public Task<VTSEventSubscriptionResponseData> UnsubscribeFromTestEventAsync() {
+			return this.Plugin.UnsubscribeFromTestEventAsync();
+		}
+
+		public Task<VTSEventSubscriptionResponseData> UnsubscribeFromTrackingEvent() {
+			return this.Plugin.UnsubscribeFromTrackingEvent();
+		}
+
+		public Task<VTSEventSubscriptionResponseData> UnsubscribeFromHotkeyTriggeredEvent() {
+			return this.Plugin.UnsubscribeFromHotkeyTriggeredEvent();
+		}
+
+		public Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelAnimationEvent() {
+			return this.Plugin.UnsubscribeFromModelAnimationEvent();
 		}
 
 		#endregion

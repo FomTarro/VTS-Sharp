@@ -145,7 +145,7 @@ namespace VTS.Core {
 			this.IsAuthenticated = false;
 			if (this.TokenStorage != null) {
 				this._token = this.TokenStorage.LoadToken();
-				if (String.IsNullOrEmpty(this._token)) {
+				if (string.IsNullOrEmpty(this._token)) {
 					GetToken(onSuccess, onError);
 				} else {
 					UseToken(onSuccess, onError);
@@ -226,7 +226,7 @@ namespace VTS.Core {
 			VTSStateData request = new VTSStateData();
 			this.Socket.Send<VTSStateData, VTSStateData>(request, onSuccess, onError);
 		}
-		public async Task<VTSStateData> GetAPIStateAsync() {
+		public async Task<VTSStateData> GetAPIState() {
 			return await VTSExtensions.Async<VTSStateData, VTSErrorData>(GetAPIState);
 		}
 
@@ -236,7 +236,7 @@ namespace VTS.Core {
 			VTSStatisticsData request = new VTSStatisticsData();
 			this.Socket.Send<VTSStatisticsData, VTSStatisticsData>(request, onSuccess, onError);
 		}
-		public async Task<VTSStatisticsData> GetStatisticsAsync() {
+		public async Task<VTSStatisticsData> GetStatistics() {
 			return await VTSExtensions.Async<VTSStatisticsData, VTSErrorData>(GetStatistics);
 		}
 
@@ -246,7 +246,7 @@ namespace VTS.Core {
 			VTSFolderInfoData request = new VTSFolderInfoData();
 			this.Socket.Send<VTSFolderInfoData, VTSFolderInfoData>(request, onSuccess, onError);
 		}
-		public async Task<VTSFolderInfoData> GetFolderInfoAsync() {
+		public async Task<VTSFolderInfoData> GetFolderInfo() {
 			return await VTSExtensions.Async<VTSFolderInfoData, VTSErrorData>(GetFolderInfo);
 		}
 
@@ -256,7 +256,7 @@ namespace VTS.Core {
 			VTSCurrentModelData request = new VTSCurrentModelData();
 			this.Socket.Send<VTSCurrentModelData, VTSCurrentModelData>(request, onSuccess, onError);
 		}
-		public Task<VTSCurrentModelData> GetCurrentModelAsync() {
+		public Task<VTSCurrentModelData> GetCurrentModel() {
 			return VTSExtensions.Async<VTSCurrentModelData, VTSErrorData>(GetCurrentModel);
 		}
 
@@ -266,7 +266,7 @@ namespace VTS.Core {
 			VTSAvailableModelsData request = new VTSAvailableModelsData();
 			this.Socket.Send<VTSAvailableModelsData, VTSAvailableModelsData>(request, onSuccess, onError);
 		}
-		public Task<VTSAvailableModelsData> GetAvailableModelsAsync() {
+		public Task<VTSAvailableModelsData> GetAvailableModels() {
 			return VTSExtensions.Async<VTSAvailableModelsData, VTSErrorData>(GetAvailableModels);
 		}
 
@@ -277,7 +277,7 @@ namespace VTS.Core {
 			request.data.modelID = modelID;
 			this.Socket.Send<VTSModelLoadData, VTSModelLoadData>(request, onSuccess, onError);
 		}
-		public Task<VTSModelLoadData> LoadModelAsync(string modelId) {
+		public Task<VTSModelLoadData> LoadModel(string modelId) {
 			return VTSExtensions.Async<string, VTSModelLoadData, VTSErrorData>(LoadModel, modelId);
 		}
 
@@ -288,7 +288,7 @@ namespace VTS.Core {
 			request.data = position;
 			this.Socket.Send<VTSMoveModelData, VTSMoveModelData>(request, onSuccess, onError);
 		}
-		public async Task<VTSMoveModelData> MoveModelAsync(VTSMoveModelData.Data position) {
+		public async Task<VTSMoveModelData> MoveModel(VTSMoveModelData.Data position) {
 			return await VTSExtensions.Async<VTSMoveModelData.Data, VTSMoveModelData, VTSErrorData>(MoveModel, position);
 		}
 
@@ -299,7 +299,7 @@ namespace VTS.Core {
 			request.data.modelID = modelID;
 			this.Socket.Send<VTSHotkeysInCurrentModelData, VTSHotkeysInCurrentModelData>(request, onSuccess, onError);
 		}
-		public async Task<VTSHotkeysInCurrentModelData> GetHotkeysInCurrentModelAsync(string modelId) {
+		public async Task<VTSHotkeysInCurrentModelData> GetHotkeysInCurrentModel(string modelId) {
 			return await VTSExtensions.Async<string, VTSHotkeysInCurrentModelData, VTSErrorData>(GetHotkeysInCurrentModel, modelId);
 		}
 
@@ -310,7 +310,7 @@ namespace VTS.Core {
 			request.data.live2DItemFileName = live2DItemFileName;
 			this.Socket.Send<VTSHotkeysInCurrentModelData, VTSHotkeysInCurrentModelData>(request, onSuccess, onError);
 		}
-		public async Task<VTSHotkeysInCurrentModelData> GetHotkeysInLive2DItemAsync(string live2DItemFileName) {
+		public async Task<VTSHotkeysInCurrentModelData> GetHotkeysInLive2DItem(string live2DItemFileName) {
 			return await VTSExtensions.Async<string, VTSHotkeysInCurrentModelData, VTSErrorData>(GetHotkeysInLive2DItem, live2DItemFileName);
 		}
 
@@ -321,7 +321,7 @@ namespace VTS.Core {
 			request.data.hotkeyID = hotkeyID;
 			this.Socket.Send<VTSHotkeyTriggerData, VTSHotkeyTriggerData>(request, onSuccess, onError);
 		}
-		public async Task<VTSHotkeyTriggerData> TriggerHotkeyAsync(string hotkeyId) {
+		public async Task<VTSHotkeyTriggerData> TriggerHotkey(string hotkeyId) {
 			return await VTSExtensions.Async<string, VTSHotkeyTriggerData, VTSErrorData>(TriggerHotkey, hotkeyId);
 		}
 
@@ -333,7 +333,7 @@ namespace VTS.Core {
 			request.data.itemInstanceID = itemInstanceID;
 			this.Socket.Send<VTSHotkeyTriggerData, VTSHotkeyTriggerData>(request, onSuccess, onError);
 		}
-		public async Task<VTSHotkeyTriggerData> TriggerHotkeyForLive2DItemAsync(string itemInstanceId, string hotkeyId) {
+		public async Task<VTSHotkeyTriggerData> TriggerHotkeyForLive2DItem(string itemInstanceId, string hotkeyId) {
 			return await VTSExtensions.Async<string, string, VTSHotkeyTriggerData, VTSErrorData>(TriggerHotkeyForLive2DItem, itemInstanceId, hotkeyId);
 		}
 
@@ -343,7 +343,7 @@ namespace VTS.Core {
 			VTSArtMeshListData request = new VTSArtMeshListData();
 			this.Socket.Send<VTSArtMeshListData, VTSArtMeshListData>(request, onSuccess, onError);
 		}
-		public async Task<VTSArtMeshListData> GetArtMeshListAsync() {
+		public async Task<VTSArtMeshListData> GetArtMeshList() {
 			return await VTSExtensions.Async<VTSArtMeshListData, VTSErrorData>(GetArtMeshList);
 		}
 
@@ -362,7 +362,7 @@ namespace VTS.Core {
 			request.data.artMeshMatcher = matcher;
 			this.Socket.Send<VTSColorTintData, VTSColorTintData>(request, onSuccess, onError);
 		}
-		public async Task<VTSColorTintData> TintArtMeshAsync(ColorTint tint, float mixWithSceneLightingColor, ArtMeshMatcher matcher) {
+		public async Task<VTSColorTintData> TintArtMesh(ColorTint tint, float mixWithSceneLightingColor, ArtMeshMatcher matcher) {
 			return await VTSExtensions.Async<ColorTint, float, ArtMeshMatcher, VTSColorTintData, VTSErrorData>(TintArtMesh, tint, mixWithSceneLightingColor, matcher);
 		}
 
@@ -372,7 +372,7 @@ namespace VTS.Core {
 			VTSSceneColorOverlayData request = new VTSSceneColorOverlayData();
 			this.Socket.Send<VTSSceneColorOverlayData, VTSSceneColorOverlayData>(request, onSuccess, onError);
 		}
-		public async Task<VTSSceneColorOverlayData> GetSceneColorOverlayInfoAsync() {
+		public async Task<VTSSceneColorOverlayData> GetSceneColorOverlayInfo() {
 			return await VTSExtensions.Async<VTSSceneColorOverlayData, VTSErrorData>(GetSceneColorOverlayInfo);
 		}
 
@@ -382,7 +382,7 @@ namespace VTS.Core {
 			VTSFaceFoundData request = new VTSFaceFoundData();
 			this.Socket.Send<VTSFaceFoundData, VTSFaceFoundData>(request, onSuccess, onError);
 		}
-		public async Task<VTSFaceFoundData> GetFaceFoundAsync() {
+		public async Task<VTSFaceFoundData> GetFaceFound() {
 			return await VTSExtensions.Async<VTSFaceFoundData, VTSErrorData>(GetFaceFound);
 		}
 
@@ -392,7 +392,7 @@ namespace VTS.Core {
 			VTSInputParameterListData request = new VTSInputParameterListData();
 			this.Socket.Send<VTSInputParameterListData, VTSInputParameterListData>(request, onSuccess, onError);
 		}
-		public async Task<VTSInputParameterListData> GetInputParameterListAsync() {
+		public async Task<VTSInputParameterListData> GetInputParameterList() {
 			return await VTSExtensions.Async<VTSInputParameterListData, VTSErrorData>(GetInputParameterList);
 		}
 
@@ -403,7 +403,7 @@ namespace VTS.Core {
 			request.data.name = parameterName;
 			this.Socket.Send<VTSParameterValueData, VTSParameterValueData>(request, onSuccess, onError);
 		}
-		public async Task<VTSParameterValueData> GetParameterValueAsync(string parameterName) {
+		public async Task<VTSParameterValueData> GetParameterValue(string parameterName) {
 			return await VTSExtensions.Async<string, VTSParameterValueData, VTSErrorData>(GetParameterValue, parameterName);
 		}
 
@@ -413,7 +413,7 @@ namespace VTS.Core {
 			VTSLive2DParameterListData request = new VTSLive2DParameterListData();
 			this.Socket.Send<VTSLive2DParameterListData, VTSLive2DParameterListData>(request, onSuccess, onError);
 		}
-		public async Task<VTSLive2DParameterListData> GetLive2DParameterListAsync() {
+		public async Task<VTSLive2DParameterListData> GetLive2DParameterList() {
 			return await VTSExtensions.Async<VTSLive2DParameterListData, VTSErrorData>(GetLive2DParameterList);
 		}
 
@@ -428,7 +428,7 @@ namespace VTS.Core {
 			request.data.defaultValue = parameter.defaultValue;
 			this.Socket.Send<VTSParameterCreationData, VTSParameterCreationData>(request, onSuccess, onError);
 		}
-		public async Task<VTSParameterCreationData> AddCustomParameterAsync(VTSCustomParameter parameter) {
+		public async Task<VTSParameterCreationData> AddCustomParameter(VTSCustomParameter parameter) {
 			return await VTSExtensions.Async<VTSCustomParameter, VTSParameterCreationData, VTSErrorData>(AddCustomParameter, parameter);
 		}
 
@@ -439,7 +439,7 @@ namespace VTS.Core {
 			request.data.parameterName = SanitizeParameterName(parameterName);
 			this.Socket.Send<VTSParameterDeletionData, VTSParameterDeletionData>(request, onSuccess, onError);
 		}
-		public async Task<VTSParameterDeletionData> RemoveCustomParameterAsync(string parameterName) {
+		public async Task<VTSParameterDeletionData> RemoveCustomParameter(string parameterName) {
 			return await VTSExtensions.Async<string, VTSParameterDeletionData, VTSErrorData>(RemoveCustomParameter, parameterName);
 		}
 
@@ -448,14 +448,14 @@ namespace VTS.Core {
 		public void InjectParameterValues(VTSParameterInjectionValue[] values, Action<VTSInjectParameterData> onSuccess, Action<VTSErrorData> onError) {
 			InjectParameterValues(values, VTSInjectParameterMode.SET, false, onSuccess, onError);
 		}
-		public async Task<VTSInjectParameterData> InjectParameterValuesAsync(VTSParameterInjectionValue[] values) {
+		public async Task<VTSInjectParameterData> InjectParameterValues(VTSParameterInjectionValue[] values) {
 			return await VTSExtensions.Async<VTSParameterInjectionValue[], VTSInjectParameterData, VTSErrorData>(InjectParameterValues, values);
 		}
 
 		public void InjectParameterValues(VTSParameterInjectionValue[] values, VTSInjectParameterMode mode, Action<VTSInjectParameterData> onSuccess, Action<VTSErrorData> onError) {
 			InjectParameterValues(values, mode, false, onSuccess, onError);
 		}
-		public async Task<VTSInjectParameterData> InjectParameterValuesAsync(VTSParameterInjectionValue[] values, VTSInjectParameterMode mode) {
+		public async Task<VTSInjectParameterData> InjectParameterValues(VTSParameterInjectionValue[] values, VTSInjectParameterMode mode) {
 			return await VTSExtensions.Async<VTSParameterInjectionValue[], VTSInjectParameterMode, VTSInjectParameterData, VTSErrorData>(InjectParameterValues, values, mode);
 		}
 
@@ -469,7 +469,7 @@ namespace VTS.Core {
 			request.data.mode = InjectParameterModeToString(mode);
 			this.Socket.Send<VTSInjectParameterData, VTSInjectParameterData>(request, onSuccess, onError);
 		}
-		public async Task<VTSInjectParameterData> InjectParameterValuesAsync(VTSParameterInjectionValue[] values, VTSInjectParameterMode mode, bool faceFound) {
+		public async Task<VTSInjectParameterData> InjectParameterValues(VTSParameterInjectionValue[] values, VTSInjectParameterMode mode, bool faceFound) {
 			return await VTSExtensions.Async<VTSParameterInjectionValue[], VTSInjectParameterMode, bool, VTSInjectParameterData, VTSErrorData>(InjectParameterValues, values, mode, faceFound);
 		}
 
@@ -480,7 +480,7 @@ namespace VTS.Core {
 			request.data.details = true;
 			this.Socket.Send<VTSExpressionStateData, VTSExpressionStateData>(request, onSuccess, onError);
 		}
-		public async Task<VTSExpressionStateData> GetExpressionStateListAsync() {
+		public async Task<VTSExpressionStateData> GetExpressionStateList() {
 			return await VTSExtensions.Async<VTSExpressionStateData, VTSErrorData>(GetExpressionStateList);
 		}
 
@@ -492,7 +492,7 @@ namespace VTS.Core {
 			request.data.active = active;
 			this.Socket.Send<VTSExpressionActivationData, VTSExpressionActivationData>(request, onSuccess, onError);
 		}
-		public async Task<VTSExpressionActivationData> SetExpressionStateAsync(string expression, bool active) {
+		public async Task<VTSExpressionActivationData> SetExpressionState(string expression, bool active) {
 			return await VTSExtensions.Async<string, bool, VTSExpressionActivationData, VTSErrorData>(SetExpressionState, expression, active);
 		}
 
@@ -502,7 +502,7 @@ namespace VTS.Core {
 			VTSCurrentModelPhysicsData request = new VTSCurrentModelPhysicsData();
 			this.Socket.Send<VTSCurrentModelPhysicsData, VTSCurrentModelPhysicsData>(request, onSuccess, onError);
 		}
-		public async Task<VTSCurrentModelPhysicsData> GetCurrentModelPhysicsAsync() {
+		public async Task<VTSCurrentModelPhysicsData> GetCurrentModelPhysics() {
 			return await VTSExtensions.Async<VTSCurrentModelPhysicsData, VTSErrorData>(GetCurrentModelPhysics);
 		}
 
@@ -514,7 +514,7 @@ namespace VTS.Core {
 			request.data.windOverrides = windOverrides;
 			this.Socket.Send<VTSOverrideModelPhysicsData, VTSOverrideModelPhysicsData>(request, onSuccess, onError);
 		}
-		public async Task<VTSOverrideModelPhysicsData> SetCurrentModelPhysicsAsync(VTSPhysicsOverride[] strengthOverrides, VTSPhysicsOverride[] windOverrides) {
+		public async Task<VTSOverrideModelPhysicsData> SetCurrentModelPhysics(VTSPhysicsOverride[] strengthOverrides, VTSPhysicsOverride[] windOverrides) {
 			return await VTSExtensions.Async<VTSPhysicsOverride[], VTSPhysicsOverride[], VTSOverrideModelPhysicsData, VTSErrorData>(SetCurrentModelPhysics, strengthOverrides, windOverrides);
 		}
 
@@ -523,7 +523,7 @@ namespace VTS.Core {
 		public void SetNDIConfig(VTSNDIConfigData config, Action<VTSNDIConfigData> onSuccess, Action<VTSErrorData> onError) {
 			this.Socket.Send<VTSNDIConfigData, VTSNDIConfigData>(config, onSuccess, onError);
 		}
-		public async Task<VTSNDIConfigData> SetNDIConfigAsync(VTSNDIConfigData config) {
+		public async Task<VTSNDIConfigData> SetNDIConfig(VTSNDIConfigData config) {
 			return await VTSExtensions.Async<VTSNDIConfigData, VTSNDIConfigData, VTSErrorData>(SetNDIConfig, config);
 		}
 
@@ -538,7 +538,7 @@ namespace VTS.Core {
 			request.data.onlyItemsWithInstanceID = options.onlyItemsWithInstanceID;
 			this.Socket.Send<VTSItemListRequestData, VTSItemListResponseData>(request, onSuccess, onError);
 		}
-		public async Task<VTSItemListResponseData> GetItemListAsync(VTSItemListOptions options) {
+		public async Task<VTSItemListResponseData> GetItemList(VTSItemListOptions options) {
 			return await VTSExtensions.Async<VTSItemListOptions, VTSItemListResponseData, VTSErrorData>(GetItemList, options);
 		}
 
@@ -561,7 +561,7 @@ namespace VTS.Core {
 			request.data.unloadWhenPluginDisconnects = options.unloadWhenPluginDisconnects;
 			this.Socket.Send<VTSItemLoadRequestData, VTSItemLoadResponseData>(request, onSuccess, onError);
 		}
-		public async Task<VTSItemLoadResponseData> LoadItemAsync(string fileName, VTSItemLoadOptions options) {
+		public async Task<VTSItemLoadResponseData> LoadItem(string fileName, VTSItemLoadOptions options) {
 			return await VTSExtensions.Async<string, VTSItemLoadOptions, VTSItemLoadResponseData, VTSErrorData>(LoadItem, fileName, options);
 		}
 
@@ -576,7 +576,7 @@ namespace VTS.Core {
 			request.data.allowUnloadingItemsLoadedByUserOrOtherPlugins = options.allowUnloadingItemsLoadedByUserOrOtherPlugins;
 			this.Socket.Send<VTSItemUnloadRequestData, VTSItemUnloadResponseData>(request, onSuccess, onError);
 		}
-		public async Task<VTSItemUnloadResponseData> UnloadItemAsync(VTSItemUnloadOptions options) {
+		public async Task<VTSItemUnloadResponseData> UnloadItem(VTSItemUnloadOptions options) {
 			return await VTSExtensions.Async<VTSItemUnloadOptions, VTSItemUnloadResponseData, VTSErrorData>(UnloadItem, options);
 		}
 
@@ -595,7 +595,7 @@ namespace VTS.Core {
 			request.data.animationPlayState = options.animationPlayState;
 			this.Socket.Send<VTSItemAnimationControlRequestData, VTSItemAnimationControlResponseData>(request, onSuccess, onError);
 		}
-		public async Task<VTSItemAnimationControlResponseData> AnimateItemAsync(string itemInstanceId, VTSItemAnimationControlOptions options) {
+		public async Task<VTSItemAnimationControlResponseData> AnimateItem(string itemInstanceId, VTSItemAnimationControlOptions options) {
 			return await VTSExtensions.Async<string, VTSItemAnimationControlOptions, VTSItemAnimationControlResponseData, VTSErrorData>(AnimateItem, itemInstanceId, options);
 		}
 
@@ -622,7 +622,7 @@ namespace VTS.Core {
 			}
 			this.Socket.Send<VTSItemMoveRequestData, VTSItemMoveResponseData>(request, onSuccess, onError);
 		}
-		public async Task<VTSItemMoveResponseData> MoveItemAsync(VTSItemMoveEntry[] items) {
+		public async Task<VTSItemMoveResponseData> MoveItem(VTSItemMoveEntry[] items) {
 			return await VTSExtensions.Async<VTSItemMoveEntry[], VTSItemMoveResponseData, VTSErrorData>(MoveItem, items);
 		}
 
@@ -638,7 +638,7 @@ namespace VTS.Core {
 			request.data.activeArtMeshes = array;
 			this.Socket.Send<VTSArtMeshSelectionRequestData, VTSArtMeshSelectionResponseData>(request, onSuccess, onError);
 		}
-		public async Task<VTSArtMeshSelectionResponseData> RequestArtMeshSelectionAsync(string textOverride, string helpOverride, int count, ICollection<string> activeArtMeshes) {
+		public async Task<VTSArtMeshSelectionResponseData> RequestArtMeshSelection(string textOverride, string helpOverride, int count, ICollection<string> activeArtMeshes) {
 			return await VTSExtensions.Async<string, string, int, ICollection<string>, VTSArtMeshSelectionResponseData, VTSErrorData>(
 				RequestArtMeshSelection, textOverride, helpOverride, count, activeArtMeshes);
 		}
@@ -665,7 +665,7 @@ namespace VTS.Core {
 		public void UnsubscribeFromAllEvents(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
 			SubscribeToEvent<VTSUnsubscribeFromAllRequestData, VTSTestEventData, VTSTestEventConfigOptions>(false, null, DoNothingCallback, onUnsubscribe, onError);
 		}
-		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromAllEventsAsync() {
+		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromAllEvents() {
 			return await VTSExtensions.Async<VTSEventSubscriptionResponseData, VTSErrorData>(UnsubscribeFromAllEvents);
 		}
 
@@ -674,7 +674,7 @@ namespace VTS.Core {
 		public void SubscribeToTestEvent(VTSTestEventConfigOptions config, Action<VTSTestEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
 			SubscribeToEvent<VTSTestEventSubscriptionRequestData, VTSTestEventData, VTSTestEventConfigOptions>(true, config, onEvent, onSubscribe, onError);
 		}
-		public async Task<VTSEventSubscriptionResponseData> SubscribeToTestEventAsync(VTSTestEventConfigOptions config, Action<VTSTestEventData> onEvent) {
+		public async Task<VTSEventSubscriptionResponseData> SubscribeToTestEvent(VTSTestEventConfigOptions config, Action<VTSTestEventData> onEvent) {
 			return await VTSExtensions.Async<VTSTestEventConfigOptions, Action<VTSTestEventData>, VTSEventSubscriptionResponseData, VTSErrorData>(
 				SubscribeToTestEvent, config, onEvent);
 		}
@@ -691,7 +691,7 @@ namespace VTS.Core {
 		public void SubscribeToModelLoadedEvent(VTSModelLoadedEventConfigOptions config, Action<VTSModelLoadedEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
 			SubscribeToEvent<VTSModelLoadedEventSubscriptionRequestData, VTSModelLoadedEventData, VTSModelLoadedEventConfigOptions>(true, config, onEvent, onSubscribe, onError);
 		}
-		public async Task<VTSEventSubscriptionResponseData> SubscribeToModelLoadedEventAsync(VTSModelLoadedEventConfigOptions config, Action<VTSModelLoadedEventData> onEvent) {
+		public async Task<VTSEventSubscriptionResponseData> SubscribeToModelLoadedEvent(VTSModelLoadedEventConfigOptions config, Action<VTSModelLoadedEventData> onEvent) {
 			return await VTSExtensions.Async<VTSModelLoadedEventConfigOptions, Action<VTSModelLoadedEventData>, VTSEventSubscriptionResponseData, VTSErrorData>(
 				SubscribeToModelLoadedEvent, config, onEvent);
 		}
@@ -699,7 +699,7 @@ namespace VTS.Core {
 		public void UnsubscribeFromModelLoadedEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
 			SubscribeToEvent<VTSModelLoadedEventSubscriptionRequestData, VTSTestEventData, VTSModelLoadedEventConfigOptions>(false, null, DoNothingCallback, onUnsubscribe, onError);
 		}
-		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelLoadedEventAsync() {
+		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelLoadedEvent() {
 			return await VTSExtensions.Async<VTSEventSubscriptionResponseData, VTSErrorData>(UnsubscribeFromModelLoadedEvent);
 		}
 
@@ -708,7 +708,7 @@ namespace VTS.Core {
 		public void SubscribeToTrackingEvent(Action<VTSTrackingEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
 			SubscribeToEvent<VTSTrackingEventSubscriptionRequestData, VTSTrackingEventData, VTSTrackingEventConfigOptions>(true, new VTSTrackingEventConfigOptions(), onEvent, onSubscribe, onError);
 		}
-		public async Task<VTSEventSubscriptionResponseData> SubscribeToTrackingEventAsync(Action<VTSTrackingEventData> onEvent) {
+		public async Task<VTSEventSubscriptionResponseData> SubscribeToTrackingEvent(Action<VTSTrackingEventData> onEvent) {
 			return await VTSExtensions.Async<Action<VTSTrackingEventData>, VTSEventSubscriptionResponseData, VTSErrorData>(
 				SubscribeToTrackingEvent, onEvent);
 		}
@@ -716,7 +716,7 @@ namespace VTS.Core {
 		public void UnsubscribeFromTrackingEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
 			SubscribeToEvent<VTSTrackingEventSubscriptionRequestData, VTSTrackingEventData, VTSTrackingEventConfigOptions>(false, null, DoNothingCallback, onUnsubscribe, onError);
 		}
-		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromTrackingEventAsync() {
+		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromTrackingEvent() {
 			return await VTSExtensions.Async<VTSEventSubscriptionResponseData, VTSErrorData>(UnsubscribeFromTrackingEvent);
 		}
 
@@ -725,7 +725,7 @@ namespace VTS.Core {
 		public void SubscribeToBackgroundChangedEvent(Action<VTSBackgroundChangedEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
 			SubscribeToEvent<VTSBackgroundChangedEventSubscriptionRequestData, VTSBackgroundChangedEventData, VTSBackgroundChangedEventConfigOptions>(true, new VTSBackgroundChangedEventConfigOptions(), onEvent, onSubscribe, onError);
 		}
-		public async Task<VTSEventSubscriptionResponseData> SubscribeToBackgroundChangedEventAsync(Action<VTSBackgroundChangedEventData> onEvent) {
+		public async Task<VTSEventSubscriptionResponseData> SubscribeToBackgroundChangedEvent(Action<VTSBackgroundChangedEventData> onEvent) {
 			return await VTSExtensions.Async<Action<VTSBackgroundChangedEventData>, VTSEventSubscriptionResponseData, VTSErrorData>(
 				SubscribeToBackgroundChangedEvent, onEvent);
 		}
@@ -733,7 +733,7 @@ namespace VTS.Core {
 		public void UnsubscribeFromBackgroundChangedEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
 			SubscribeToEvent<VTSBackgroundChangedEventSubscriptionRequestData, VTSBackgroundChangedEventData, VTSBackgroundChangedEventConfigOptions>(false, null, DoNothingCallback, onUnsubscribe, onError);
 		}
-		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromBackgroundChangedEventAsync() {
+		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromBackgroundChangedEvent() {
 			return await VTSExtensions.Async<VTSEventSubscriptionResponseData, VTSErrorData>(UnsubscribeFromBackgroundChangedEvent);
 		}
 
@@ -742,7 +742,7 @@ namespace VTS.Core {
 		public void SubscribeToModelConfigChangedEvent(Action<VTSModelConfigChangedEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
 			SubscribeToEvent<VTSModelConfigChangedEventSubscriptionRequestData, VTSModelConfigChangedEventData, VTSModelConfigChangedEventConfigOptions>(true, new VTSModelConfigChangedEventConfigOptions(), onEvent, onSubscribe, onError);
 		}
-		public async Task<VTSEventSubscriptionResponseData> SubscribeToModelConfigChangedEventAsync(Action<VTSModelConfigChangedEventData> onEvent) {
+		public async Task<VTSEventSubscriptionResponseData> SubscribeToModelConfigChangedEvent(Action<VTSModelConfigChangedEventData> onEvent) {
 			return await VTSExtensions.Async<Action<VTSModelConfigChangedEventData>, VTSEventSubscriptionResponseData, VTSErrorData>(
 				SubscribeToModelConfigChangedEvent, onEvent);
 		}
@@ -750,7 +750,7 @@ namespace VTS.Core {
 		public void UnsubscribeFromModelConfigChangedEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
 			SubscribeToEvent<VTSModelConfigChangedEventSubscriptionRequestData, VTSModelConfigChangedEventData, VTSModelConfigChangedEventConfigOptions>(false, null, DoNothingCallback, onUnsubscribe, onError);
 		}
-		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelConfigChangedEventAsync() {
+		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelConfigChangedEvent() {
 			return await VTSExtensions.Async<VTSEventSubscriptionResponseData, VTSErrorData>(UnsubscribeFromModelConfigChangedEvent);
 		}
 
@@ -759,7 +759,7 @@ namespace VTS.Core {
 		public void SubscribeToModelMovedEvent(Action<VTSModelMovedEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
 			SubscribeToEvent<VTSModelMovedEventSubscriptionRequestData, VTSModelMovedEventData, VTSModelMovedEventConfigOptions>(true, new VTSModelMovedEventConfigOptions(), onEvent, onSubscribe, onError);
 		}
-		public async Task<VTSEventSubscriptionResponseData> SubscribeToModelMovedEventAsync(Action<VTSModelMovedEventData> onEvent) {
+		public async Task<VTSEventSubscriptionResponseData> SubscribeToModelMovedEvent(Action<VTSModelMovedEventData> onEvent) {
 			return await VTSExtensions.Async<Action<VTSModelMovedEventData>, VTSEventSubscriptionResponseData, VTSErrorData>(
 				SubscribeToModelMovedEvent, onEvent);
 		}
@@ -767,7 +767,7 @@ namespace VTS.Core {
 		public void UnsubscribeFromModelMovedEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
 			SubscribeToEvent<VTSModelMovedEventSubscriptionRequestData, VTSModelMovedEventData, VTSModelMovedEventConfigOptions>(false, null, DoNothingCallback, onUnsubscribe, onError);
 		}
-		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelMovedEventAsync() {
+		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelMovedEvent() {
 			return await VTSExtensions.Async<VTSEventSubscriptionResponseData, VTSErrorData>(UnsubscribeFromModelMovedEvent);
 		}
 
@@ -776,7 +776,7 @@ namespace VTS.Core {
 		public void SubscribeToModelOutlineEvent(VTSModelOutlineEventConfigOptions config, Action<VTSModelOutlineEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
 			SubscribeToEvent<VTSModelOutlineEventSubscriptionRequestData, VTSModelOutlineEventData, VTSModelOutlineEventConfigOptions>(true, config, onEvent, onSubscribe, onError);
 		}
-		public async Task<VTSEventSubscriptionResponseData> SubscribeToModelOutlineEventAsync(VTSModelOutlineEventConfigOptions config, Action<VTSModelOutlineEventData> onEvent) {
+		public async Task<VTSEventSubscriptionResponseData> SubscribeToModelOutlineEvent(VTSModelOutlineEventConfigOptions config, Action<VTSModelOutlineEventData> onEvent) {
 			return await VTSExtensions.Async<VTSModelOutlineEventConfigOptions, Action<VTSModelOutlineEventData>, VTSEventSubscriptionResponseData, VTSErrorData>(
 				SubscribeToModelOutlineEvent, config, onEvent);
 		}
@@ -784,7 +784,7 @@ namespace VTS.Core {
 		public void UnsubscribeFromModelOutlineEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
 			SubscribeToEvent<VTSModelOutlineEventSubscriptionRequestData, VTSModelOutlineEventData, VTSModelOutlineEventConfigOptions>(false, null, DoNothingCallback, onUnsubscribe, onError);
 		}
-		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelOutlineEventAsync() {
+		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelOutlineEvent() {
 			return await VTSExtensions.Async<VTSEventSubscriptionResponseData, VTSErrorData>(UnsubscribeFromModelOutlineEvent);
 		}
 
@@ -793,7 +793,7 @@ namespace VTS.Core {
 		public void SubscribeToHotkeyTriggeredEvent(VTSHotkeyTriggeredEventConfigOptions config, Action<VTSHotkeyTriggeredEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
 			SubscribeToEvent<VTSHotkeyTriggeredEventSubscriptionRequestData, VTSHotkeyTriggeredEventData, VTSHotkeyTriggeredEventConfigOptions>(true, config, onEvent, onSubscribe, onError);
 		}
-		public async Task<VTSEventSubscriptionResponseData> SubscribeToHotkeyTriggeredEventAsync(VTSHotkeyTriggeredEventConfigOptions config, Action<VTSHotkeyTriggeredEventData> onEvent) {
+		public async Task<VTSEventSubscriptionResponseData> SubscribeToHotkeyTriggeredEvent(VTSHotkeyTriggeredEventConfigOptions config, Action<VTSHotkeyTriggeredEventData> onEvent) {
 			return await VTSExtensions.Async<VTSHotkeyTriggeredEventConfigOptions, Action<VTSHotkeyTriggeredEventData>, VTSEventSubscriptionResponseData, VTSErrorData>(
 				SubscribeToHotkeyTriggeredEvent, config, onEvent);
 		}
@@ -801,7 +801,7 @@ namespace VTS.Core {
 		public void UnsubscribeFromHotkeyTriggeredEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
 			SubscribeToEvent<VTSHotkeyTriggeredEventSubscriptionRequestData, VTSHotkeyTriggeredEventData, VTSHotkeyTriggeredEventConfigOptions>(false, null, DoNothingCallback, onUnsubscribe, onError);
 		}
-		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromHotkeyTriggeredEventAsync() {
+		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromHotkeyTriggeredEvent() {
 			return await VTSExtensions.Async<VTSEventSubscriptionResponseData, VTSErrorData>(UnsubscribeFromHotkeyTriggeredEvent);
 		}
 
@@ -810,7 +810,7 @@ namespace VTS.Core {
 		public void SubscribeToModelAnimationEvent(VTSModelAnimationEventConfigOptions config, Action<VTSModelAnimationEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
 			SubscribeToEvent<VTSModelAnimationEventSubscriptionRequestData, VTSModelAnimationEventData, VTSModelAnimationEventConfigOptions>(true, config, onEvent, onSubscribe, onError);
 		}
-		public async Task<VTSEventSubscriptionResponseData> SubscribeToModelAnimationEventAsync(VTSModelAnimationEventConfigOptions config, Action<VTSModelAnimationEventData> onEvent) {
+		public async Task<VTSEventSubscriptionResponseData> SubscribeToModelAnimationEvent(VTSModelAnimationEventConfigOptions config, Action<VTSModelAnimationEventData> onEvent) {
 			return await VTSExtensions.Async<VTSModelAnimationEventConfigOptions, Action<VTSModelAnimationEventData>, VTSEventSubscriptionResponseData, VTSErrorData>(
 				SubscribeToModelAnimationEvent, config, onEvent);
 		}
@@ -818,7 +818,7 @@ namespace VTS.Core {
 		public void UnsubscribeFromModelAnimationEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
 			SubscribeToEvent<VTSModelAnimationEventSubscriptionRequestData, VTSModelAnimationEventData, VTSModelAnimationEventConfigOptions>(false, null, DoNothingCallback, onUnsubscribe, onError);
 		}
-		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelAnimationEventAsync() {
+		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelAnimationEvent() {
 			return await VTSExtensions.Async<VTSEventSubscriptionResponseData, VTSErrorData>(UnsubscribeFromModelAnimationEvent);
 		}
 
