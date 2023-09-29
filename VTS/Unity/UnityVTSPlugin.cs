@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using UnityEngine;
+
 using VTS.Core;
 
 namespace VTS.Unity {
@@ -41,7 +43,7 @@ namespace VTS.Unity {
 
 		public IJsonUtility JsonUtility { get { return this.Plugin.JsonUtility; } }
 		public ITokenStorage TokenStorage { get { return this.Plugin.TokenStorage; } }
-		private IVTSLogger _logger = new UnityVTSLoggerImpl();
+		private readonly IVTSLogger _logger = new UnityVTSLoggerImpl();
 		public IVTSLogger Logger { get { return this._logger; } }
 
 		#endregion
@@ -288,19 +290,19 @@ namespace VTS.Unity {
 			this.Plugin.UnsubscribeFromModelOutlineEvent(onUnsubscribe, onError);
 		}
 
-		public void SubscribeToHotkeyTriggeredEvent(VTSHotkeyTriggeredEventConfigOptions config, Action<VTSHotkeyTriggeredEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError){
+		public void SubscribeToHotkeyTriggeredEvent(VTSHotkeyTriggeredEventConfigOptions config, Action<VTSHotkeyTriggeredEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
 			this.Plugin.SubscribeToHotkeyTriggeredEvent(config, onEvent, onSubscribe, onError);
 		}
 
-		public void UnsubscribeFromHotkeyTriggeredEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError){
+		public void UnsubscribeFromHotkeyTriggeredEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
 			this.Plugin.UnsubscribeFromHotkeyTriggeredEvent(onUnsubscribe, onError);
 		}
 
-		public void SubscribeToModelAnimationEvent(VTSModelAnimationEventConfigOptions config, Action<VTSModelAnimationEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError){
+		public void SubscribeToModelAnimationEvent(VTSModelAnimationEventConfigOptions config, Action<VTSModelAnimationEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
 			this.Plugin.SubscribeToModelAnimationEvent(config, onEvent, onSubscribe, onError);
 		}
 
-		public void UnsubscribeFromModelAnimationEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError){
+		public void UnsubscribeFromModelAnimationEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
 			this.Plugin.UnsubscribeFromModelAnimationEvent(onUnsubscribe, onError);
 		}
 
@@ -323,8 +325,7 @@ namespace VTS.Unity {
 					return null;
 				}
 				return Convert.ToBase64String(icon.EncodeToPNG());
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				logger.LogError(e);
 			}
 			return null;
@@ -346,9 +347,9 @@ namespace VTS.Unity {
 		/// <returns></returns>
 		public static Color32 ColorTintToColor(ColorTint color) {
 			return new Color32(
-				color.colorR, 
-				color.colorG, 
-				color.colorB, 
+				color.colorR,
+				color.colorG,
+				color.colorB,
 				color.colorA
 			);
 		}

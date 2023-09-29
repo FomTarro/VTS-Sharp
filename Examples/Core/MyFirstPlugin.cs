@@ -1,12 +1,8 @@
 ﻿using System.Threading.Tasks;
-using VTS.Core;
 
-namespace VTS.Core.Examples
-{
-    public static class MyFirstPlugin
-    {
-        public static async Task Main(string[] args)
-        {
+namespace VTS.Core.Examples {
+    public static class MyFirstPlugin {
+        public static async Task Main(string[] args) {
             var logger = new ConsoleVTSLoggerImpl();
             var websocket = new WebSocketImpl(logger);
             var jsonUtility = new NewtonsoftJsonUtilityImpl();
@@ -14,19 +10,16 @@ namespace VTS.Core.Examples
 
             var plugin = new CoreVTSPlugin(logger, 100, "My first plugin", "My Name", "");
 
-            try
-            {
+            try {
                 await plugin.InitializeAsync(websocket, jsonUtility, tokenStorage, () => logger.LogWarning("Disconnected!"));
                 logger.Log("Connected!");
 
                 var apiState = await plugin.GetAPIStateAsync();
                 logger.Log("Using VTubeStudio " + apiState.data.vTubeStudioVersion);
-                
+
                 var currentModel = await plugin.GetCurrentModelAsync();
                 logger.Log("The current model is: " + currentModel.data.modelName);
-            }
-            catch (VTSException e)
-            {
+            } catch (VTSException e) {
                 logger.LogError(e);
             }
         }

@@ -11,7 +11,7 @@ namespace VTS.Core {
 		public void LogError(string error) {
 			Console.WriteLine(string.Format("[Error] - {0}", error));
 		}
-		
+
 		public void LogError(Exception error) {
 			Console.WriteLine(string.Format("[Error] - {0}", error));
 		}

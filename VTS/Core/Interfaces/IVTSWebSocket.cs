@@ -60,7 +60,7 @@ namespace VTS.Core {
 		void SendEventSubscription<T, K, V>(T request, Action<K> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError, Action resubscribe)
 			where T : VTSEventSubscriptionRequestData<V>
 			where K : VTSEventData
-			where V:  VTSEventConfigData;
+			where V : VTSEventConfigData;
 		/// <summary>
 		/// Sets the connection IP address to the given string. Returns true if the string is a valid IP Address format, returns false otherwise.
 		/// If the IP Address is changed while an active connection exists, you will need to reconnect.

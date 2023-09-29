@@ -1,12 +1,11 @@
-﻿using System;
+using System;
 
 namespace VTS.Core {
 	/// <summary>
 	/// Enum for the actions that can be triggered by hotkeys.
 	/// </summary>
 	[Serializable]
-	public enum HotkeyAction
-	{
+	public enum HotkeyAction {
 		Unset = -1,                       // Unset.
 		TriggerAnimation = 0,             // Play an animation.
 		ChangeIdleAnimation = 1,          // Change the idle animation.

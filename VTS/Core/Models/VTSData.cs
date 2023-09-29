@@ -29,15 +29,13 @@ namespace VTS.Core {
 	}
 
 	[System.Serializable]
-	public class VTSException : Exception
-	{
+	public class VTSException : Exception {
 		public VTSErrorData ErrorData { get; }
 
 		public VTSException(VTSErrorData errorData)
-			: base($"Request ID #{errorData.requestID} failed\n" 
-			       + $"ErrorID - {errorData.data.errorID}\n" 
-			       + $"Message - {errorData.data.message}")
-		{
+			: base($"Request ID #{errorData.requestID} failed\n"
+				   + $"ErrorID - {errorData.data.errorID}\n"
+				   + $"Message - {errorData.data.message}") {
 			ErrorData = errorData;
 		}
 	}
@@ -1208,7 +1206,7 @@ namespace VTS.Core {
 			return this.data.subscribe;
 		}
 
-		public void SetConfig(VTSEventConfigData config){
+		public void SetConfig(VTSEventConfigData config) {
 			this.data.config = (K)config;
 		}
 	}
@@ -1242,7 +1240,7 @@ namespace VTS.Core {
 	}
 
 	// Unsubscribe 
-		
+
 	[System.Serializable]
 	public class VTSUnsubscribeFromAllRequestData : VTSEventSubscriptionRequestData<VTSTestEventConfigOptions> {
 		public VTSUnsubscribeFromAllRequestData() {
