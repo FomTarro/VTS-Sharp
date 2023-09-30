@@ -9,7 +9,7 @@ This library is maintained by Tom "Skeletom" Farro. If you need to contact him, 
 
 If you're more of an email-oriented person, you can contact his support email: [tom@skeletom.net](mailto:tom@skeletom.net).
 
-This library can also be found on the [Unity Asset Store](https://assetstore.unity.com/packages/tools/integration/vts-sharp-203218), but this repo will always be the most up-to-date version.
+This library can also be found on the [Unity Asset Store](https://assetstore.unity.com/packages/tools/integration/vts-sharp-203218), and the core library (with no Unity-specific components) can be downloaded as a [NuGet Package](https://www.nuget.org/packages/VTS-Sharp/2.1.0), but this repo will always be the most up-to-date version.
  
 ## Usage
 In order to start making a plugin, follow these simple steps:

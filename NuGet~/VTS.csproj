@@ -5,9 +5,9 @@
         <ImplicitUsings>disable</ImplicitUsings>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageId>VTS-Sharp</PackageId>
-        <Version>2.0.1</Version>
+        <Version>2.1.0</Version>
         <Title>VTS-Sharp</Title>
-        <Authors>FomTarro</Authors>
+        <Authors>Tom 'Skeletom' Farro</Authors>
         <Description>C# Library for interacting with the VTube Studio API</Description>
         <PackageProjectUrl>https://github.com/FomTarro/VTS-Sharp</PackageProjectUrl>
         <RepositoryUrl>https://github.com/FomTarro/VTS-Sharp</RepositoryUrl>
@@ -16,7 +16,7 @@
         <Product>VTS-Sharp</Product>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <Copyright>FomTarro</Copyright>
+        <Copyright>Tom 'Skeletom' Farro</Copyright>
         <PackageTags>plugin csharp unity dotnet godot-engine vtuber vtube-studio</PackageTags>
     </PropertyGroup>
 
