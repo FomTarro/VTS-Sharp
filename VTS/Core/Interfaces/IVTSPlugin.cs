@@ -982,5 +982,9 @@ namespace VTS.Core {
 		/// Unsubscribes from the Model Animation Event.
 		/// </summary>
 		Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelAnimationEvent();
+
+
+		void RequestPermission(VTSPermission permission, Action<VTSPermissionData> onSuccess, Action<VTSErrorData> onError);
+		Task<VTSPermissionData> RequestPermission(VTSPermission permission);
 	}
 }

@@ -46,6 +46,17 @@ namespace VTS.Core {
 		public float y;
 	}
 
+	[System.Serializable]
+	public enum VTSPermission {
+		LoadCustomImagesAsItems,
+	}
+
+	[System.Serializable]
+	public struct VTSPermissionStatus {
+		public VTSPermission name;
+		public bool granted;
+	}
+
 	#endregion
 
 	#region General API
@@ -82,6 +93,22 @@ namespace VTS.Core {
 			public string authenticationToken;
 			public bool authenticated;
 			public string reason;
+		}
+	}
+
+	[System.Serializable]
+	public class VTSPermissionData : VTSMessageData {
+		public VTSPermissionData() {
+			this.messageType = "PermissionRequest";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public bool grantSuccess;
+			public VTSPermission requestedPermission;
+			public VTSPermissionStatus[] permissions;
 		}
 	}
 
