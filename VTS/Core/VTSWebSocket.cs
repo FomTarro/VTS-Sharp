@@ -447,6 +447,9 @@ namespace VTS.Core {
 									case "ArtMeshSelectionResponse":
 										this._callbacks[response.requestID].onSuccess(this._json.FromJson<VTSArtMeshSelectionResponseData>(data));
 										break;
+									case "PermissionResponse":
+										this._callbacks[response.requestID].onSuccess(this._json.FromJson<VTSPermissionResponseData>(data));
+										break;
 									case "EventSubscriptionResponse":
 										this._callbacks[response.requestID].onSuccess(this._json.FromJson<VTSEventSubscriptionResponseData>(data));
 										break;

@@ -97,8 +97,8 @@ namespace VTS.Core {
 	}
 
 	[System.Serializable]
-	public class VTSPermissionData : VTSMessageData {
-		public VTSPermissionData() {
+	public class VTSPermissionRequestData : VTSMessageData {
+		public VTSPermissionRequestData() {
 			this.messageType = "PermissionRequest";
 			this.data = new Data();
 		}
@@ -106,8 +106,21 @@ namespace VTS.Core {
 
 		[System.Serializable]
 		public class Data {
-			public bool grantSuccess;
 			public VTSPermission requestedPermission;
+		}
+	}
+
+	[System.Serializable]
+	public class VTSPermissionResponseData : VTSMessageData {
+		public VTSPermissionResponseData() {
+			this.messageType = "PermissionResponse";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public bool grantSuccess;
 			public VTSPermissionStatus[] permissions;
 		}
 	}
@@ -1213,6 +1226,103 @@ namespace VTS.Core {
 		}
 	}
 
+	[System.Serializable]
+	public class VTSItemPinRequestData : VTSMessageData {
+		public VTSItemPinRequestData() {
+			this.messageType = "ItemPinRequest";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+
+			public bool pin;
+			public string itemInstanceID;
+			public VTSItemAngleRelativityMode angleRelativeTo;
+			public VTSItemSizeRelativityMode sizeRealtiveTo;
+			public VTSVertexPinMode vertexPinType;
+			public ArtMeshCoordinate pinInfo;
+		}
+	}
+
+	[System.Serializable]
+	public class VTSItemPinResponseData : VTSMessageData {
+
+		public VTSItemPinResponseData() {
+			this.messageType = "ItemPinResponse";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+
+			public bool isPinned;
+			public string itemInstanceID;
+			public string itemFileName;
+		}
+	}
+
+	[System.Serializable]
+	public enum VTSItemAngleRelativityMode {
+		RelativeToWorld,
+		RelativeToCurrentItemRotation,
+		RelativeToModel,
+		RelativeToPinPosition,
+	}
+
+	[System.Serializable]
+	public enum VTSItemSizeRelativityMode {
+		RelativeToWorld,
+		RelativeToCurrentItemSize,
+	}
+
+	[System.Serializable]
+	public enum VTSVertexPinMode {
+		Provided,
+		Center,
+		Random
+	}
+
+	[System.Serializable]
+	public class ArtMeshCoordinate : BarycentricCoordinate {
+		public string modelID;
+		public string artMeshID;
+		public float angle;
+		public float size;
+
+		public BarycentricCoordinate ToBarycentricCoordinate() {
+			return new BarycentricCoordinate {
+				vertexID1 = this.vertexID1,
+				vertexID2 = this.vertexID2,
+				vertexID3 = this.vertexID3,
+				vertexWeight1 = this.vertexWeight1,
+				vertexWeight2 = this.vertexWeight2,
+				vertexWeight3 = this.vertexWeight3
+			};
+		}
+
+		public void SetBarycentricCoodrinate(BarycentricCoordinate coordinate) {
+			this.vertexID1 = coordinate.vertexID1;
+			this.vertexID2 = coordinate.vertexID2;
+			this.vertexID3 = coordinate.vertexID3;
+			this.vertexWeight1 = coordinate.vertexWeight1;
+			this.vertexWeight2 = coordinate.vertexWeight2;
+			this.vertexWeight3 = coordinate.vertexWeight3;
+		}
+	}
+
+	[System.Serializable]
+	public class BarycentricCoordinate {
+		public int vertexID1;
+		public int vertexID2;
+		public int vertexID3;
+		public float vertexWeight1;
+		public float vertexWeight2;
+		public float vertexWeight3;
+	}
+
 	#endregion
 
 	#region Event API
@@ -1650,6 +1760,24 @@ namespace VTS.Core {
 		Custom,
 		Start,
 		End,
+	}
+
+	[System.Serializable]
+	public enum VTSItemEventType {
+		Added,
+		Removed,
+		DroppedPinned,
+		DroppedUnpinned,
+		Clicked,
+		Locked,
+		Unlocked,
+	}
+
+	[System.Serializable]
+	public class ArtMeshHit {
+		public int artMeshOrder;
+		public bool isMasked;
+		public ArtMeshCoordinate hitInfo;
 	}
 
 	#endregion

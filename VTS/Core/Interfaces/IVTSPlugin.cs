@@ -516,6 +516,14 @@ namespace VTS.Core {
 		/// </summary>
 		/// <param name="position">The desired position information. Fields will be null-valued by default.</param>
 		Task<VTSMoveModelData> MoveModel(VTSMoveModelData.Data position);
+		void PinItemToCenter(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError);
+		Task<VTSItemPinResponseData> PinItemToCenter(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo);
+		void PinItemToRandom(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError);
+		Task<VTSItemPinResponseData> PinItemToRandom(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo);
+		void PinItemToPoint(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, BarycentricCoordinate point, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError);
+		Task<VTSItemPinResponseData> PinItemToPoint(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, BarycentricCoordinate point);
+		void UnpinItem(string itemInsanceID, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError);
+		Task<VTSItemPinResponseData> UnpinItem(string itemInstanceID);
 		/// <summary>
 		/// Removes a custom parameter from the currently loaded VTS model.
 		/// 
@@ -558,6 +566,22 @@ namespace VTS.Core {
 		/// <param name="count">The number of art meshes to select. Values of 0 or lower will allow the user to choose any arbitrary number of art meshes (but at least one).</param>
 		/// <param name="activeArtMeshes">A list of already-selected art meshes.</param>
 		Task<VTSArtMeshSelectionResponseData> RequestArtMeshSelection(string textOverride, string helpOverride, int count, ICollection<string> activeArtMeshes);
+		/// <summary>
+		/// Initiates a prompt in VTube Studio to request advanced permissions from the user.
+		/// 
+		/// For more info, see
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Permissions/README.md#requesting-permissions">https://github.com/DenchiSoft/VTubeStudio/blob/master/Permissions/README.md#requesting-permissions</a>
+		/// </summary>
+		/// <param name="permission">The permission being requested.</param>
+		void RequestPermission(VTSPermission permission, Action<VTSPermissionResponseData> onSuccess, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Initiates a prompt in VTube Studio to request advanced permissions from the user.
+		/// 
+		/// For more info, see
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Permissions/README.md#requesting-permissions">https://github.com/DenchiSoft/VTubeStudio/blob/master/Permissions/README.md#requesting-permissions</a>
+		/// </summary>
+		/// <param name="permission">The permission being requested.</param>
+		Task<VTSPermissionResponseData> RequestPermission(VTSPermission permission);
 		/// <summary>
 		/// Overrides the physics properties of the current model. Once a plugin has overridden a model's physics, no other plugins may do so.
 		/// 
@@ -982,9 +1006,5 @@ namespace VTS.Core {
 		/// Unsubscribes from the Model Animation Event.
 		/// </summary>
 		Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelAnimationEvent();
-
-
-		void RequestPermission(VTSPermission permission, Action<VTSPermissionData> onSuccess, Action<VTSErrorData> onError);
-		Task<VTSPermissionData> RequestPermission(VTSPermission permission);
 	}
 }

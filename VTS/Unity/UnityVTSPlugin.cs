@@ -231,6 +231,10 @@ namespace VTS.Unity {
 			this.Plugin.RequestArtMeshSelection(textOverride, helpOverride, count, activeArtMeshes, onSuccess, onError);
 		}
 
+		public void RequestPermission(VTSPermission permission, Action<VTSPermissionResponseData> onSuccess, Action<VTSErrorData> onError) {
+			Plugin.RequestPermission(permission, onSuccess, onError);
+		}
+
 		#endregion
 
 		#region VTS Event Subscription API Wrapper
@@ -421,6 +425,10 @@ namespace VTS.Unity {
 
 		public Task<VTSArtMeshSelectionResponseData> RequestArtMeshSelection(string textOverride, string helpOverride, int count, ICollection<string> activeArtMeshes) {
 			return this.Plugin.RequestArtMeshSelection(textOverride, helpOverride, count, activeArtMeshes);
+		}
+
+		public Task<VTSPermissionResponseData> RequestPermission(VTSPermission permission) {
+			return Plugin.RequestPermission(permission);
 		}
 
 		public Task<VTSOverrideModelPhysicsData> SetCurrentModelPhysics(VTSPhysicsOverride[] strengthOverrides, VTSPhysicsOverride[] windOverrides) {

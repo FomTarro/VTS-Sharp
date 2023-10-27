@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -626,7 +627,58 @@ namespace VTS.Core {
 			return await VTSExtensions.Async<VTSItemMoveEntry[], VTSItemMoveResponseData, VTSErrorData>(MoveItem, items);
 		}
 
-		// Request Art mesh Selection
+		// Pin/Unpin Items
+
+		private void PinItem(string itemInstanceID, VTSItemAngleRelativityMode angleRelativeTo, VTSItemSizeRelativityMode sizeRelativeTo, VTSVertexPinMode vertexPinType, ArtMeshCoordinate pinInfo, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
+			VTSItemPinRequestData request = new VTSItemPinRequestData();
+			request.data.pin = true;
+			request.data.itemInstanceID = itemInstanceID;
+			request.data.vertexPinType = vertexPinType;
+			request.data.angleRelativeTo = angleRelativeTo;
+			request.data.sizeRealtiveTo = sizeRelativeTo;
+			request.data.pinInfo = pinInfo;
+			this.Socket.Send<VTSItemPinRequestData, VTSItemPinResponseData>(request, onSuccess, onError);
+		}
+
+		public void PinItemToCenter(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
+			ArtMeshCoordinate coordinate = new ArtMeshCoordinate {
+				modelID = modelID,
+				artMeshID = artMeshID,
+				angle = angle,
+				size = size
+			};
+			PinItem(itemInstanceID, angleRelativeTo, sizeRelativeTo, VTSVertexPinMode.Center, coordinate, onSuccess, onError);
+		}
+
+		public void PinItemToRandom(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
+			ArtMeshCoordinate coordinate = new ArtMeshCoordinate {
+				modelID = modelID,
+				artMeshID = artMeshID,
+				angle = angle,
+				size = size
+			};
+			PinItem(itemInstanceID, angleRelativeTo, sizeRelativeTo, VTSVertexPinMode.Random, coordinate, onSuccess, onError);
+		}
+
+		public void PinItemToPoint(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, BarycentricCoordinate point, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
+			ArtMeshCoordinate coordinate = new ArtMeshCoordinate {
+				modelID = modelID,
+				artMeshID = artMeshID,
+				angle = angle,
+				size = size,
+			};
+			coordinate.SetBarycentricCoodrinate(point);
+			PinItem(itemInstanceID, angleRelativeTo, sizeRelativeTo, VTSVertexPinMode.Provided, coordinate, onSuccess, onError);
+		}
+
+		public void UnpinItem(string itemInsanceID, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
+			VTSItemPinRequestData request = new VTSItemPinRequestData();
+			request.data.pin = false;
+			request.data.itemInstanceID = itemInsanceID;
+			this.Socket.Send<VTSItemPinRequestData, VTSItemPinResponseData>(request, onSuccess, onError);
+		}
+
+		// Request Art Mesh Selection
 
 		public void RequestArtMeshSelection(string textOverride, string helpOverride, int count, ICollection<string> activeArtMeshes, Action<VTSArtMeshSelectionResponseData> onSuccess, Action<VTSErrorData> onError) {
 			VTSArtMeshSelectionRequestData request = new VTSArtMeshSelectionRequestData();
@@ -641,6 +693,18 @@ namespace VTS.Core {
 		public async Task<VTSArtMeshSelectionResponseData> RequestArtMeshSelection(string textOverride, string helpOverride, int count, ICollection<string> activeArtMeshes) {
 			return await VTSExtensions.Async<string, string, int, ICollection<string>, VTSArtMeshSelectionResponseData, VTSErrorData>(
 				RequestArtMeshSelection, textOverride, helpOverride, count, activeArtMeshes);
+		}
+
+		// Request Permissions
+
+		public void RequestPermission(VTSPermission permission, Action<VTSPermissionResponseData> onSuccess, Action<VTSErrorData> onError) {
+			VTSPermissionRequestData request = new VTSPermissionRequestData();
+			request.data.requestedPermission = permission;
+			this.Socket.Send<VTSPermissionRequestData, VTSPermissionResponseData>(request, onSuccess, onError);
+		}
+
+		public async Task<VTSPermissionResponseData> RequestPermission(VTSPermission permission) {
+			return await VTSExtensions.Async<VTSPermission, VTSPermissionResponseData, VTSErrorData>(RequestPermission, permission);
 		}
 
 		#endregion
