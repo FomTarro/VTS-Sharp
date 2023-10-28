@@ -650,6 +650,11 @@ namespace VTS.Core {
 			PinItem(itemInstanceID, angleRelativeTo, sizeRelativeTo, VTSVertexPinMode.Center, coordinate, onSuccess, onError);
 		}
 
+		public async Task<VTSItemPinResponseData> PinItemToCenter(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo) {
+			return await VTSExtensions.Async<string, string, string, float, VTSItemAngleRelativityMode, float, VTSItemSizeRelativityMode, VTSItemPinResponseData, VTSErrorData>(
+				PinItemToCenter, itemInstanceID, modelID, artMeshID, angle, angleRelativeTo, size, sizeRelativeTo);
+		}
+
 		public void PinItemToRandom(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
 			ArtMeshCoordinate coordinate = new ArtMeshCoordinate {
 				modelID = modelID,
