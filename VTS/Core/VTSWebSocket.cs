@@ -450,6 +450,9 @@ namespace VTS.Core {
 									case "PermissionResponse":
 										this._callbacks[response.requestID].onSuccess(this._json.FromJson<VTSPermissionResponseData>(data));
 										break;
+									case "ItemPinResponse":
+										this._callbacks[response.requestID].onSuccess(this._json.FromJson<VTSItemPinResponseData>(data));
+										break;
 									case "EventSubscriptionResponse":
 										this._callbacks[response.requestID].onSuccess(this._json.FromJson<VTSEventSubscriptionResponseData>(data));
 										break;

@@ -566,6 +566,32 @@ namespace VTS.Core {
 			return await VTSExtensions.Async<string, VTSItemLoadOptions, VTSItemLoadResponseData, VTSErrorData>(LoadItem, fileName, options);
 		}
 
+		public void LoadCustomDataItem(string fileName, string base64, VTSCustomDataItemLoadOptions options, Action<VTSItemLoadResponseData> onSuccess, Action<VTSErrorData> onError) {
+			VTSItemLoadRequestData request = new VTSItemLoadRequestData();
+			request.data.fileName = fileName;
+			request.data.positionX = options.positionX;
+			request.data.positionY = options.positionY;
+			request.data.size = options.size;
+			request.data.rotation = options.rotation;
+			request.data.fadeTime = options.fadeTime;
+			request.data.order = options.order;
+			request.data.failIfOrderTaken = options.failIfOrderTaken;
+			request.data.smoothing = options.smoothing;
+			request.data.censored = options.censored;
+			request.data.flipped = options.flipped;
+			request.data.locked = options.locked;
+			request.data.unloadWhenPluginDisconnects = options.unloadWhenPluginDisconnects;
+			// Custom Data item settings
+			request.data.customDataBase64 = base64;
+			request.data.customDataAskUserFirst = options.askUserFirst;
+			request.data.customDataSkipAskingUserIfWhitelisted = options.skipAskingUserIfWhitelisted;
+			request.data.customDataAskTimer = options.askTimer;
+			this.Socket.Send<VTSItemLoadRequestData, VTSItemLoadResponseData>(request, onSuccess, onError);
+		}
+		public async Task<VTSItemLoadResponseData> LoadCustomDataItem(string fileName, string base64, VTSCustomDataItemLoadOptions options) {
+			return await VTSExtensions.Async<string, string, VTSCustomDataItemLoadOptions, VTSItemLoadResponseData, VTSErrorData>(LoadCustomDataItem, fileName, base64, options);
+		}
+
 		// Unload Item
 
 		public void UnloadItem(VTSItemUnloadOptions options, Action<VTSItemUnloadResponseData> onSuccess, Action<VTSErrorData> onError) {
@@ -665,6 +691,12 @@ namespace VTS.Core {
 			PinItem(itemInstanceID, angleRelativeTo, sizeRelativeTo, VTSVertexPinMode.Random, coordinate, onSuccess, onError);
 		}
 
+		public async Task<VTSItemPinResponseData> PinItemToRandom(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo) {
+			return await VTSExtensions.Async<string, string, string, float, VTSItemAngleRelativityMode, float, VTSItemSizeRelativityMode, VTSItemPinResponseData, VTSErrorData>(
+				PinItemToRandom, itemInstanceID, modelID, artMeshID, angle, angleRelativeTo, size, sizeRelativeTo);
+		}
+
+
 		public void PinItemToPoint(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, BarycentricCoordinate point, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
 			ArtMeshCoordinate coordinate = new ArtMeshCoordinate {
 				modelID = modelID,
@@ -676,12 +708,24 @@ namespace VTS.Core {
 			PinItem(itemInstanceID, angleRelativeTo, sizeRelativeTo, VTSVertexPinMode.Provided, coordinate, onSuccess, onError);
 		}
 
+		public async Task<VTSItemPinResponseData> PinItemToPoint(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, BarycentricCoordinate point) {
+			return await VTSExtensions.Async<string, string, string, float, VTSItemAngleRelativityMode, float, VTSItemSizeRelativityMode, BarycentricCoordinate, VTSItemPinResponseData, VTSErrorData>(
+				PinItemToPoint, itemInstanceID, modelID, artMeshID, angle, angleRelativeTo, size, sizeRelativeTo, point);
+		}
+
+
 		public void UnpinItem(string itemInsanceID, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
 			VTSItemPinRequestData request = new VTSItemPinRequestData();
 			request.data.pin = false;
 			request.data.itemInstanceID = itemInsanceID;
 			this.Socket.Send<VTSItemPinRequestData, VTSItemPinResponseData>(request, onSuccess, onError);
 		}
+
+		public async Task<VTSItemPinResponseData> UnpinItem(string itemInstanceID) {
+			return await VTSExtensions.Async<string, VTSItemPinResponseData, VTSErrorData>(
+				UnpinItem, itemInstanceID);
+		}
+
 
 		// Request Art Mesh Selection
 

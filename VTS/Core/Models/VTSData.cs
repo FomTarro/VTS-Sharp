@@ -827,6 +827,60 @@ namespace VTS.Core {
 		public bool unloadWhenPluginDisconnects;
 	}
 
+	/// <summary>
+	/// A container for holding the numerous loading options for an Custom Item Load request.
+	/// 
+	/// For more info about what each field does, see 
+	/// <a href="https://github.com/DenchiSoft/VTubeStudio#custom-data-items">https://github.com/DenchiSoft/VTubeStudio#custom-data-items</a>
+	/// </summary>
+	[System.Serializable]
+	public class VTSCustomDataItemLoadOptions : VTSItemLoadOptions {
+
+		public VTSCustomDataItemLoadOptions() : base() {
+			this.askUserFirst = true;
+			this.skipAskingUserIfWhitelisted = true;
+			this.askTimer = -1;
+		}
+
+		public VTSCustomDataItemLoadOptions(
+			float positionX,
+			float positionY,
+			float size,
+			float rotation,
+			float fadeTime,
+			int order,
+			bool failIfOrderTaken,
+			float smoothing,
+			bool censored,
+			bool flipped,
+			bool locked,
+			bool unloadWhenPluginDisconnects,
+			bool askUserFirst,
+			bool skipAskingUserIfWhitelisted,
+			float askTimer
+		) : base(
+			positionX,
+			positionY,
+			size,
+			rotation,
+			fadeTime,
+			order,
+			failIfOrderTaken,
+			smoothing,
+			censored,
+			flipped,
+			locked,
+			unloadWhenPluginDisconnects) {
+			this.askUserFirst = askUserFirst;
+			this.skipAskingUserIfWhitelisted = skipAskingUserIfWhitelisted;
+			this.askTimer = askTimer;
+		}
+
+		public bool askUserFirst;
+		public bool skipAskingUserIfWhitelisted;
+		public float askTimer;
+	}
+
 	[System.Serializable]
 	public class VTSItemLoadRequestData : VTSMessageData {
 		public VTSItemLoadRequestData() {
@@ -850,6 +904,10 @@ namespace VTS.Core {
 			public bool flipped;
 			public bool locked;
 			public bool unloadWhenPluginDisconnects;
+			public string customDataBase64;
+			public bool customDataAskUserFirst;
+			public bool customDataSkipAskingUserIfWhitelisted;
+			public float customDataAskTimer;
 		}
 	}
 

@@ -213,6 +213,10 @@ namespace VTS.Unity {
 			this.Plugin.LoadItem(fileName, options, onSuccess, onError);
 		}
 
+		public void LoadCustomDataItem(string fileName, string base64, VTSCustomDataItemLoadOptions options, Action<VTSItemLoadResponseData> onSuccess, Action<VTSErrorData> onError) {
+			this.Plugin.LoadCustomDataItem(fileName, base64, options, onSuccess, onError);
+		}
+
 		public void UnloadItem(VTSItemUnloadOptions options, Action<VTSItemUnloadResponseData> onSuccess, Action<VTSErrorData> onError) {
 			this.Plugin.UnloadItem(options, onSuccess, onError);
 		}
@@ -232,7 +236,22 @@ namespace VTS.Unity {
 		}
 
 		public void RequestPermission(VTSPermission permission, Action<VTSPermissionResponseData> onSuccess, Action<VTSErrorData> onError) {
-			Plugin.RequestPermission(permission, onSuccess, onError);
+			this.Plugin.RequestPermission(permission, onSuccess, onError);
+		}
+
+		public void PinItemToCenter(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
+			this.Plugin.PinItemToCenter(itemInstanceID, modelID, artMeshID, angle, angleRelativeTo, size, sizeRelativeTo, onSuccess, onError);
+		}
+
+		public void PinItemToRandom(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
+			this.Plugin.PinItemToRandom(itemInstanceID, modelID, artMeshID, angle, angleRelativeTo, size, sizeRelativeTo, onSuccess, onError);
+		}
+		public void PinItemToPoint(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, BarycentricCoordinate point, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
+			this.Plugin.PinItemToPoint(itemInstanceID, modelID, artMeshID, angle, angleRelativeTo, size, sizeRelativeTo, point, onSuccess, onError);
+		}
+
+		public void UnpinItem(string itemInsanceID, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
+			this.Plugin.UnpinItem(itemInsanceID, onSuccess, onError);
 		}
 
 		#endregion
@@ -407,6 +426,10 @@ namespace VTS.Unity {
 			return this.Plugin.LoadItem(fileName, options);
 		}
 
+		public Task<VTSItemLoadResponseData> LoadCustomDataItem(string fileName, string base64, VTSCustomDataItemLoadOptions options) {
+			return this.Plugin.LoadCustomDataItem(fileName, base64, options);
+		}
+
 		public Task<VTSModelLoadData> LoadModel(string modelId) {
 			return this.Plugin.LoadModel(modelId);
 		}
@@ -428,7 +451,23 @@ namespace VTS.Unity {
 		}
 
 		public Task<VTSPermissionResponseData> RequestPermission(VTSPermission permission) {
-			return Plugin.RequestPermission(permission);
+			return this.Plugin.RequestPermission(permission);
+		}
+
+		public Task<VTSItemPinResponseData> PinItemToCenter(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo) {
+			return this.Plugin.PinItemToCenter(itemInstanceID, modelID, artMeshID, angle, angleRelativeTo, size, sizeRelativeTo);
+		}
+
+		public Task<VTSItemPinResponseData> PinItemToRandom(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo) {
+			return this.Plugin.PinItemToRandom(itemInstanceID, modelID, artMeshID, angle, angleRelativeTo, size, sizeRelativeTo);
+		}
+
+		public Task<VTSItemPinResponseData> PinItemToPoint(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, BarycentricCoordinate point) {
+			return this.Plugin.PinItemToPoint(itemInstanceID, modelID, artMeshID, angle, angleRelativeTo, size, sizeRelativeTo, point);
+		}
+
+		public Task<VTSItemPinResponseData> UnpinItem(string itemInstanceID) {
+			return this.Plugin.UnpinItem(itemInstanceID);
 		}
 
 		public Task<VTSOverrideModelPhysicsData> SetCurrentModelPhysics(VTSPhysicsOverride[] strengthOverrides, VTSPhysicsOverride[] windOverrides) {
