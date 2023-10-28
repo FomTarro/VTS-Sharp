@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 
 namespace VTS.Core {
 
@@ -1820,6 +1821,51 @@ namespace VTS.Core {
 		End,
 	}
 
+	// Item Event
+
+	[System.Serializable]
+	public class VTSItemEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSItemEventConfigOptions> {
+		public VTSItemEventSubscriptionRequestData() {
+			this.data.eventName = "ItemEvent";
+		}
+	}
+
+	/// <summary>
+	/// A container for providing subscription options for an Item Event subscription.
+	/// 
+	/// For more info about what each field does, see 
+	/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#item-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#item-event</a>
+	/// </summary>
+	[System.Serializable]
+	public class VTSItemEventConfigOptions : VTSEventConfigData {
+		public VTSItemEventConfigOptions() { }
+
+		public VTSItemEventConfigOptions(string[] itemInstanceIDs, string[] itemFileNames) {
+			this.itemInstanceIDs = itemInstanceIDs;
+			this.itemFileNames = itemFileNames;
+		}
+
+		public string[] itemInstanceIDs;
+		public string[] itemFileNames;
+	}
+
+	[System.Serializable]
+	public class VTSItemEventData : VTSEventData {
+		public VTSItemEventData() {
+			this.messageType = "ItemEvent";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public VTSItemEventType itemEventType;
+			public string itemInsanceID;
+			public string itemFileName;
+			public Pair itemPosition;
+		}
+	}
+
 	[System.Serializable]
 	public enum VTSItemEventType {
 		Added,
@@ -1829,6 +1875,54 @@ namespace VTS.Core {
 		Clicked,
 		Locked,
 		Unlocked,
+	}
+
+	// Model Clicked Event
+
+	[System.Serializable]
+	public class VTSModelClickedEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSModelClickedEventConfigOptions> {
+		public VTSModelClickedEventSubscriptionRequestData() {
+			this.data.eventName = "ModelClickedEvent";
+		}
+	}
+
+	/// <summary>
+	/// A container for providing subscription options for a Model Clicked Event subscription.
+	/// 
+	/// For more info about what each field does, see 
+	/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#model-clicked-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#model-clicked-event</a>
+	/// </summary>
+	[System.Serializable]
+	public class VTSModelClickedEventConfigOptions : VTSEventConfigData {
+		public VTSModelClickedEventConfigOptions() { }
+
+		public VTSModelClickedEventConfigOptions(bool onlyClicksOnModel) {
+			this.onlyClicksOnModel = onlyClicksOnModel;
+		}
+
+		public bool onlyClicksOnModel;
+	}
+
+	[System.Serializable]
+	public class VTSModelClickedEventData : VTSEventData {
+		public VTSModelClickedEventData() {
+			this.messageType = "ModelClickedEvent";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public bool modelLoaded;
+			public string loadedModelID;
+			public string loadedModelName;
+			public bool modelWasClicked;
+			public int mouseButtonID;
+			public Pair clickPosition;
+			public Pair windowSize;
+			public int clickedArtMeshCount;
+			public ArtMeshHit[] artMeshHits;
+		}
 	}
 
 	[System.Serializable]

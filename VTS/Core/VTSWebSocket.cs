@@ -338,6 +338,12 @@ namespace VTS.Core {
 									case "ModelAnimationEvent":
 										this._events[response.messageType].onEvent(this._json.FromJson<VTSModelAnimationEventData>(data));
 										break;
+									case "ItemEvent":
+										this._events[response.messageType].onEvent(this._json.FromJson<VTSItemEventData>(data));
+										break;
+									case "ModelClickedEvent":
+										this._events[response.messageType].onEvent(this._json.FromJson<VTSModelClickedEventData>(data));
+										break;
 								}
 							} catch (Exception e) {
 								// Neatly handle errors in case the deserialization or success callback throw an exception
@@ -461,7 +467,6 @@ namespace VTS.Core {
 										error.data.message = "Unable to parse response as valid response type: " + data;
 										this._callbacks[response.requestID].onError(error);
 										break;
-
 								}
 							} catch (Exception e) {
 								// Neatly handle errors in case the deserialization or success callback throw an exception

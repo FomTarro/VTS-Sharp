@@ -955,6 +955,48 @@ namespace VTS.Core {
 		/// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
 		Task<VTSEventSubscriptionResponseData> SubscribeToTrackingEvent(Action<VTSTrackingEventData> onEvent);
 		/// <summary>
+		/// Subscribes to the Item Event.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#item-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#item-event</a>
+		/// </summary>
+		/// <param name="config">Configuration options about the subscription.</param>
+		/// <param name="onEvent">Callback to execute upon receiving an event.</param>
+		/// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void SubscribeToItemEvent(VTSItemEventConfigOptions config, Action<VTSItemEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Subscribes to the Item Event.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#item-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#item-event</a>
+		/// </summary>
+		/// <param name="config">Configuration options about the subscription.</param>
+		/// <param name="onEvent">Callback to execute upon receiving an event.</param>
+		/// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
+		Task<VTSEventSubscriptionResponseData> SubscribeToItemEvent(VTSItemEventConfigOptions config, Action<VTSItemEventData> onEvent);
+		/// <summary>
+		/// Subscribes to the Model Clicked Event.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#model-clicked-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#model-clicked-event</a>
+		/// </summary>
+		/// <param name="config">Configuration options about the subscription.</param>
+		/// <param name="onEvent">Callback to execute upon receiving an event.</param>
+		/// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void SubscribeToModelClickedEvent(VTSModelClickedEventConfigOptions config, Action<VTSModelClickedEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Subscribes to the Model Clicked Event.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#model-clicked-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#model-clicked-event</a>
+		/// </summary>
+		/// <param name="config">Configuration options about the subscription.</param>
+		/// <param name="onEvent">Callback to execute upon receiving an event.</param>
+		/// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
+		Task<VTSEventSubscriptionResponseData> SubscribeToModelClickedEvent(VTSModelClickedEventConfigOptions config, Action<VTSModelClickedEventData> onEvent);
+		/// <summary>
 		/// Tints matched components of the current art mesh.
 		/// 
 		/// For more info, see 
@@ -1134,5 +1176,25 @@ namespace VTS.Core {
 		/// Unsubscribes from the Model Animation Event.
 		/// </summary>
 		Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelAnimationEvent();
+		/// <summary>
+		/// Unsubscribes from the Item Event.
+		/// </summary>
+		/// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing from the event.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void UnsubscribeFromItemEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Unsubscribes from the Item Event.
+		/// </summary>
+		Task<VTSEventSubscriptionResponseData> UnsubscribeFromItemEvent();
+		/// <summary>
+		/// Unsubscribes from the Model Clicked Event.
+		/// </summary>
+		/// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing from the event.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void UnsubscribeFromModelClickedEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Unsubscribes from the Model Clicked Event.
+		/// </summary>
+		Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelClickedEvent();
 	}
 }

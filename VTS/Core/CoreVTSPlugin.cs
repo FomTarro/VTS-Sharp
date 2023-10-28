@@ -935,6 +935,43 @@ namespace VTS.Core {
 			return await VTSExtensions.Async<VTSEventSubscriptionResponseData, VTSErrorData>(UnsubscribeFromModelAnimationEvent);
 		}
 
+		// Item Event
+
+		public void SubscribeToItemEvent(VTSItemEventConfigOptions config, Action<VTSItemEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
+			SubscribeToEvent<VTSItemEventSubscriptionRequestData, VTSItemEventData, VTSItemEventConfigOptions>(true, config, onEvent, onSubscribe, onError);
+		}
+		public async Task<VTSEventSubscriptionResponseData> SubscribeToItemEvent(VTSItemEventConfigOptions config, Action<VTSItemEventData> onEvent) {
+			return await VTSExtensions.Async<VTSItemEventConfigOptions, Action<VTSItemEventData>, VTSEventSubscriptionResponseData, VTSErrorData>(
+				SubscribeToItemEvent, config, onEvent);
+		}
+
+		public void UnsubscribeFromItemEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
+			SubscribeToEvent<VTSItemEventSubscriptionRequestData, VTSItemEventData, VTSItemEventConfigOptions>(false, null, DoNothingCallback, onUnsubscribe, onError);
+		}
+		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromItemEvent() {
+			return await VTSExtensions.Async<VTSEventSubscriptionResponseData, VTSErrorData>(UnsubscribeFromItemEvent);
+		}
+
+		// Model Clicked Event
+
+		public void SubscribeToModelClickedEvent(VTSModelClickedEventConfigOptions config, Action<VTSModelClickedEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
+			SubscribeToEvent<VTSModelClickedEventSubscriptionRequestData, VTSModelClickedEventData, VTSModelClickedEventConfigOptions>(true, config, onEvent, onSubscribe, onError);
+		}
+
+		public async Task<VTSEventSubscriptionResponseData> SubscribeToModelClickedEvent(VTSModelClickedEventConfigOptions config, Action<VTSModelClickedEventData> onEvent) {
+			return await VTSExtensions.Async<VTSModelClickedEventConfigOptions, Action<VTSModelClickedEventData>, VTSEventSubscriptionResponseData, VTSErrorData>(
+				SubscribeToModelClickedEvent, config, onEvent);
+		}
+
+		public void UnsubscribeFromModelClickedEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
+			SubscribeToEvent<VTSModelClickedEventSubscriptionRequestData, VTSModelClickedEventData, VTSModelClickedEventConfigOptions>(false, null, DoNothingCallback, onUnsubscribe, onError);
+		}
+
+		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelClickedEvent() {
+			return await VTSExtensions.Async<VTSEventSubscriptionResponseData, VTSErrorData>(UnsubscribeFromModelClickedEvent);
+		}
+
+
 		#endregion
 
 		#region Helper Methods 

@@ -334,6 +334,22 @@ namespace VTS.Unity {
 			this.Plugin.UnsubscribeFromModelAnimationEvent(onUnsubscribe, onError);
 		}
 
+		public void SubscribeToItemEvent(VTSItemEventConfigOptions config, Action<VTSItemEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
+			this.Plugin.SubscribeToItemEvent(config, onEvent, onSubscribe, onError);
+		}
+
+		public void UnsubscribeFromItemEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
+			this.Plugin.UnsubscribeFromItemEvent(onUnsubscribe, onError);
+		}
+
+		public void SubscribeToModelClickedEvent(VTSModelClickedEventConfigOptions config, Action<VTSModelClickedEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
+			this.Plugin.SubscribeToModelClickedEvent(config, onEvent, onSubscribe, onError);
+		}
+
+		public void UnsubscribeFromModelClickedEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
+			this.Plugin.UnsubscribeFromModelClickedEvent(onUnsubscribe, onError);
+		}
+
 		#endregion
 
 		#region Async/Await Wrappers
@@ -518,6 +534,14 @@ namespace VTS.Unity {
 			return this.Plugin.SubscribeToTrackingEvent(onEvent);
 		}
 
+		public Task<VTSEventSubscriptionResponseData> SubscribeToItemEvent(VTSItemEventConfigOptions config, Action<VTSItemEventData> onEvent) {
+			return this.Plugin.SubscribeToItemEvent(config, onEvent);
+		}
+
+		public Task<VTSEventSubscriptionResponseData> SubscribeToModelClickedEvent(VTSModelClickedEventConfigOptions config, Action<VTSModelClickedEventData> onEvent) {
+			return this.Plugin.SubscribeToModelClickedEvent(config, onEvent);
+		}
+
 		public Task<VTSColorTintData> TintArtMesh(ColorTint tint, float mixWithSceneLightingColor, ArtMeshMatcher matcher) {
 			return this.Plugin.TintArtMesh(tint, mixWithSceneLightingColor, matcher);
 		}
@@ -572,6 +596,14 @@ namespace VTS.Unity {
 
 		public Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelAnimationEvent() {
 			return this.Plugin.UnsubscribeFromModelAnimationEvent();
+		}
+
+		public Task<VTSEventSubscriptionResponseData> UnsubscribeFromItemEvent() {
+			return this.Plugin.UnsubscribeFromItemEvent();
+		}
+
+		public Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelClickedEvent() {
+			return this.Plugin.UnsubscribeFromModelClickedEvent();
 		}
 
 		#endregion
