@@ -2,24 +2,14 @@
 using Microsoft.Extensions.Logging;
 using VTS.Core;
 
-namespace AdvancedPlugin.Services;
+namespace VTS.Core.Examples.Advanced.Services;
 
 //Singleton
 
-public class VTSLogger : IVTSLogger
+public class VTSLogger(ILogger<VTSLogger> logger) : IVTSLogger
 {
-    private readonly ILogger<VTSLogger> _logger;
-
-    public VTSLogger(ILogger<VTSLogger> logger)
-    {
-        _logger = logger;
-    }
-
-    public void Log(string message) => _logger.LogInformation(message);
-
-    public void LogError(string error) => _logger.LogError(error);
-
-    public void LogError(Exception error) => _logger.LogError(error, error.Message);
-
-    public void LogWarning(string warning) => _logger.LogWarning(warning);
+    public void Log(string message) => logger.LogInformation(message);
+    public void LogError(string error) => logger.LogError(error);
+    public void LogError(Exception error) => logger.LogError(error, error?.Message);
+    public void LogWarning(string warning) => logger.LogWarning(warning);
 }

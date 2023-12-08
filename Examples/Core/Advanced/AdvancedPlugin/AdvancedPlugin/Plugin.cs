@@ -1,10 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using AdvancedPlugin.Models;
-using AdvancedPlugin.Services;
-using VTS.Core;
+﻿using VTS.Core.Examples.Advanced.Models;
+using VTS.Core.Examples.Advanced.Services;
 
-namespace AdvancedPlugin;
+namespace VTS.Core.Examples.Advanced;
 
 public class Plugin(IServiceProvider services, VTSLogger logger, PluginInfo pluginInfo)
 {
@@ -21,8 +18,8 @@ public class Plugin(IServiceProvider services, VTSLogger logger, PluginInfo plug
         } catch (VTSException e) {
             logger.LogError(e); // VTS probably isn't running
         }
-
         SubscribeToEvents(plugin, logger);
+        
         await LogVtsInfo(plugin, logger);
     }
     private static async Task LogVtsInfo(CoreVTSPlugin plugin, VTSLogger logger)
@@ -36,7 +33,8 @@ public class Plugin(IServiceProvider services, VTSLogger logger, PluginInfo plug
     
     private void SubscribeToEvents(CoreVTSPlugin plugin, VTSLogger logger)
     {
-        plugin.SubscribeToBackgroundChangedEvent((backgroundInfo) => {
+        plugin.SubscribeToBackgroundChangedEvent((backgroundInfo) =>
+        {
             logger.Log($"The background was changed to: {backgroundInfo.data.backgroundName}");
         });
     }

@@ -1,9 +1,9 @@
-﻿using AdvancedPlugin;
-using AdvancedPlugin.Models;
-using AdvancedPlugin.Services;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using VTS.Core.Examples.Advanced;
+using VTS.Core.Examples.Advanced.Models;
+using VTS.Core.Examples.Advanced.Services;
 
 // Not yet AOT compatible
 

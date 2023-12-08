@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace AdvancedPlugin.Models;
+namespace VTS.Core.Examples.Advanced.Models;
 
 public class PluginInfoModel
 {
