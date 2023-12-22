@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 
 namespace VTS.Core {
 
@@ -46,6 +47,17 @@ namespace VTS.Core {
 		public float y;
 	}
 
+	[System.Serializable]
+	public enum VTSPermission {
+		LoadCustomImagesAsItems,
+	}
+
+	[System.Serializable]
+	public struct VTSPermissionStatus {
+		public VTSPermission name;
+		public bool granted;
+	}
+
 	#endregion
 
 	#region General API
@@ -82,6 +94,35 @@ namespace VTS.Core {
 			public string authenticationToken;
 			public bool authenticated;
 			public string reason;
+		}
+	}
+
+	[System.Serializable]
+	public class VTSPermissionRequestData : VTSMessageData {
+		public VTSPermissionRequestData() {
+			this.messageType = "PermissionRequest";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public VTSPermission requestedPermission;
+		}
+	}
+
+	[System.Serializable]
+	public class VTSPermissionResponseData : VTSMessageData {
+		public VTSPermissionResponseData() {
+			this.messageType = "PermissionResponse";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public bool grantSuccess;
+			public VTSPermissionStatus[] permissions;
 		}
 	}
 
@@ -787,6 +828,60 @@ namespace VTS.Core {
 		public bool unloadWhenPluginDisconnects;
 	}
 
+	/// <summary>
+	/// A container for holding the numerous loading options for an Custom Item Load request.
+	/// 
+	/// For more info about what each field does, see 
+	/// <a href="https://github.com/DenchiSoft/VTubeStudio#custom-data-items">https://github.com/DenchiSoft/VTubeStudio#custom-data-items</a>
+	/// </summary>
+	[System.Serializable]
+	public class VTSCustomDataItemLoadOptions : VTSItemLoadOptions {
+
+		public VTSCustomDataItemLoadOptions() : base() {
+			this.askUserFirst = true;
+			this.skipAskingUserIfWhitelisted = true;
+			this.askTimer = -1;
+		}
+
+		public VTSCustomDataItemLoadOptions(
+			float positionX,
+			float positionY,
+			float size,
+			float rotation,
+			float fadeTime,
+			int order,
+			bool failIfOrderTaken,
+			float smoothing,
+			bool censored,
+			bool flipped,
+			bool locked,
+			bool unloadWhenPluginDisconnects,
+			bool askUserFirst,
+			bool skipAskingUserIfWhitelisted,
+			float askTimer
+		) : base(
+			positionX,
+			positionY,
+			size,
+			rotation,
+			fadeTime,
+			order,
+			failIfOrderTaken,
+			smoothing,
+			censored,
+			flipped,
+			locked,
+			unloadWhenPluginDisconnects) {
+			this.askUserFirst = askUserFirst;
+			this.skipAskingUserIfWhitelisted = skipAskingUserIfWhitelisted;
+			this.askTimer = askTimer;
+		}
+
+		public bool askUserFirst;
+		public bool skipAskingUserIfWhitelisted;
+		public float askTimer;
+	}
+
 	[System.Serializable]
 	public class VTSItemLoadRequestData : VTSMessageData {
 		public VTSItemLoadRequestData() {
@@ -810,6 +905,10 @@ namespace VTS.Core {
 			public bool flipped;
 			public bool locked;
 			public bool unloadWhenPluginDisconnects;
+			public string customDataBase64;
+			public bool customDataAskUserFirst;
+			public bool customDataSkipAskingUserIfWhitelisted;
+			public float customDataAskTimer;
 		}
 	}
 
@@ -1184,6 +1283,103 @@ namespace VTS.Core {
 			public string[] activeArtMeshes;
 			public string[] inactiveArtMeshes;
 		}
+	}
+
+	[System.Serializable]
+	public class VTSItemPinRequestData : VTSMessageData {
+		public VTSItemPinRequestData() {
+			this.messageType = "ItemPinRequest";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+
+			public bool pin;
+			public string itemInstanceID;
+			public VTSItemAngleRelativityMode angleRelativeTo;
+			public VTSItemSizeRelativityMode sizeRealtiveTo;
+			public VTSVertexPinMode vertexPinType;
+			public ArtMeshCoordinate pinInfo;
+		}
+	}
+
+	[System.Serializable]
+	public class VTSItemPinResponseData : VTSMessageData {
+
+		public VTSItemPinResponseData() {
+			this.messageType = "ItemPinResponse";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+
+			public bool isPinned;
+			public string itemInstanceID;
+			public string itemFileName;
+		}
+	}
+
+	[System.Serializable]
+	public enum VTSItemAngleRelativityMode {
+		RelativeToWorld,
+		RelativeToCurrentItemRotation,
+		RelativeToModel,
+		RelativeToPinPosition,
+	}
+
+	[System.Serializable]
+	public enum VTSItemSizeRelativityMode {
+		RelativeToWorld,
+		RelativeToCurrentItemSize,
+	}
+
+	[System.Serializable]
+	public enum VTSVertexPinMode {
+		Provided,
+		Center,
+		Random
+	}
+
+	[System.Serializable]
+	public class ArtMeshCoordinate : BarycentricCoordinate {
+		public string modelID;
+		public string artMeshID;
+		public float angle;
+		public float size;
+
+		public BarycentricCoordinate ToBarycentricCoordinate() {
+			return new BarycentricCoordinate {
+				vertexID1 = this.vertexID1,
+				vertexID2 = this.vertexID2,
+				vertexID3 = this.vertexID3,
+				vertexWeight1 = this.vertexWeight1,
+				vertexWeight2 = this.vertexWeight2,
+				vertexWeight3 = this.vertexWeight3
+			};
+		}
+
+		public void SetBarycentricCoodrinate(BarycentricCoordinate coordinate) {
+			this.vertexID1 = coordinate.vertexID1;
+			this.vertexID2 = coordinate.vertexID2;
+			this.vertexID3 = coordinate.vertexID3;
+			this.vertexWeight1 = coordinate.vertexWeight1;
+			this.vertexWeight2 = coordinate.vertexWeight2;
+			this.vertexWeight3 = coordinate.vertexWeight3;
+		}
+	}
+
+	[System.Serializable]
+	public class BarycentricCoordinate {
+		public int vertexID1;
+		public int vertexID2;
+		public int vertexID3;
+		public float vertexWeight1;
+		public float vertexWeight2;
+		public float vertexWeight3;
 	}
 
 	#endregion
@@ -1623,6 +1819,117 @@ namespace VTS.Core {
 		Custom,
 		Start,
 		End,
+	}
+
+	// Item Event
+
+	[System.Serializable]
+	public class VTSItemEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSItemEventConfigOptions> {
+		public VTSItemEventSubscriptionRequestData() {
+			this.data.eventName = "ItemEvent";
+		}
+	}
+
+	/// <summary>
+	/// A container for providing subscription options for an Item Event subscription.
+	/// 
+	/// For more info about what each field does, see 
+	/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#item-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#item-event</a>
+	/// </summary>
+	[System.Serializable]
+	public class VTSItemEventConfigOptions : VTSEventConfigData {
+		public VTSItemEventConfigOptions() { }
+
+		public VTSItemEventConfigOptions(string[] itemInstanceIDs, string[] itemFileNames) {
+			this.itemInstanceIDs = itemInstanceIDs;
+			this.itemFileNames = itemFileNames;
+		}
+
+		public string[] itemInstanceIDs;
+		public string[] itemFileNames;
+	}
+
+	[System.Serializable]
+	public class VTSItemEventData : VTSEventData {
+		public VTSItemEventData() {
+			this.messageType = "ItemEvent";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public VTSItemEventType itemEventType;
+			public string itemInsanceID;
+			public string itemFileName;
+			public Pair itemPosition;
+		}
+	}
+
+	[System.Serializable]
+	public enum VTSItemEventType {
+		Added,
+		Removed,
+		DroppedPinned,
+		DroppedUnpinned,
+		Clicked,
+		Locked,
+		Unlocked,
+	}
+
+	// Model Clicked Event
+
+	[System.Serializable]
+	public class VTSModelClickedEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSModelClickedEventConfigOptions> {
+		public VTSModelClickedEventSubscriptionRequestData() {
+			this.data.eventName = "ModelClickedEvent";
+		}
+	}
+
+	/// <summary>
+	/// A container for providing subscription options for a Model Clicked Event subscription.
+	/// 
+	/// For more info about what each field does, see 
+	/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#model-clicked-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#model-clicked-event</a>
+	/// </summary>
+	[System.Serializable]
+	public class VTSModelClickedEventConfigOptions : VTSEventConfigData {
+		public VTSModelClickedEventConfigOptions() { }
+
+		public VTSModelClickedEventConfigOptions(bool onlyClicksOnModel) {
+			this.onlyClicksOnModel = onlyClicksOnModel;
+		}
+
+		public bool onlyClicksOnModel;
+	}
+
+	[System.Serializable]
+	public class VTSModelClickedEventData : VTSEventData {
+		public VTSModelClickedEventData() {
+			this.messageType = "ModelClickedEvent";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public bool modelLoaded;
+			public string loadedModelID;
+			public string loadedModelName;
+			public bool modelWasClicked;
+			public int mouseButtonID;
+			public Pair clickPosition;
+			public Pair windowSize;
+			public int clickedArtMeshCount;
+			public ArtMeshHit[] artMeshHits;
+		}
+	}
+
+	[System.Serializable]
+	public class ArtMeshHit {
+		public int artMeshOrder;
+		public bool isMasked;
+		public ArtMeshCoordinate hitInfo;
 	}
 
 	#endregion

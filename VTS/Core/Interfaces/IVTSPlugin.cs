@@ -463,6 +463,28 @@ namespace VTS.Core {
 		/// <param name="options">Configuration options about the request.</param>
 		Task<VTSItemLoadResponseData> LoadItem(string fileName, VTSItemLoadOptions options);
 		/// <summary>
+		/// Loads an item into the scene from a base64 string, with properties based on the provided options.
+		/// 
+		/// For more, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio#custom-data-items">https://github.com/DenchiSoft/VTubeStudio#custom-data-items</a>
+		/// </summary>
+		/// <param name="fileName">The file name of the item to load, must be a .jpg, .png or .gif.</param>
+		/// <param name="base64">The base64 string form of the image to load as an item.</param>
+		/// <param name="options">Configuration options about the request.</param>
+		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void LoadCustomDataItem(string fileName, string base64, VTSCustomDataItemLoadOptions options, Action<VTSItemLoadResponseData> onSuccess, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Loads an item into the scene from a base64 string, with properties based on the provided options.
+		/// 
+		/// For more, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio#custom-data-items">https://github.com/DenchiSoft/VTubeStudio#custom-data-items</a>
+		/// </summary>
+		/// <param name="fileName">The file name of the item to load, must be a .jpg, .png or .gif.</param>
+		/// <param name="base64">The base64 string form of the image to load as an item.</param>
+		/// <param name="options">Configuration options about the request.</param>
+		Task<VTSItemLoadResponseData> LoadCustomDataItem(string fileName, string base64, VTSCustomDataItemLoadOptions options);
+		/// <summary>
 		/// Loads a VTS model by its Model ID. Will return an error if the model cannot be loaded.
 		/// 
 		/// For more info, see 
@@ -517,6 +539,118 @@ namespace VTS.Core {
 		/// <param name="position">The desired position information. Fields will be null-valued by default.</param>
 		Task<VTSMoveModelData> MoveModel(VTSMoveModelData.Data position);
 		/// <summary>
+		/// Pins the specified item to the center of the specified ArtMesh of the specified model.
+		/// 
+		/// For more info, particularly about what each field does, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio#pin-items-to-the-model">https://github.com/DenchiSoft/VTubeStudio#pin-items-to-the-model</a>
+		/// </summary>
+		/// <param name="itemInstanceID">The item to pin.</param>
+		/// <param name="modelID">The model to pin it to.</param>
+		/// <param name="artMeshID">The artmesh to pin it to on that model.</param>
+		/// <param name="angle">The angle of the item.</param>
+		/// <param name="angleRelativeTo">The mode to interpert the angle value by.</param>
+		/// <param name="size">The size of the item.</param>
+		/// <param name="sizeRelativeTo">The mode to interpert the size value by.</param>
+		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void PinItemToCenter(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Pins the specified item to the center of the specified ArtMesh of the specified model.
+		/// 
+		/// For more info, particularly about what each field does, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio#pin-items-to-the-model">https://github.com/DenchiSoft/VTubeStudio#pin-items-to-the-model</a>
+		/// </summary>
+		/// <param name="itemInstanceID">The item to pin.</param>
+		/// <param name="modelID">The model to pin it to.</param>
+		/// <param name="artMeshID">The artmesh to pin it to on that model.</param>
+		/// <param name="angle">The angle of the item.</param>
+		/// <param name="angleRelativeTo">The mode to interpert the angle value by.</param>
+		/// <param name="size">The size of the item.</param>
+		/// <param name="sizeRelativeTo">The mode to interpert the size value by.</param>
+		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		Task<VTSItemPinResponseData> PinItemToCenter(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo);
+		/// <summary>
+		/// Pins the specified item to a random point in the specified ArtMesh of the specified model.
+		/// 
+		/// For more info, particularly about what each field does, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio#pin-items-to-the-model">https://github.com/DenchiSoft/VTubeStudio#pin-items-to-the-model</a>
+		/// </summary>
+		/// <param name="itemInstanceID">The item to pin.</param>
+		/// <param name="modelID">The model to pin it to.</param>
+		/// <param name="artMeshID">The artmesh to pin it to on that model.</param>
+		/// <param name="angle">The angle of the item.</param>
+		/// <param name="angleRelativeTo">The mode to interpert the angle value by.</param>
+		/// <param name="size">The size of the item.</param>
+		/// <param name="sizeRelativeTo">The mode to interpert the size value by.</param>
+		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void PinItemToRandom(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Pins the specified item to a random point in the specified ArtMesh of the specified model.
+		/// 
+		/// For more info, particularly about what each field does, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio#pin-items-to-the-model">https://github.com/DenchiSoft/VTubeStudio#pin-items-to-the-model</a>
+		/// </summary>
+		/// <param name="itemInstanceID">The item to pin.</param>
+		/// <param name="modelID">The model to pin it to.</param>
+		/// <param name="artMeshID">The artmesh to pin it to on that model.</param>
+		/// <param name="angle">The angle of the item.</param>
+		/// <param name="angleRelativeTo">The mode to interpert the angle value by.</param>
+		/// <param name="size">The size of the item.</param>
+		/// <param name="sizeRelativeTo">The mode to interpert the size value by.</param>
+		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		Task<VTSItemPinResponseData> PinItemToRandom(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo);
+		/// <summary>
+		/// Pins the specified item to a random point in the specified ArtMesh of the specified model.
+		/// 
+		/// For more info, particularly about what each field does, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio#pin-items-to-the-model">https://github.com/DenchiSoft/VTubeStudio#pin-items-to-the-model</a>
+		/// </summary>
+		/// <param name="itemInstanceID">The item to pin.</param>
+		/// <param name="modelID">The model to pin it to.</param>
+		/// <param name="artMeshID">The artmesh to pin it to on that model.</param>
+		/// <param name="angle">The angle of the item.</param>
+		/// <param name="angleRelativeTo">The mode to interpert the angle value by.</param>
+		/// <param name="size">The size of the item.</param>
+		/// <param name="sizeRelativeTo">The mode to interpert the size value by.</param>
+		/// <param name="point">The barycentric coordinate defining where inside the ArtMesh the item should be pinned.</point>
+		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void PinItemToPoint(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, BarycentricCoordinate point, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Pins the specified item to a random point in the specified ArtMesh of the specified model.
+		/// 
+		/// For more info, particularly about what each field does, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio#pin-items-to-the-model">https://github.com/DenchiSoft/VTubeStudio#pin-items-to-the-model</a>
+		/// </summary>
+		/// <param name="itemInstanceID">The item to pin.</param>
+		/// <param name="modelID">The model to pin it to.</param>
+		/// <param name="artMeshID">The artmesh to pin it to on that model.</param>
+		/// <param name="angle">The angle of the item.</param>
+		/// <param name="angleRelativeTo">The mode to interpert the angle value by.</param>
+		/// <param name="size">The size of the item.</param>
+		/// <param name="sizeRelativeTo">The mode to interpert the size value by.</param>
+		/// <param name="point">The barycentric coordinate defining where inside the ArtMesh the item should be pinned.</point>
+		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		Task<VTSItemPinResponseData> PinItemToPoint(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, BarycentricCoordinate point);
+		/// <summary>
+		/// Unpins the specified item from wherever it is pinned to.
+		/// </summary>
+		/// <param name="itemInstanceID">The item to unpin.</param>
+		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void UnpinItem(string itemInstanceID, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Unpins the specified item from wherever it is pinned to.
+		/// </summary>
+		/// <param name="itemInstanceID">The item to unpin.</param>
+		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		Task<VTSItemPinResponseData> UnpinItem(string itemInstanceID);
+		/// <summary>
 		/// Removes a custom parameter from the currently loaded VTS model.
 		/// 
 		/// For more info, see 
@@ -558,6 +692,24 @@ namespace VTS.Core {
 		/// <param name="count">The number of art meshes to select. Values of 0 or lower will allow the user to choose any arbitrary number of art meshes (but at least one).</param>
 		/// <param name="activeArtMeshes">A list of already-selected art meshes.</param>
 		Task<VTSArtMeshSelectionResponseData> RequestArtMeshSelection(string textOverride, string helpOverride, int count, ICollection<string> activeArtMeshes);
+		/// <summary>
+		/// Initiates a prompt in VTube Studio to request advanced permissions from the user.
+		/// 
+		/// For more info, see
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Permissions/README.md#requesting-permissions">https://github.com/DenchiSoft/VTubeStudio/blob/master/Permissions/README.md#requesting-permissions</a>
+		/// </summary>
+		/// <param name="permission">The permission being requested.</param>
+		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void RequestPermission(VTSPermission permission, Action<VTSPermissionResponseData> onSuccess, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Initiates a prompt in VTube Studio to request advanced permissions from the user.
+		/// 
+		/// For more info, see
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Permissions/README.md#requesting-permissions">https://github.com/DenchiSoft/VTubeStudio/blob/master/Permissions/README.md#requesting-permissions</a>
+		/// </summary>
+		/// <param name="permission">The permission being requested.</param>
+		Task<VTSPermissionResponseData> RequestPermission(VTSPermission permission);
 		/// <summary>
 		/// Overrides the physics properties of the current model. Once a plugin has overridden a model's physics, no other plugins may do so.
 		/// 
@@ -803,6 +955,48 @@ namespace VTS.Core {
 		/// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
 		Task<VTSEventSubscriptionResponseData> SubscribeToTrackingEvent(Action<VTSTrackingEventData> onEvent);
 		/// <summary>
+		/// Subscribes to the Item Event.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#item-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#item-event</a>
+		/// </summary>
+		/// <param name="config">Configuration options about the subscription.</param>
+		/// <param name="onEvent">Callback to execute upon receiving an event.</param>
+		/// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void SubscribeToItemEvent(VTSItemEventConfigOptions config, Action<VTSItemEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Subscribes to the Item Event.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#item-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#item-event</a>
+		/// </summary>
+		/// <param name="config">Configuration options about the subscription.</param>
+		/// <param name="onEvent">Callback to execute upon receiving an event.</param>
+		/// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
+		Task<VTSEventSubscriptionResponseData> SubscribeToItemEvent(VTSItemEventConfigOptions config, Action<VTSItemEventData> onEvent);
+		/// <summary>
+		/// Subscribes to the Model Clicked Event.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#model-clicked-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#model-clicked-event</a>
+		/// </summary>
+		/// <param name="config">Configuration options about the subscription.</param>
+		/// <param name="onEvent">Callback to execute upon receiving an event.</param>
+		/// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void SubscribeToModelClickedEvent(VTSModelClickedEventConfigOptions config, Action<VTSModelClickedEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Subscribes to the Model Clicked Event.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#model-clicked-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#model-clicked-event</a>
+		/// </summary>
+		/// <param name="config">Configuration options about the subscription.</param>
+		/// <param name="onEvent">Callback to execute upon receiving an event.</param>
+		/// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
+		Task<VTSEventSubscriptionResponseData> SubscribeToModelClickedEvent(VTSModelClickedEventConfigOptions config, Action<VTSModelClickedEventData> onEvent);
+		/// <summary>
 		/// Tints matched components of the current art mesh.
 		/// 
 		/// For more info, see 
@@ -982,5 +1176,25 @@ namespace VTS.Core {
 		/// Unsubscribes from the Model Animation Event.
 		/// </summary>
 		Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelAnimationEvent();
+		/// <summary>
+		/// Unsubscribes from the Item Event.
+		/// </summary>
+		/// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing from the event.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void UnsubscribeFromItemEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Unsubscribes from the Item Event.
+		/// </summary>
+		Task<VTSEventSubscriptionResponseData> UnsubscribeFromItemEvent();
+		/// <summary>
+		/// Unsubscribes from the Model Clicked Event.
+		/// </summary>
+		/// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing from the event.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void UnsubscribeFromModelClickedEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Unsubscribes from the Model Clicked Event.
+		/// </summary>
+		Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelClickedEvent();
 	}
 }
