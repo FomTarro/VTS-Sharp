@@ -213,6 +213,10 @@ namespace VTS.Unity {
 			this.Plugin.LoadItem(fileName, options, onSuccess, onError);
 		}
 
+		public void LoadCustomDataItem(string fileName, string base64, VTSCustomDataItemLoadOptions options, Action<VTSItemLoadResponseData> onSuccess, Action<VTSErrorData> onError) {
+			this.Plugin.LoadCustomDataItem(fileName, base64, options, onSuccess, onError);
+		}
+
 		public void UnloadItem(VTSItemUnloadOptions options, Action<VTSItemUnloadResponseData> onSuccess, Action<VTSErrorData> onError) {
 			this.Plugin.UnloadItem(options, onSuccess, onError);
 		}
@@ -229,6 +233,25 @@ namespace VTS.Unity {
 			ICollection<string> activeArtMeshes,
 			Action<VTSArtMeshSelectionResponseData> onSuccess, Action<VTSErrorData> onError) {
 			this.Plugin.RequestArtMeshSelection(textOverride, helpOverride, count, activeArtMeshes, onSuccess, onError);
+		}
+
+		public void RequestPermission(VTSPermission permission, Action<VTSPermissionResponseData> onSuccess, Action<VTSErrorData> onError) {
+			this.Plugin.RequestPermission(permission, onSuccess, onError);
+		}
+
+		public void PinItemToCenter(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
+			this.Plugin.PinItemToCenter(itemInstanceID, modelID, artMeshID, angle, angleRelativeTo, size, sizeRelativeTo, onSuccess, onError);
+		}
+
+		public void PinItemToRandom(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
+			this.Plugin.PinItemToRandom(itemInstanceID, modelID, artMeshID, angle, angleRelativeTo, size, sizeRelativeTo, onSuccess, onError);
+		}
+		public void PinItemToPoint(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, BarycentricCoordinate point, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
+			this.Plugin.PinItemToPoint(itemInstanceID, modelID, artMeshID, angle, angleRelativeTo, size, sizeRelativeTo, point, onSuccess, onError);
+		}
+
+		public void UnpinItem(string itemInsanceID, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
+			this.Plugin.UnpinItem(itemInsanceID, onSuccess, onError);
 		}
 
 		#endregion
@@ -309,6 +332,22 @@ namespace VTS.Unity {
 
 		public void UnsubscribeFromModelAnimationEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
 			this.Plugin.UnsubscribeFromModelAnimationEvent(onUnsubscribe, onError);
+		}
+
+		public void SubscribeToItemEvent(VTSItemEventConfigOptions config, Action<VTSItemEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
+			this.Plugin.SubscribeToItemEvent(config, onEvent, onSubscribe, onError);
+		}
+
+		public void UnsubscribeFromItemEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
+			this.Plugin.UnsubscribeFromItemEvent(onUnsubscribe, onError);
+		}
+
+		public void SubscribeToModelClickedEvent(VTSModelClickedEventConfigOptions config, Action<VTSModelClickedEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
+			this.Plugin.SubscribeToModelClickedEvent(config, onEvent, onSubscribe, onError);
+		}
+
+		public void UnsubscribeFromModelClickedEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
+			this.Plugin.UnsubscribeFromModelClickedEvent(onUnsubscribe, onError);
 		}
 
 		#endregion
@@ -403,6 +442,10 @@ namespace VTS.Unity {
 			return this.Plugin.LoadItem(fileName, options);
 		}
 
+		public Task<VTSItemLoadResponseData> LoadCustomDataItem(string fileName, string base64, VTSCustomDataItemLoadOptions options) {
+			return this.Plugin.LoadCustomDataItem(fileName, base64, options);
+		}
+
 		public Task<VTSModelLoadData> LoadModel(string modelId) {
 			return this.Plugin.LoadModel(modelId);
 		}
@@ -421,6 +464,26 @@ namespace VTS.Unity {
 
 		public Task<VTSArtMeshSelectionResponseData> RequestArtMeshSelection(string textOverride, string helpOverride, int count, ICollection<string> activeArtMeshes) {
 			return this.Plugin.RequestArtMeshSelection(textOverride, helpOverride, count, activeArtMeshes);
+		}
+
+		public Task<VTSPermissionResponseData> RequestPermission(VTSPermission permission) {
+			return this.Plugin.RequestPermission(permission);
+		}
+
+		public Task<VTSItemPinResponseData> PinItemToCenter(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo) {
+			return this.Plugin.PinItemToCenter(itemInstanceID, modelID, artMeshID, angle, angleRelativeTo, size, sizeRelativeTo);
+		}
+
+		public Task<VTSItemPinResponseData> PinItemToRandom(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo) {
+			return this.Plugin.PinItemToRandom(itemInstanceID, modelID, artMeshID, angle, angleRelativeTo, size, sizeRelativeTo);
+		}
+
+		public Task<VTSItemPinResponseData> PinItemToPoint(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, BarycentricCoordinate point) {
+			return this.Plugin.PinItemToPoint(itemInstanceID, modelID, artMeshID, angle, angleRelativeTo, size, sizeRelativeTo, point);
+		}
+
+		public Task<VTSItemPinResponseData> UnpinItem(string itemInstanceID) {
+			return this.Plugin.UnpinItem(itemInstanceID);
 		}
 
 		public Task<VTSOverrideModelPhysicsData> SetCurrentModelPhysics(VTSPhysicsOverride[] strengthOverrides, VTSPhysicsOverride[] windOverrides) {
@@ -469,6 +532,14 @@ namespace VTS.Unity {
 
 		public Task<VTSEventSubscriptionResponseData> SubscribeToTrackingEvent(Action<VTSTrackingEventData> onEvent) {
 			return this.Plugin.SubscribeToTrackingEvent(onEvent);
+		}
+
+		public Task<VTSEventSubscriptionResponseData> SubscribeToItemEvent(VTSItemEventConfigOptions config, Action<VTSItemEventData> onEvent) {
+			return this.Plugin.SubscribeToItemEvent(config, onEvent);
+		}
+
+		public Task<VTSEventSubscriptionResponseData> SubscribeToModelClickedEvent(VTSModelClickedEventConfigOptions config, Action<VTSModelClickedEventData> onEvent) {
+			return this.Plugin.SubscribeToModelClickedEvent(config, onEvent);
 		}
 
 		public Task<VTSColorTintData> TintArtMesh(ColorTint tint, float mixWithSceneLightingColor, ArtMeshMatcher matcher) {
@@ -525,6 +596,14 @@ namespace VTS.Unity {
 
 		public Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelAnimationEvent() {
 			return this.Plugin.UnsubscribeFromModelAnimationEvent();
+		}
+
+		public Task<VTSEventSubscriptionResponseData> UnsubscribeFromItemEvent() {
+			return this.Plugin.UnsubscribeFromItemEvent();
+		}
+
+		public Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelClickedEvent() {
+			return this.Plugin.UnsubscribeFromModelClickedEvent();
 		}
 
 		#endregion

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -565,6 +566,32 @@ namespace VTS.Core {
 			return await VTSExtensions.Async<string, VTSItemLoadOptions, VTSItemLoadResponseData, VTSErrorData>(LoadItem, fileName, options);
 		}
 
+		public void LoadCustomDataItem(string fileName, string base64, VTSCustomDataItemLoadOptions options, Action<VTSItemLoadResponseData> onSuccess, Action<VTSErrorData> onError) {
+			VTSItemLoadRequestData request = new VTSItemLoadRequestData();
+			request.data.fileName = fileName;
+			request.data.positionX = options.positionX;
+			request.data.positionY = options.positionY;
+			request.data.size = options.size;
+			request.data.rotation = options.rotation;
+			request.data.fadeTime = options.fadeTime;
+			request.data.order = options.order;
+			request.data.failIfOrderTaken = options.failIfOrderTaken;
+			request.data.smoothing = options.smoothing;
+			request.data.censored = options.censored;
+			request.data.flipped = options.flipped;
+			request.data.locked = options.locked;
+			request.data.unloadWhenPluginDisconnects = options.unloadWhenPluginDisconnects;
+			// Custom Data item settings
+			request.data.customDataBase64 = base64;
+			request.data.customDataAskUserFirst = options.askUserFirst;
+			request.data.customDataSkipAskingUserIfWhitelisted = options.skipAskingUserIfWhitelisted;
+			request.data.customDataAskTimer = options.askTimer;
+			this.Socket.Send<VTSItemLoadRequestData, VTSItemLoadResponseData>(request, onSuccess, onError);
+		}
+		public async Task<VTSItemLoadResponseData> LoadCustomDataItem(string fileName, string base64, VTSCustomDataItemLoadOptions options) {
+			return await VTSExtensions.Async<string, string, VTSCustomDataItemLoadOptions, VTSItemLoadResponseData, VTSErrorData>(LoadCustomDataItem, fileName, base64, options);
+		}
+
 		// Unload Item
 
 		public void UnloadItem(VTSItemUnloadOptions options, Action<VTSItemUnloadResponseData> onSuccess, Action<VTSErrorData> onError) {
@@ -626,7 +653,81 @@ namespace VTS.Core {
 			return await VTSExtensions.Async<VTSItemMoveEntry[], VTSItemMoveResponseData, VTSErrorData>(MoveItem, items);
 		}
 
-		// Request Art mesh Selection
+		// Pin/Unpin Items
+
+		private void PinItem(string itemInstanceID, VTSItemAngleRelativityMode angleRelativeTo, VTSItemSizeRelativityMode sizeRelativeTo, VTSVertexPinMode vertexPinType, ArtMeshCoordinate pinInfo, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
+			VTSItemPinRequestData request = new VTSItemPinRequestData();
+			request.data.pin = true;
+			request.data.itemInstanceID = itemInstanceID;
+			request.data.vertexPinType = vertexPinType;
+			request.data.angleRelativeTo = angleRelativeTo;
+			request.data.sizeRealtiveTo = sizeRelativeTo;
+			request.data.pinInfo = pinInfo;
+			this.Socket.Send<VTSItemPinRequestData, VTSItemPinResponseData>(request, onSuccess, onError);
+		}
+
+		public void PinItemToCenter(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
+			ArtMeshCoordinate coordinate = new ArtMeshCoordinate {
+				modelID = modelID,
+				artMeshID = artMeshID,
+				angle = angle,
+				size = size
+			};
+			PinItem(itemInstanceID, angleRelativeTo, sizeRelativeTo, VTSVertexPinMode.Center, coordinate, onSuccess, onError);
+		}
+
+		public async Task<VTSItemPinResponseData> PinItemToCenter(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo) {
+			return await VTSExtensions.Async<string, string, string, float, VTSItemAngleRelativityMode, float, VTSItemSizeRelativityMode, VTSItemPinResponseData, VTSErrorData>(
+				PinItemToCenter, itemInstanceID, modelID, artMeshID, angle, angleRelativeTo, size, sizeRelativeTo);
+		}
+
+		public void PinItemToRandom(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
+			ArtMeshCoordinate coordinate = new ArtMeshCoordinate {
+				modelID = modelID,
+				artMeshID = artMeshID,
+				angle = angle,
+				size = size
+			};
+			PinItem(itemInstanceID, angleRelativeTo, sizeRelativeTo, VTSVertexPinMode.Random, coordinate, onSuccess, onError);
+		}
+
+		public async Task<VTSItemPinResponseData> PinItemToRandom(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo) {
+			return await VTSExtensions.Async<string, string, string, float, VTSItemAngleRelativityMode, float, VTSItemSizeRelativityMode, VTSItemPinResponseData, VTSErrorData>(
+				PinItemToRandom, itemInstanceID, modelID, artMeshID, angle, angleRelativeTo, size, sizeRelativeTo);
+		}
+
+
+		public void PinItemToPoint(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, BarycentricCoordinate point, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
+			ArtMeshCoordinate coordinate = new ArtMeshCoordinate {
+				modelID = modelID,
+				artMeshID = artMeshID,
+				angle = angle,
+				size = size,
+			};
+			coordinate.SetBarycentricCoodrinate(point);
+			PinItem(itemInstanceID, angleRelativeTo, sizeRelativeTo, VTSVertexPinMode.Provided, coordinate, onSuccess, onError);
+		}
+
+		public async Task<VTSItemPinResponseData> PinItemToPoint(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, BarycentricCoordinate point) {
+			return await VTSExtensions.Async<string, string, string, float, VTSItemAngleRelativityMode, float, VTSItemSizeRelativityMode, BarycentricCoordinate, VTSItemPinResponseData, VTSErrorData>(
+				PinItemToPoint, itemInstanceID, modelID, artMeshID, angle, angleRelativeTo, size, sizeRelativeTo, point);
+		}
+
+
+		public void UnpinItem(string itemInsanceID, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
+			VTSItemPinRequestData request = new VTSItemPinRequestData();
+			request.data.pin = false;
+			request.data.itemInstanceID = itemInsanceID;
+			this.Socket.Send<VTSItemPinRequestData, VTSItemPinResponseData>(request, onSuccess, onError);
+		}
+
+		public async Task<VTSItemPinResponseData> UnpinItem(string itemInstanceID) {
+			return await VTSExtensions.Async<string, VTSItemPinResponseData, VTSErrorData>(
+				UnpinItem, itemInstanceID);
+		}
+
+
+		// Request Art Mesh Selection
 
 		public void RequestArtMeshSelection(string textOverride, string helpOverride, int count, ICollection<string> activeArtMeshes, Action<VTSArtMeshSelectionResponseData> onSuccess, Action<VTSErrorData> onError) {
 			VTSArtMeshSelectionRequestData request = new VTSArtMeshSelectionRequestData();
@@ -641,6 +742,18 @@ namespace VTS.Core {
 		public async Task<VTSArtMeshSelectionResponseData> RequestArtMeshSelection(string textOverride, string helpOverride, int count, ICollection<string> activeArtMeshes) {
 			return await VTSExtensions.Async<string, string, int, ICollection<string>, VTSArtMeshSelectionResponseData, VTSErrorData>(
 				RequestArtMeshSelection, textOverride, helpOverride, count, activeArtMeshes);
+		}
+
+		// Request Permissions
+
+		public void RequestPermission(VTSPermission permission, Action<VTSPermissionResponseData> onSuccess, Action<VTSErrorData> onError) {
+			VTSPermissionRequestData request = new VTSPermissionRequestData();
+			request.data.requestedPermission = permission;
+			this.Socket.Send<VTSPermissionRequestData, VTSPermissionResponseData>(request, onSuccess, onError);
+		}
+
+		public async Task<VTSPermissionResponseData> RequestPermission(VTSPermission permission) {
+			return await VTSExtensions.Async<VTSPermission, VTSPermissionResponseData, VTSErrorData>(RequestPermission, permission);
 		}
 
 		#endregion
@@ -821,6 +934,43 @@ namespace VTS.Core {
 		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelAnimationEvent() {
 			return await VTSExtensions.Async<VTSEventSubscriptionResponseData, VTSErrorData>(UnsubscribeFromModelAnimationEvent);
 		}
+
+		// Item Event
+
+		public void SubscribeToItemEvent(VTSItemEventConfigOptions config, Action<VTSItemEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
+			SubscribeToEvent<VTSItemEventSubscriptionRequestData, VTSItemEventData, VTSItemEventConfigOptions>(true, config, onEvent, onSubscribe, onError);
+		}
+		public async Task<VTSEventSubscriptionResponseData> SubscribeToItemEvent(VTSItemEventConfigOptions config, Action<VTSItemEventData> onEvent) {
+			return await VTSExtensions.Async<VTSItemEventConfigOptions, Action<VTSItemEventData>, VTSEventSubscriptionResponseData, VTSErrorData>(
+				SubscribeToItemEvent, config, onEvent);
+		}
+
+		public void UnsubscribeFromItemEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
+			SubscribeToEvent<VTSItemEventSubscriptionRequestData, VTSItemEventData, VTSItemEventConfigOptions>(false, null, DoNothingCallback, onUnsubscribe, onError);
+		}
+		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromItemEvent() {
+			return await VTSExtensions.Async<VTSEventSubscriptionResponseData, VTSErrorData>(UnsubscribeFromItemEvent);
+		}
+
+		// Model Clicked Event
+
+		public void SubscribeToModelClickedEvent(VTSModelClickedEventConfigOptions config, Action<VTSModelClickedEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
+			SubscribeToEvent<VTSModelClickedEventSubscriptionRequestData, VTSModelClickedEventData, VTSModelClickedEventConfigOptions>(true, config, onEvent, onSubscribe, onError);
+		}
+
+		public async Task<VTSEventSubscriptionResponseData> SubscribeToModelClickedEvent(VTSModelClickedEventConfigOptions config, Action<VTSModelClickedEventData> onEvent) {
+			return await VTSExtensions.Async<VTSModelClickedEventConfigOptions, Action<VTSModelClickedEventData>, VTSEventSubscriptionResponseData, VTSErrorData>(
+				SubscribeToModelClickedEvent, config, onEvent);
+		}
+
+		public void UnsubscribeFromModelClickedEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
+			SubscribeToEvent<VTSModelClickedEventSubscriptionRequestData, VTSModelClickedEventData, VTSModelClickedEventConfigOptions>(false, null, DoNothingCallback, onUnsubscribe, onError);
+		}
+
+		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelClickedEvent() {
+			return await VTSExtensions.Async<VTSEventSubscriptionResponseData, VTSErrorData>(UnsubscribeFromModelClickedEvent);
+		}
+
 
 		#endregion
 
