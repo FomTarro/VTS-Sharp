@@ -1299,7 +1299,7 @@ namespace VTS.Core {
 			public bool pin;
 			public string itemInstanceID;
 			public VTSItemAngleRelativityMode angleRelativeTo;
-			public VTSItemSizeRelativityMode sizeRealtiveTo;
+			public VTSItemSizeRelativityMode sizeRelativeTo;
 			public VTSVertexPinMode vertexPinType;
 			public ArtMeshCoordinate pinInfo;
 		}
