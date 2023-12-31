@@ -5,7 +5,7 @@
         <ImplicitUsings>disable</ImplicitUsings>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageId>VTS-Sharp</PackageId>
-        <Version>2.2.1</Version>
+        <Version>2.2.2</Version>
         <Title>VTS-Sharp</Title>
         <Authors>Tom 'Skeletom' Farro</Authors>
         <Description>C# Library for interacting with the VTube Studio API</Description>
