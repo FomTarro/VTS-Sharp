@@ -661,7 +661,7 @@ namespace VTS.Core {
 			request.data.itemInstanceID = itemInstanceID;
 			request.data.vertexPinType = vertexPinType;
 			request.data.angleRelativeTo = angleRelativeTo;
-			request.data.sizeRealtiveTo = sizeRelativeTo;
+			request.data.sizeRelativeTo = sizeRelativeTo;
 			request.data.pinInfo = pinInfo;
 			this.Socket.Send<VTSItemPinRequestData, VTSItemPinResponseData>(request, onSuccess, onError);
 		}
