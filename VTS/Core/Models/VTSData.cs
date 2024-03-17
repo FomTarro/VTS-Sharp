@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 
 namespace VTS.Core {
 
@@ -1382,6 +1381,204 @@ namespace VTS.Core {
 		public float vertexWeight3;
 	}
 
+	[System.Serializable]
+	public class VTSPostProcessingStateRequestData : VTSMessageData {
+		public VTSPostProcessingStateRequestData() {
+			this.messageType = "PostProcessingListRequest";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public bool fillPostProcessingPresetsArray = true;
+			public bool fillPostProcessingEffectsArray = true;
+			public Effects[] effectIDFilter;
+		}
+
+	}
+
+	[System.Serializable]
+	public class VTSPostProcessingStateResponseData : VTSMessageData {
+		public VTSPostProcessingStateResponseData() {
+			this.messageType = "PostProcessingListResponse";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public bool postProcessingSupported;
+			public bool postProcessingActive;
+			public bool canSendPostProcessingUpdateRequestRightNow;
+			public bool restrictedEffectsAllowed;
+			public bool presetIsActive;
+			public string activePreset;
+			public int presetCount;
+			public int activeEffectCount;
+			public int effectCountBeforeFilter;
+			public int configCountBeforeFilter;
+			public int effectCountAfterFilter;
+			public int configCountAfterFilter;
+			public PostProcessingEffect[] postProcessingEffects;
+		}
+	}
+
+	[System.Serializable]
+	public class PostProcessingEffect {
+		public string internalID;
+		public Effects enumID;
+		public string explanation;
+		public bool effectIsActive;
+		public bool effectIsRestricted;
+		public PostProcessingEffectConfig[] configEntries;
+	}
+
+	[System.Serializable]
+	public class PostProcessingEffectConfig {
+		public string internalID;
+		public EffectConfigs enumID;
+		public string explanation;
+		public string type;
+		public bool activationConfig;
+		public float floatValue;
+		public float floatMin;
+		public float floatMax;
+		public float floatDefault;
+		public int intValue;
+		public int intMin;
+		public int intMax;
+		public int intDefault;
+		public string colorValue;
+		public string colorDefault;
+		public bool colorHasAlpha;
+		public bool boolValue;
+		public bool boolDefault;
+		public string stringValue;
+		public string stringDefault;
+		public string sceneItemValue;
+		public string sceneItemDefault;
+	}
+
+	public class VTSPostProcssingUpdateRequestData : VTSMessageData {
+
+		public VTSPostProcssingUpdateRequestData() {
+			this.messageType = "PostProcessingUpdateRequest";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public bool postProcessingOn;
+			public bool setPostProcessingPreset;
+			public bool setPostProcessingValues;
+			public string presetToSet;
+			public float postProcessingFadeTime;
+			public bool setAllOtherValuesToDefault;
+			public bool usingRestrictedEffects;
+			public bool randomizeAll;
+			public float randomizeAllChaosLevel;
+			public PostProcessingValue[] postProcessingValues;
+		}
+	}
+
+	[System.Serializable]
+	public class PostProcessingValue {
+		public EffectConfigs configID;
+		public string configValue;
+
+		public PostProcessingValue(EffectConfigs configID, float value) {
+			this.configID = configID;
+			this.configValue = value.ToString();
+		}
+
+		public PostProcessingValue(EffectConfigs configID, bool value) {
+			this.configID = configID;
+			this.configValue = value.ToString();
+		}
+
+		public PostProcessingValue(EffectConfigs configID, int value) {
+			this.configID = configID;
+			this.configValue = value.ToString();
+		}
+
+		public PostProcessingValue(EffectConfigs configID, string value) {
+			this.configID = configID;
+			this.configValue = value;
+		}
+	}
+
+	[System.Serializable]
+	public class VTSPostProcessingUpdateResponseData : VTSMessageData {
+		public VTSPostProcessingUpdateResponseData() {
+			this.messageType = "PostProcessingUpdateResponse";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public bool postProcessingActive;
+			public bool presetIsActive;
+			public string activePreset;
+			public int activeEffectCount;
+		}
+	}
+
+	/// <summary>
+	/// A container for holding the numerous update options for a Post Processing Update request.
+	/// 
+	/// For more info about what each field does, see 
+	/// <a href="https://github.com/DenchiSoft/VTubeStudio?tab=readme-ov-file#set-post-processing-effects">https://github.com/DenchiSoft/VTubeStudio?tab=readme-ov-file#set-post-processing-effects</a>
+	/// </summary>
+	[System.Serializable]
+	public class VTSPostProcessingUpdateOptions {
+		public VTSPostProcessingUpdateOptions() {
+			this.postProcessingOn = false;
+			this.setPostProcessingPreset = false;
+			this.setPostProcessingValues = false;
+			this.presetToSet = "";
+			this.postProcessingFadeTime = 0;
+			this.setAllOtherValuesToDefault = false;
+			this.usingRestrictedEffects = false;
+			this.randomizeAll = false;
+			this.randomizeAllChaosLevel = 0;
+		}
+
+		public VTSPostProcessingUpdateOptions(
+			bool postProcessingOn,
+			bool setPostProcessingPreset,
+			bool setPostProcessingValues,
+			string presetToSet,
+			float postProcessingFadeTime,
+			bool setAllOtherValuesToDefault,
+			bool usingRestrictedEffects,
+			bool randomizeAll,
+			float randomizeAllChaosLevel
+		) {
+			this.postProcessingOn = postProcessingOn;
+			this.setPostProcessingPreset = setPostProcessingPreset;
+			this.setPostProcessingValues = setPostProcessingValues;
+			this.presetToSet = presetToSet;
+			this.postProcessingFadeTime = postProcessingFadeTime;
+			this.setAllOtherValuesToDefault = setAllOtherValuesToDefault;
+			this.usingRestrictedEffects = usingRestrictedEffects;
+			this.randomizeAll = randomizeAll;
+			this.randomizeAllChaosLevel = randomizeAllChaosLevel;
+		}
+
+		public bool postProcessingOn;
+		public bool setPostProcessingPreset;
+		public bool setPostProcessingValues;
+		public string presetToSet;
+		public float postProcessingFadeTime;
+		public bool setAllOtherValuesToDefault;
+		public bool usingRestrictedEffects;
+		public bool randomizeAll;
+		public float randomizeAllChaosLevel;
+	}
+
 	#endregion
 
 	#region Event API
@@ -1930,6 +2127,41 @@ namespace VTS.Core {
 		public int artMeshOrder;
 		public bool isMasked;
 		public ArtMeshCoordinate hitInfo;
+	}
+
+	// Post Processing Event
+
+	[System.Serializable]
+	public class VTSPostProcessingEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSPostProcessingEventConfigOptions> {
+		public VTSPostProcessingEventSubscriptionRequestData() {
+			this.data.eventName = "PostProcessingEvent";
+		}
+	}
+
+	/// <summary>
+	/// A container for providing subscription options for a Post Processing Event subscription.
+	/// 
+	/// For more info about what each field does, see 
+	/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#post-processing-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#post-processing-event</a>
+	/// </summary>
+	[System.Serializable]
+	public class VTSPostProcessingEventConfigOptions : VTSEventConfigData {
+		public VTSPostProcessingEventConfigOptions() { }
+	}
+
+	[System.Serializable]
+	public class VTSPostProcessingEventData : VTSEventData {
+		public VTSPostProcessingEventData() {
+			this.messageType = "PostProcessingEvent";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public bool currentOnState;
+			public string currentPreset;
+		}
 	}
 
 	#endregion

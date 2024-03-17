@@ -756,6 +756,37 @@ namespace VTS.Core {
 			return await VTSExtensions.Async<VTSPermission, VTSPermissionResponseData, VTSErrorData>(RequestPermission, permission);
 		}
 
+		public void GetPostProcessingEffectStateList(bool fillPostProcessingPresetsArray, bool fillPostProcessingEffectsArray, Effects[] effectIDFilter, Action<VTSPostProcessingStateResponseData> onSuccess, Action<VTSErrorData> onError) {
+			VTSPostProcessingStateRequestData request = new VTSPostProcessingStateRequestData();
+			request.data.fillPostProcessingPresetsArray = fillPostProcessingPresetsArray;
+			request.data.fillPostProcessingEffectsArray = fillPostProcessingEffectsArray;
+			request.data.effectIDFilter = effectIDFilter;
+			this.Socket.Send<VTSPostProcessingStateRequestData, VTSPostProcessingStateResponseData>(request, onSuccess, onError);
+		}
+
+		public async Task<VTSPostProcessingStateResponseData> GetPostProcessingEffectStateList(bool fillPostProcessingPresetsArray, bool fillPostProcessingEffectsArray, Effects[] effectIDFilter) {
+			return await VTSExtensions.Async<bool, bool, Effects[], VTSPostProcessingStateResponseData, VTSErrorData>(GetPostProcessingEffectStateList, fillPostProcessingPresetsArray, fillPostProcessingEffectsArray, effectIDFilter);
+		}
+
+		public void SetPostProcessingEffectValues(VTSPostProcessingUpdateOptions options, PostProcessingValue[] values, Action<VTSPostProcessingUpdateResponseData> onSuccess, Action<VTSErrorData> onError) {
+			VTSPostProcssingUpdateRequestData request = new VTSPostProcssingUpdateRequestData();
+			request.data.postProcessingOn = options.postProcessingOn;
+			request.data.setPostProcessingPreset = options.setPostProcessingPreset;
+			request.data.setPostProcessingValues = options.setPostProcessingValues;
+			request.data.presetToSet = options.presetToSet;
+			request.data.postProcessingFadeTime = options.postProcessingFadeTime;
+			request.data.setAllOtherValuesToDefault = options.setAllOtherValuesToDefault;
+			request.data.usingRestrictedEffects = options.usingRestrictedEffects;
+			request.data.randomizeAll = options.randomizeAll;
+			request.data.randomizeAllChaosLevel = options.randomizeAllChaosLevel;
+			request.data.postProcessingValues = values;
+			this.Socket.Send<VTSPostProcssingUpdateRequestData, VTSPostProcessingUpdateResponseData>(request, onSuccess, onError);
+		}
+
+		public async Task<VTSPostProcessingUpdateResponseData> SetPostProcessingEffectValues(VTSPostProcessingUpdateOptions options, PostProcessingValue[] values) {
+			return await VTSExtensions.Async<VTSPostProcessingUpdateOptions, PostProcessingValue[], VTSPostProcessingUpdateResponseData, VTSErrorData>(SetPostProcessingEffectValues, options, values);
+		}
+
 		#endregion
 
 		#region VTS Event Subscription API Wrapper
@@ -971,6 +1002,24 @@ namespace VTS.Core {
 			return await VTSExtensions.Async<VTSEventSubscriptionResponseData, VTSErrorData>(UnsubscribeFromModelClickedEvent);
 		}
 
+		// Post Processing Event
+
+		public void SubscribeToPostProcessingEvent(VTSPostProcessingEventConfigOptions config, Action<VTSPostProcessingEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
+			SubscribeToEvent<VTSPostProcessingEventSubscriptionRequestData, VTSPostProcessingEventData, VTSPostProcessingEventConfigOptions>(true, config, onEvent, onSubscribe, onError);
+		}
+
+		public async Task<VTSEventSubscriptionResponseData> SubscribeToPostProcessingEvent(VTSPostProcessingEventConfigOptions config, Action<VTSPostProcessingEventData> onEvent) {
+			return await VTSExtensions.Async<VTSPostProcessingEventConfigOptions, Action<VTSPostProcessingEventData>, VTSEventSubscriptionResponseData, VTSErrorData>(
+				SubscribeToPostProcessingEvent, config, onEvent);
+		}
+
+		public void UnsubscribeFromPostProcessingEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
+			SubscribeToEvent<VTSPostProcessingEventSubscriptionRequestData, VTSPostProcessingEventData, VTSPostProcessingEventConfigOptions>(false, null, DoNothingCallback, onUnsubscribe, onError);
+		}
+
+		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromPostProcessingEvent() {
+			return await VTSExtensions.Async<VTSEventSubscriptionResponseData, VTSErrorData>(UnsubscribeFromPostProcessingEvent);
+		}
 
 		#endregion
 
