@@ -73,6 +73,17 @@ namespace VTS.Unity.Examples {
 			);
 		}
 
+		public void PrintPostProcessingEffects() {
+			GetPostProcessingEffectStateList(
+				true, true, new Effects[0],
+				(r) => {
+					Debug.Log(this.JsonUtility.ToJson(r));
+					_text.text = this.JsonUtility.ToJson(r);
+				},
+				(e) => { _text.text = e.data.message; }
+			);
+		}
+
 		public void TintColor() {
 			ArtMeshMatcher matcher = new ArtMeshMatcher();
 			matcher.tintAll = true;
@@ -83,6 +94,18 @@ namespace VTS.Unity.Examples {
 				(r) => { _text.text = this.JsonUtility.ToJson(r); },
 				(e) => { _text.text = e.data.message; }
 			);
+		}
+
+		public void AdjustAnalogGlitch(float f) {
+			VTSPostProcessingUpdateOptions opts = new VTSPostProcessingUpdateOptions();
+			opts.postProcessingOn = true;
+			opts.setPostProcessingValues = true;
+			PostProcessingValue value = new PostProcessingValue(EffectConfigs.AnalogGlitch_Strength, f);
+			PostProcessingValue value2 = new PostProcessingValue(EffectConfigs.AnalogGlitch_ScanlineJitter, f);
+			PostProcessingValue[] values = (new[] { value, value2 });
+			SetPostProcessingEffectValues(opts, values,
+				(r) => { _text.text = this.JsonUtility.ToJson(r); },
+				(e) => { _text.text = e.data.message; });
 		}
 
 		public void ToggleHeadRoll() {

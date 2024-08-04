@@ -996,6 +996,31 @@ namespace VTS.Core {
 		/// <param name="onEvent">Callback to execute upon receiving an event.</param>
 		/// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
 		Task<VTSEventSubscriptionResponseData> SubscribeToModelClickedEvent(VTSModelClickedEventConfigOptions config, Action<VTSModelClickedEventData> onEvent);
+
+		/// <summary>
+		/// Subscribes to the Post Processing Event.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#post-processing-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#post-processing-event</a>
+		/// </summary>
+		/// <param name="config">Configuration options about the subscription.</param>
+		/// <param name="onEvent">Callback to execute upon receiving an event.</param>
+		/// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void SubscribeToPostProcessingEvent(VTSPostProcessingEventConfigOptions config, Action<VTSPostProcessingEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Subscribes to the Post Processing Event.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#post-processing-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#post-processing-event</a>
+		/// </summary>
+		/// <param name="config">Configuration options about the subscription.</param>
+		/// <param name="onEvent">Callback to execute upon receiving an event.</param>
+		/// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		Task<VTSEventSubscriptionResponseData> SubscribeToPostProcessingEvent(VTSPostProcessingEventConfigOptions config, Action<VTSPostProcessingEventData> onEvent);
+
+
 		/// <summary>
 		/// Tints matched components of the current art mesh.
 		/// 
@@ -1196,5 +1221,62 @@ namespace VTS.Core {
 		/// Unsubscribes from the Model Clicked Event.
 		/// </summary>
 		Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelClickedEvent();
+
+		/// <summary>
+		/// Unsubscribes from the Post Processing Event.
+		/// </summary>
+		/// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing from the event.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void UnsubscribeFromPostProcessingEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Unsubscribes from the Model Clicked Event.
+		/// </summary>
+		Task<VTSEventSubscriptionResponseData> UnsubscribeFromPostProcessingEvent();
+
+		/// <summary>
+		/// Queries VTube Studio for a list of all information regarfing Post-Processing presets and effects.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio?tab=readme-ov-file#get-list-of-post-processing-effects-and-state">https://github.com/DenchiSoft/VTubeStudio?tab=readme-ov-file#get-list-of-post-processing-effects-and-state</a>
+		/// </summary>
+		/// <param name="fillPostProcessingPresetsArray">A flag which can be set to true to tell VTube Studio to return a list of all Presets.</param>
+		/// <param name="fillPostProcessingEffectsArray">A flag which can be set to true to tell VTube Studio to return a list of all effects.</param>
+		/// <param name="effectIDFilter">List of effects to filter the response query for.</param>
+		///	<param name="onSuccess">Callback executed upon receiving a response.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		/// <returns></returns>
+		void GetPostProcessingEffectStateList(bool fillPostProcessingPresetsArray, bool fillPostProcessingEffectsArray, Effects[] effectIDFilter, Action<VTSPostProcessingStateResponseData> onSuccess, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Queries VTube Studio for a list of all information regarfing Post-Processing presets and effects.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio?tab=readme-ov-file#get-list-of-post-processing-effects-and-state">https://github.com/DenchiSoft/VTubeStudio?tab=readme-ov-file#get-list-of-post-processing-effects-and-state</a>
+		/// </summary>
+		/// <param name="fillPostProcessingPresetsArray">A flag which can be set to true to tell VTube Studio to return a list of all Presets.</param>
+		/// <param name="fillPostProcessingEffectsArray">A flag which can be set to true to tell VTube Studio to return a list of all effects.</param>
+		/// <param name="effectIDFilter">List of effects to filter the response query for.</param>
+		/// <returns></returns>
+		Task<VTSPostProcessingStateResponseData> GetPostProcessingEffectStateList(bool fillPostProcessingPresetsArray, bool fillPostProcessingEffectsArray, Effects[] effectIDFilter);
+
+		/// <summary>
+		/// Updates the state and/or values of the provided post-processing effects and parameters.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio?tab=readme-ov-file#set-post-processing-effects">https://github.com/DenchiSoft/VTubeStudio?tab=readme-ov-file#set-post-processing-effects</a>
+		/// </summary>
+		/// <param name="options">Configuration options about the request.</param>
+		/// <param name="values">A list of post processing parameters to update.</param>
+		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void SetPostProcessingEffectValues(VTSPostProcessingUpdateOptions options, PostProcessingValue[] values, Action<VTSPostProcessingUpdateResponseData> onSuccess, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Updates the state and/or values of the provided post-processing effects and parameters.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio?tab=readme-ov-file#set-post-processing-effects">https://github.com/DenchiSoft/VTubeStudio?tab=readme-ov-file#set-post-processing-effects</a>
+		/// </summary>
+		/// <param name="options">Configuration options about the request.</param>
+		/// <param name="values">A list of post processing parameters to update.</param>
+		Task<VTSPostProcessingUpdateResponseData> SetPostProcessingEffectValues(VTSPostProcessingUpdateOptions options, PostProcessingValue[] values);
 	}
 }

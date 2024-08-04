@@ -344,6 +344,9 @@ namespace VTS.Core {
 									case "ModelClickedEvent":
 										this._events[response.messageType].onEvent(this._json.FromJson<VTSModelClickedEventData>(data));
 										break;
+									case "PostProcessingEvent":
+										this._events[response.messageType].onEvent(this._json.FromJson<VTSPostProcessingEventData>(data));
+										break;
 								}
 							} catch (Exception e) {
 								// Neatly handle errors in case the deserialization or success callback throw an exception
@@ -458,6 +461,12 @@ namespace VTS.Core {
 										break;
 									case "ItemPinResponse":
 										this._callbacks[response.requestID].onSuccess(this._json.FromJson<VTSItemPinResponseData>(data));
+										break;
+									case "PostProcessingListResponse":
+										this._callbacks[response.requestID].onSuccess(this._json.FromJson<VTSPostProcessingStateResponseData>(data));
+										break;
+									case "PostProcessingUpdateResponse":
+										this._callbacks[response.requestID].onSuccess(this._json.FromJson<VTSPostProcessingUpdateResponseData>(data));
 										break;
 									case "EventSubscriptionResponse":
 										this._callbacks[response.requestID].onSuccess(this._json.FromJson<VTSEventSubscriptionResponseData>(data));

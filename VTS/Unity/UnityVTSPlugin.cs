@@ -161,6 +161,14 @@ namespace VTS.Unity {
 			this.Plugin.GetParameterValue(parameterName, onSuccess, onError);
 		}
 
+		public void GetPostProcessingEffectStateList(bool fillPostProcessingPresetsArray, bool fillPostProcessingEffectsArray, Effects[] effectIDFilter, Action<VTSPostProcessingStateResponseData> onSuccess, Action<VTSErrorData> onError) {
+			this.Plugin.GetPostProcessingEffectStateList(fillPostProcessingPresetsArray, fillPostProcessingEffectsArray, effectIDFilter, onSuccess, onError);
+		}
+
+		public void SetPostProcessingEffectValues(VTSPostProcessingUpdateOptions options, PostProcessingValue[] values, Action<VTSPostProcessingUpdateResponseData> onSuccess, Action<VTSErrorData> onError) {
+			this.Plugin.SetPostProcessingEffectValues(options, values, onSuccess, onError);
+		}
+
 		public void GetLive2DParameterList(Action<VTSLive2DParameterListData> onSuccess, Action<VTSErrorData> onError) {
 			this.Plugin.GetLive2DParameterList(onSuccess, onError);
 		}
@@ -348,6 +356,14 @@ namespace VTS.Unity {
 
 		public void UnsubscribeFromModelClickedEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
 			this.Plugin.UnsubscribeFromModelClickedEvent(onUnsubscribe, onError);
+		}
+
+		public void SubscribeToPostProcessingEvent(VTSPostProcessingEventConfigOptions config, Action<VTSPostProcessingEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
+			this.Plugin.SubscribeToPostProcessingEvent(config, onEvent, onSubscribe, onError);
+		}
+
+		public void UnsubscribeFromPostProcessingEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
+			this.Plugin.UnsubscribeFromPostProcessingEvent(onUnsubscribe, onError);
 		}
 
 		#endregion
@@ -542,6 +558,10 @@ namespace VTS.Unity {
 			return this.Plugin.SubscribeToModelClickedEvent(config, onEvent);
 		}
 
+		public Task<VTSEventSubscriptionResponseData> SubscribeToPostProcessingEvent(VTSPostProcessingEventConfigOptions config, Action<VTSPostProcessingEventData> onEvent) {
+			return this.Plugin.SubscribeToPostProcessingEvent(config, onEvent);
+		}
+
 		public Task<VTSColorTintData> TintArtMesh(ColorTint tint, float mixWithSceneLightingColor, ArtMeshMatcher matcher) {
 			return this.Plugin.TintArtMesh(tint, mixWithSceneLightingColor, matcher);
 		}
@@ -604,6 +624,18 @@ namespace VTS.Unity {
 
 		public Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelClickedEvent() {
 			return this.Plugin.UnsubscribeFromModelClickedEvent();
+		}
+
+		public Task<VTSEventSubscriptionResponseData> UnsubscribeFromPostProcessingEvent() {
+			return this.Plugin.UnsubscribeFromPostProcessingEvent();
+		}
+
+		public Task<VTSPostProcessingStateResponseData> GetPostProcessingEffectStateList(bool fillPostProcessingPresetsArray, bool fillPostProcessingEffectsArray, Effects[] effectIDFilter) {
+			return this.Plugin.GetPostProcessingEffectStateList(fillPostProcessingPresetsArray, fillPostProcessingEffectsArray, effectIDFilter);
+		}
+
+		public Task<VTSPostProcessingUpdateResponseData> SetPostProcessingEffectValues(VTSPostProcessingUpdateOptions options, PostProcessingValue[] values) {
+			return this.Plugin.SetPostProcessingEffectValues(options, values);
 		}
 
 		#endregion
