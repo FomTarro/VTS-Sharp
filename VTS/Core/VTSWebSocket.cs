@@ -46,7 +46,7 @@ namespace VTS.Core {
 
 		#region Lifecycle
 
-		public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, IVTSLogger logger) {
+		public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility) {
 			if (this._ws == null) {
 				// Only add this listener to the event the first time we initialize.
 				GLOBAL_PORT_DISCOVERY_EVENT += OnPortDiscovered;

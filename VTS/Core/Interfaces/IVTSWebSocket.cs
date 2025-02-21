@@ -32,7 +32,7 @@ namespace VTS.Core {
 		/// </summary>
 		/// <returns></returns>
 		Dictionary<int, VTSStateBroadcastData> GetPorts();
-		void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, IVTSLogger logger);
+		void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility);
 		void ResubscribeToEvents();
 		/// <summary>
 		/// Sends a payload of type T, expecting a response of type K. 

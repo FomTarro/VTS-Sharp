@@ -65,7 +65,7 @@ namespace VTS.Core {
 		public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onConnect, Action onDisconnect, Action<VTSErrorData> onError) {
 			this.TokenStorage = tokenStorage;
 			this.JsonUtility = jsonUtility;
-			this.Socket.Initialize(webSocket, this.JsonUtility, this.Logger);
+			this.Socket.Initialize(webSocket, this.JsonUtility);
 			Action onCombinedConnect = () => {
 				this.Socket.ResubscribeToEvents();
 				onConnect();
