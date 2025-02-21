@@ -39,6 +39,11 @@ namespace VTS.Core {
 		private float _portDiscoveryTimer = 0;
 		private Action _onPortDiscoveryTimeout = null;
 
+		public VTSWebSocket(IVTSLogger logger)
+		{
+			_logger = logger;
+		}
+
 		#region Lifecycle
 
 		public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, IVTSLogger logger) {
@@ -50,7 +55,6 @@ namespace VTS.Core {
 			Disconnect();
 			this._ws = webSocket;
 			this._json = jsonUtility;
-			this._logger = logger;
 			StartUDP();
 		}
 

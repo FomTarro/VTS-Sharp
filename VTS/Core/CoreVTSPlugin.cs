@@ -38,7 +38,7 @@ namespace VTS.Core {
 		/// <param name="pluginAuthor">The plugin author. Must be between 3 and 32 characters.</param>
 		/// <param name="pluginIcon">The plugin icon, encoded as a base64 string. Must be 128*128 pixels exactly.</param>
 		public CoreVTSPlugin(IVTSLogger logger, int updateIntervalMs, string pluginName, string pluginAuthor, string pluginIcon) {
-			this.Socket = new VTSWebSocket();
+			this.Socket = new VTSWebSocket(logger);
 			this.Logger = logger;
 			this.PluginName = pluginName;
 			this.PluginAuthor = pluginAuthor;
