@@ -39,22 +39,22 @@ namespace VTS.Core {
 		private float _portDiscoveryTimer = 0;
 		private Action _onPortDiscoveryTimeout = null;
 
-		public VTSWebSocket(IVTSLogger logger)
-		{
-			_logger = logger;
+		public VTSWebSocket(IWebSocket webSocket, IJsonUtility jsonUtility, IVTSLogger logger)
+        {
+            _ws = webSocket;
+            _json = jsonUtility;
+            _logger = logger;
 		}
 
 		#region Lifecycle
 
-		public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility) {
+		public void Initialize() {
 			if (this._ws == null) {
 				// Only add this listener to the event the first time we initialize.
 				GLOBAL_PORT_DISCOVERY_EVENT += OnPortDiscovered;
 			}
 			// Stop existing socket.
 			Disconnect();
-			this._ws = webSocket;
-			this._json = jsonUtility;
 			StartUDP();
 		}
 

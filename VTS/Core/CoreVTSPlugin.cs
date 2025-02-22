@@ -32,14 +32,19 @@ namespace VTS.Core {
 		/// <summary>
 		/// Creates a new VTSPlugin.
 		/// </summary>
+		/// <param name="webSocket">The WebSocket implementation.</param>
+		/// <param name="jsonUtility">The JSON serializer/deserializer implementation.</param>
+		/// <param name="tokenStorage">The Token Storage implementation.</param>
 		/// <param name="logger">The logger implementation</param>
 		/// <param name="updateIntervalMs">The number of milliseconds between each update cycle of the plugin.</param>
 		/// <param name="pluginName">The plugin name. Must be between 3 and 32 characters.</param>
 		/// <param name="pluginAuthor">The plugin author. Must be between 3 and 32 characters.</param>
 		/// <param name="pluginIcon">The plugin icon, encoded as a base64 string. Must be 128*128 pixels exactly.</param>
-		public CoreVTSPlugin(IVTSLogger logger, int updateIntervalMs, string pluginName, string pluginAuthor, string pluginIcon) {
-			this.Socket = new VTSWebSocket(logger);
-			this.Logger = logger;
+		public CoreVTSPlugin(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, IVTSLogger logger, int updateIntervalMs, string pluginName, string pluginAuthor, string pluginIcon) {
+			this.Socket = new VTSWebSocket(webSocket, jsonUtility, logger);
+            this.TokenStorage = tokenStorage;
+            this.JsonUtility = jsonUtility;
+            this.Logger = logger;
 			this.PluginName = pluginName;
 			this.PluginAuthor = pluginAuthor;
 			this.PluginIcon = pluginIcon;
@@ -62,10 +67,8 @@ namespace VTS.Core {
 
 		#region Initialization
 
-		public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onConnect, Action onDisconnect, Action<VTSErrorData> onError) {
-			this.TokenStorage = tokenStorage;
-			this.JsonUtility = jsonUtility;
-			this.Socket.Initialize(webSocket, this.JsonUtility);
+		public void Initialize(Action onConnect, Action onDisconnect, Action<VTSErrorData> onError) {
+			this.Socket.Initialize();
 			Action onCombinedConnect = () => {
 				this.Socket.ResubscribeToEvents();
 				onConnect();
@@ -101,13 +104,10 @@ namespace VTS.Core {
 			});
 		}
 
-		public Task InitializeAsync(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onDisconnect) {
+		public Task InitializeAsync(Action onDisconnect) {
 			var tcs = new TaskCompletionSource<object>();
 
 			Initialize(
-				webSocket,
-				jsonUtility,
-				tokenStorage,
 				() => tcs.SetResult(null),
 				onDisconnect,
 				error => tcs.SetException(error.ToException())
