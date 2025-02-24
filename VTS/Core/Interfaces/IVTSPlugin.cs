@@ -70,6 +70,7 @@ namespace VTS.Core {
 		/// 
 		/// For more info, see 
 		/// <a href="https://github.com/DenchiSoft/VTubeStudio#controling-items-and-item-animations">https://github.com/DenchiSoft/VTubeStudio#controling-items-and-item-animations</a>
+		/// </summary>
 		/// <param name="itemInstanceID">The ID of the item to move.</param>
 		/// <param name="options">Configuration options about the request.</param>
 		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
@@ -80,7 +81,8 @@ namespace VTS.Core {
 		/// 
 		/// For more info, see 
 		/// <a href="https://github.com/DenchiSoft/VTubeStudio#controling-items-and-item-animations">https://github.com/DenchiSoft/VTubeStudio#controling-items-and-item-animations</a>
-		/// <param name="itemInstanceID">The ID of the item to move.</param>
+		/// </summary>
+		/// <param name="itemInstanceId">The ID of the item to move.</param>
 		/// <param name="options">Configuration options about the request.</param>
 		Task<VTSItemAnimationControlResponseData> AnimateItem(string itemInstanceId, VTSItemAnimationControlOptions options);
 		/// <summary>
@@ -231,7 +233,7 @@ namespace VTS.Core {
 		/// For more info, see 
 		/// <a href="https://github.com/DenchiSoft/VTubeStudio#requesting-list-of-hotkeys-available-in-current-or-other-vts-model">https://github.com/DenchiSoft/VTubeStudio#requesting-list-of-hotkeys-available-in-current-or-other-vts-model</a>
 		/// </summary>
-		/// <param name="modelID">Optional, the model ID to get hotkeys for.</param>
+		/// <param name="modelId">Optional, the model ID to get hotkeys for.</param>
 		Task<VTSHotkeysInCurrentModelData> GetHotkeysInCurrentModel(string modelId);
 		/// <summary>
 		/// Gets a list of available hotkeys for the specified Live2D Item.
@@ -500,7 +502,7 @@ namespace VTS.Core {
 		/// For more info, see 
 		/// <a href="https://github.com/DenchiSoft/VTubeStudio#loading-a-vts-model-by-its-id">https://github.com/DenchiSoft/VTubeStudio#loading-a-vts-model-by-its-id</a>
 		/// </summary>
-		/// <param name="modelID">The Model ID/Name.</param>
+		/// <param name="modelId">The Model ID/Name.</param>
 		Task<VTSModelLoadData> LoadModel(string modelId);
 		/// <summary>
 		/// Moves the items of the specified IDs based on their provided options.
@@ -567,8 +569,6 @@ namespace VTS.Core {
 		/// <param name="angleRelativeTo">The mode to interpert the angle value by.</param>
 		/// <param name="size">The size of the item.</param>
 		/// <param name="sizeRelativeTo">The mode to interpert the size value by.</param>
-		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
-		/// <param name="onError">Callback executed upon receiving an error.</param>
 		Task<VTSItemPinResponseData> PinItemToCenter(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo);
 		/// <summary>
 		/// Pins the specified item to a random point in the specified ArtMesh of the specified model.
@@ -599,8 +599,6 @@ namespace VTS.Core {
 		/// <param name="angleRelativeTo">The mode to interpert the angle value by.</param>
 		/// <param name="size">The size of the item.</param>
 		/// <param name="sizeRelativeTo">The mode to interpert the size value by.</param>
-		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
-		/// <param name="onError">Callback executed upon receiving an error.</param>
 		Task<VTSItemPinResponseData> PinItemToRandom(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo);
 		/// <summary>
 		/// Pins the specified item to a random point in the specified ArtMesh of the specified model.
@@ -615,7 +613,7 @@ namespace VTS.Core {
 		/// <param name="angleRelativeTo">The mode to interpert the angle value by.</param>
 		/// <param name="size">The size of the item.</param>
 		/// <param name="sizeRelativeTo">The mode to interpert the size value by.</param>
-		/// <param name="point">The barycentric coordinate defining where inside the ArtMesh the item should be pinned.</point>
+		/// <param name="point">The barycentric coordinate defining where inside the ArtMesh the item should be pinned.</param>
 		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
 		/// <param name="onError">Callback executed upon receiving an error.</param>
 		void PinItemToPoint(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, BarycentricCoordinate point, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError);
@@ -632,9 +630,7 @@ namespace VTS.Core {
 		/// <param name="angleRelativeTo">The mode to interpert the angle value by.</param>
 		/// <param name="size">The size of the item.</param>
 		/// <param name="sizeRelativeTo">The mode to interpert the size value by.</param>
-		/// <param name="point">The barycentric coordinate defining where inside the ArtMesh the item should be pinned.</point>
-		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
-		/// <param name="onError">Callback executed upon receiving an error.</param>
+		/// <param name="point">The barycentric coordinate defining where inside the ArtMesh the item should be pinned.</param>
 		Task<VTSItemPinResponseData> PinItemToPoint(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, BarycentricCoordinate point);
 		/// <summary>
 		/// Unpins the specified item from wherever it is pinned to.
@@ -647,8 +643,6 @@ namespace VTS.Core {
 		/// Unpins the specified item from wherever it is pinned to.
 		/// </summary>
 		/// <param name="itemInstanceID">The item to unpin.</param>
-		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
-		/// <param name="onError">Callback executed upon receiving an error.</param>
 		Task<VTSItemPinResponseData> UnpinItem(string itemInstanceID);
 		/// <summary>
 		/// Removes a custom parameter from the currently loaded VTS model.
@@ -736,7 +730,7 @@ namespace VTS.Core {
 		/// For more info, see 
 		/// <a href="https://github.com/DenchiSoft/VTubeStudio#requesting-activation-or-deactivation-of-expressions">https://github.com/DenchiSoft/VTubeStudio#requesting-activation-or-deactivation-of-expressions</a>
 		/// </summary>
-		/// <parame name="expression">The expression file name to change the state of.</param>
+		/// <param name="expression">The expression file name to change the state of.</param>
 		/// <param name="active">The state to set the expression to. True to activate, false to deactivate.</param>
 		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
 		/// <param name="onError">Callback executed upon receiving an error.</param>
@@ -747,7 +741,7 @@ namespace VTS.Core {
 		/// For more info, see 
 		/// <a href="https://github.com/DenchiSoft/VTubeStudio#requesting-activation-or-deactivation-of-expressions">https://github.com/DenchiSoft/VTubeStudio#requesting-activation-or-deactivation-of-expressions</a>
 		/// </summary>
-		/// <parame name="expression">The expression file name to change the state of.</param>
+		/// <param name="expression">The expression file name to change the state of.</param>
 		/// <param name="active">The state to set the expression to. True to activate, false to deactivate.</param>
 		Task<VTSExpressionActivationData> SetExpressionState(string expression, bool active);
 		/// <summary>
@@ -763,7 +757,7 @@ namespace VTS.Core {
 		/// For more info, see 
 		/// <a href="https://github.com/DenchiSoft/VTubeStudio#get-and-set-ndi-settings">https://github.com/DenchiSoft/VTubeStudio#get-and-set-ndi-settings</a>
 		/// </summary>
-		/// <parame name="config">The desired NDI configuration.</param>
+		/// <param name="config">The desired NDI configuration.</param>
 		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
 		/// <param name="onError">Callback executed upon receiving an error.</param>
 		void SetNDIConfig(VTSNDIConfigData config, Action<VTSNDIConfigData> onSuccess, Action<VTSErrorData> onError);
@@ -773,7 +767,7 @@ namespace VTS.Core {
 		/// For more info, see 
 		/// <a href="https://github.com/DenchiSoft/VTubeStudio#get-and-set-ndi-settings">https://github.com/DenchiSoft/VTubeStudio#get-and-set-ndi-settings</a>
 		/// </summary>
-		/// <parame name="config">The desired NDI configuration.</param>
+		/// <param name="config">The desired NDI configuration.</param>
 		Task<VTSNDIConfigData> SetNDIConfig(VTSNDIConfigData config);
 		/// <summary>
 		/// Sets the connection port to the given number. Returns true if the port is a valid VTube Studio port, returns false otherwise. 
@@ -876,6 +870,7 @@ namespace VTS.Core {
 		/// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#model-loadedunloaded">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#model-loadedunloaded</a>
 		/// </summary>
 		/// <param name="config">Configuration options about the subscription.</param>
+		/// <param name="onEvent">Callback executed upon completion.</param>
 		Task<VTSEventSubscriptionResponseData> SubscribeToModelLoadedEvent(VTSModelLoadedEventConfigOptions config, Action<VTSModelLoadedEventData> onEvent);
 		/// <summary>
 		/// Subscribes to the Model Moved Event.
@@ -952,7 +947,6 @@ namespace VTS.Core {
 		/// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#lostfound-tracking">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#lostfound-tracking</a>
 		/// </summary>
 		/// <param name="onEvent">Callback to execute upon receiving an event.</param>
-		/// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
 		Task<VTSEventSubscriptionResponseData> SubscribeToTrackingEvent(Action<VTSTrackingEventData> onEvent);
 		/// <summary>
 		/// Subscribes to the Item Event.
@@ -973,7 +967,6 @@ namespace VTS.Core {
 		/// </summary>
 		/// <param name="config">Configuration options about the subscription.</param>
 		/// <param name="onEvent">Callback to execute upon receiving an event.</param>
-		/// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
 		Task<VTSEventSubscriptionResponseData> SubscribeToItemEvent(VTSItemEventConfigOptions config, Action<VTSItemEventData> onEvent);
 		/// <summary>
 		/// Subscribes to the Model Clicked Event.
@@ -994,7 +987,6 @@ namespace VTS.Core {
 		/// </summary>
 		/// <param name="config">Configuration options about the subscription.</param>
 		/// <param name="onEvent">Callback to execute upon receiving an event.</param>
-		/// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
 		Task<VTSEventSubscriptionResponseData> SubscribeToModelClickedEvent(VTSModelClickedEventConfigOptions config, Action<VTSModelClickedEventData> onEvent);
 
 		/// <summary>
@@ -1016,8 +1008,6 @@ namespace VTS.Core {
 		/// </summary>
 		/// <param name="config">Configuration options about the subscription.</param>
 		/// <param name="onEvent">Callback to execute upon receiving an event.</param>
-		/// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
-		/// <param name="onError">Callback executed upon receiving an error.</param>
 		Task<VTSEventSubscriptionResponseData> SubscribeToPostProcessingEvent(VTSPostProcessingEventConfigOptions config, Action<VTSPostProcessingEventData> onEvent);
 
 
@@ -1028,7 +1018,7 @@ namespace VTS.Core {
 		/// <a href="https://github.com/DenchiSoft/VTubeStudio#tint-artmeshes-with-color">https://github.com/DenchiSoft/VTubeStudio#tint-artmeshes-with-color</a>
 		/// </summary>
 		/// <param name="tint">The tint to be applied.</param>
-		/// <param name="mixWithSceneLightingColor"> The amount to mix the color with scene lighting, from 0 to 1. Default is 1.0, which will have the color override scene lighting completely.
+		/// <param name="mixWithSceneLightingColor"> The amount to mix the color with scene lighting, from 0 to 1. Default is 1.0, which will have the color override scene lighting completely.</param>
 		/// <param name="matcher">The ArtMesh matcher search parameters.</param>
 		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
 		/// <param name="onError">Callback executed upon receiving an error.</param>
@@ -1040,7 +1030,7 @@ namespace VTS.Core {
 		/// <a href="https://github.com/DenchiSoft/VTubeStudio#tint-artmeshes-with-color">https://github.com/DenchiSoft/VTubeStudio#tint-artmeshes-with-color</a>
 		/// </summary>
 		/// <param name="tint">The tint to be applied.</param>
-		/// <param name="mixWithSceneLightingColor"> The amount to mix the color with scene lighting, from 0 to 1. Default is 1.0, which will have the color override scene lighting completely.
+		/// <param name="mixWithSceneLightingColor"> The amount to mix the color with scene lighting, from 0 to 1. Default is 1.0, which will have the color override scene lighting completely.</param>
 		/// <param name="matcher">The ArtMesh matcher search parameters.</param>
 		Task<VTSColorTintData> TintArtMesh(ColorTint tint, float mixWithSceneLightingColor, ArtMeshMatcher matcher);
 		/// <summary>
@@ -1059,7 +1049,7 @@ namespace VTS.Core {
 		/// For more info, see 
 		/// <a href="https://github.com/DenchiSoft/VTubeStudio#requesting-execution-of-hotkeys">https://github.com/DenchiSoft/VTubeStudio#requesting-execution-of-hotkeys</a>
 		/// </summary>
-		/// <param name="hotkeyID">The model ID to get hotkeys for.</param>
+		/// <param name="hotkeyId">The model ID to get hotkeys for.</param>
 		Task<VTSHotkeyTriggerData> TriggerHotkey(string hotkeyId);
 		/// <summary>
 		/// Triggers a given hotkey on a specified Live2D item.
@@ -1078,8 +1068,8 @@ namespace VTS.Core {
 		/// For more info, see 
 		/// <a href="https://github.com/DenchiSoft/VTubeStudio#requesting-execution-of-hotkeys">https://github.com/DenchiSoft/VTubeStudio#requesting-execution-of-hotkeys</a>
 		/// </summary>
-		/// <param name="itemInstanceID">The instance ID of the Live2D item.</param>
-		/// <param name="hotkeyID">The model ID to get hotkeys for.</param>
+		/// <param name="itemInstanceId">The instance ID of the Live2D item.</param>
+		/// <param name="hotkeyId">The model ID to get hotkeys for.</param>
 		Task<VTSHotkeyTriggerData> TriggerHotkeyForLive2DItem(string itemInstanceId, string hotkeyId);
 		/// <summary>
 		/// Unload items from the scene, either broadly, by identifier, or by file name, based on the provided options.
@@ -1108,7 +1098,6 @@ namespace VTS.Core {
 		/// <summary>
 		/// Unsubscribes from all events.
 		/// </summary>
-		/// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing to the event.</param>
 		Task<VTSEventSubscriptionResponseData> UnsubscribeFromAllEvents();
 		/// <summary>
 		/// Unsubscribes from the Background Changed Event.
@@ -1139,7 +1128,6 @@ namespace VTS.Core {
 		/// <summary>
 		/// Unsubscribes from the Model Loaded Event.
 		/// </summary>
-		/// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing from the event.</param>
 		Task<VTSEventSubscriptionResponseData> UnsubscribeFromModelLoadedEvent();
 		/// <summary>
 		/// Unsubscribes from the Model Moved Event.
