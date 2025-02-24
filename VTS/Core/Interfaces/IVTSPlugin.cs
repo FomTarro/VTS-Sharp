@@ -76,15 +76,15 @@ namespace VTS.Core {
 		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
 		/// <param name="onError">Callback executed upon receiving an error.</param>
 		void AnimateItem(string itemInstanceID, VTSItemAnimationControlOptions options, Action<VTSItemAnimationControlResponseData> onSuccess, Action<VTSErrorData> onError);
-        /// <summary>
-        /// Alters the properties of the item of the specified ID based on the provided options.
-        /// 
-        /// For more info, see 
-        /// <a href="https://github.com/DenchiSoft/VTubeStudio#controling-items-and-item-animations">https://github.com/DenchiSoft/VTubeStudio#controling-items-and-item-animations</a>
-        /// </summary>
-        /// <param name="itemInstanceId">The ID of the item to move.</param>
-        /// <param name="options">Configuration options about the request.</param>
-        Task<VTSItemAnimationControlResponseData> AnimateItem(string itemInstanceId, VTSItemAnimationControlOptions options);
+		/// <summary>
+		/// Alters the properties of the item of the specified ID based on the provided options.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio#controling-items-and-item-animations">https://github.com/DenchiSoft/VTubeStudio#controling-items-and-item-animations</a>
+		/// </summary>
+		/// <param name="itemInstanceId">The ID of the item to move.</param>
+		/// <param name="options">Configuration options about the request.</param>
+		Task<VTSItemAnimationControlResponseData> AnimateItem(string itemInstanceId, VTSItemAnimationControlOptions options);
 		/// <summary>
 		/// Disconnects from VTube Studio. Will fire the onDisconnect callback set via the Initialize method.
 		/// </summary>
@@ -227,14 +227,14 @@ namespace VTS.Core {
 		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
 		/// <param name="onError">Callback executed upon receiving an error.</param>
 		void GetHotkeysInCurrentModel(string modelID, Action<VTSHotkeysInCurrentModelData> onSuccess, Action<VTSErrorData> onError);
-        /// <summary>
-        /// Gets a list of available hotkeys.
-        /// 
-        /// For more info, see 
-        /// <a href="https://github.com/DenchiSoft/VTubeStudio#requesting-list-of-hotkeys-available-in-current-or-other-vts-model">https://github.com/DenchiSoft/VTubeStudio#requesting-list-of-hotkeys-available-in-current-or-other-vts-model</a>
-        /// </summary>
-        /// <param name="modelId">Optional, the model ID to get hotkeys for.</param>
-        Task<VTSHotkeysInCurrentModelData> GetHotkeysInCurrentModel(string modelId);
+		/// <summary>
+		/// Gets a list of available hotkeys.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio#requesting-list-of-hotkeys-available-in-current-or-other-vts-model">https://github.com/DenchiSoft/VTubeStudio#requesting-list-of-hotkeys-available-in-current-or-other-vts-model</a>
+		/// </summary>
+		/// <param name="modelId">Optional, the model ID to get hotkeys for.</param>
+		Task<VTSHotkeysInCurrentModelData> GetHotkeysInCurrentModel(string modelId);
 		/// <summary>
 		/// Gets a list of available hotkeys for the specified Live2D Item.
 		/// 
@@ -496,14 +496,14 @@ namespace VTS.Core {
 		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
 		/// <param name="onError">Callback executed upon receiving an error.</param>
 		void LoadModel(string modelID, Action<VTSModelLoadData> onSuccess, Action<VTSErrorData> onError);
-        /// <summary>
-        /// Loads a VTS model by its Model ID. Will return an error if the model cannot be loaded.
-        /// 
-        /// For more info, see 
-        /// <a href="https://github.com/DenchiSoft/VTubeStudio#loading-a-vts-model-by-its-id">https://github.com/DenchiSoft/VTubeStudio#loading-a-vts-model-by-its-id</a>
-        /// </summary>
-        /// <param name="modelId">The Model ID/Name.</param>
-        Task<VTSModelLoadData> LoadModel(string modelId);
+		/// <summary>
+		/// Loads a VTS model by its Model ID. Will return an error if the model cannot be loaded.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio#loading-a-vts-model-by-its-id">https://github.com/DenchiSoft/VTubeStudio#loading-a-vts-model-by-its-id</a>
+		/// </summary>
+		/// <param name="modelId">The Model ID/Name.</param>
+		Task<VTSModelLoadData> LoadModel(string modelId);
 		/// <summary>
 		/// Moves the items of the specified IDs based on their provided options.
 		/// 
@@ -863,15 +863,15 @@ namespace VTS.Core {
 		/// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
 		/// <param name="onError">Callback executed upon receiving an error.</param>
 		void SubscribeToModelLoadedEvent(VTSModelLoadedEventConfigOptions config, Action<VTSModelLoadedEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError);
-        /// <summary>
-        /// Subscribes to the Model Loaded Event. Can be configured with a model ID to only recieve events about the given model.
-        /// 
-        /// For more info, see 
-        /// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#model-loadedunloaded">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#model-loadedunloaded</a>
-        /// </summary>
-        /// <param name="config">Configuration options about the subscription.</param>
-        /// <param name="onEvent">Callback executed upon completion.</param>
-        Task<VTSEventSubscriptionResponseData> SubscribeToModelLoadedEvent(VTSModelLoadedEventConfigOptions config, Action<VTSModelLoadedEventData> onEvent);
+		/// <summary>
+		/// Subscribes to the Model Loaded Event. Can be configured with a model ID to only recieve events about the given model.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#model-loadedunloaded">https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md#model-loadedunloaded</a>
+		/// </summary>
+		/// <param name="config">Configuration options about the subscription.</param>
+		/// <param name="onEvent">Callback executed upon completion.</param>
+		Task<VTSEventSubscriptionResponseData> SubscribeToModelLoadedEvent(VTSModelLoadedEventConfigOptions config, Action<VTSModelLoadedEventData> onEvent);
 		/// <summary>
 		/// Subscribes to the Model Moved Event.
 		/// 
@@ -1043,14 +1043,14 @@ namespace VTS.Core {
 		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
 		/// <param name="onError">Callback executed upon receiving an error.</param>
 		void TriggerHotkey(string hotkeyID, Action<VTSHotkeyTriggerData> onSuccess, Action<VTSErrorData> onError);
-        /// <summary>
-        /// Triggers a given hotkey.
-        /// 
-        /// For more info, see 
-        /// <a href="https://github.com/DenchiSoft/VTubeStudio#requesting-execution-of-hotkeys">https://github.com/DenchiSoft/VTubeStudio#requesting-execution-of-hotkeys</a>
-        /// </summary>
-        /// <param name="hotkeyId">The model ID to get hotkeys for.</param>
-        Task<VTSHotkeyTriggerData> TriggerHotkey(string hotkeyId);
+		/// <summary>
+		/// Triggers a given hotkey.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio#requesting-execution-of-hotkeys">https://github.com/DenchiSoft/VTubeStudio#requesting-execution-of-hotkeys</a>
+		/// </summary>
+		/// <param name="hotkeyId">The model ID to get hotkeys for.</param>
+		Task<VTSHotkeyTriggerData> TriggerHotkey(string hotkeyId);
 		/// <summary>
 		/// Triggers a given hotkey on a specified Live2D item.
 		/// 
@@ -1062,15 +1062,15 @@ namespace VTS.Core {
 		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
 		/// <param name="onError">Callback executed upon receiving an error.</param>
 		void TriggerHotkeyForLive2DItem(string itemInstanceID, string hotkeyID, Action<VTSHotkeyTriggerData> onSuccess, Action<VTSErrorData> onError);
-        /// <summary>
-        /// Triggers a given hotkey on a specified Live2D item.
-        /// 
-        /// For more info, see 
-        /// <a href="https://github.com/DenchiSoft/VTubeStudio#requesting-execution-of-hotkeys">https://github.com/DenchiSoft/VTubeStudio#requesting-execution-of-hotkeys</a>
-        /// </summary>
-        /// <param name="itemInstanceId">The instance ID of the Live2D item.</param>
-        /// <param name="hotkeyId">The model ID to get hotkeys for.</param>
-        Task<VTSHotkeyTriggerData> TriggerHotkeyForLive2DItem(string itemInstanceId, string hotkeyId);
+		/// <summary>
+		/// Triggers a given hotkey on a specified Live2D item.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio#requesting-execution-of-hotkeys">https://github.com/DenchiSoft/VTubeStudio#requesting-execution-of-hotkeys</a>
+		/// </summary>
+		/// <param name="itemInstanceId">The instance ID of the Live2D item.</param>
+		/// <param name="hotkeyId">The model ID to get hotkeys for.</param>
+		Task<VTSHotkeyTriggerData> TriggerHotkeyForLive2DItem(string itemInstanceId, string hotkeyId);
 		/// <summary>
 		/// Unload items from the scene, either broadly, by identifier, or by file name, based on the provided options.
 		/// 
