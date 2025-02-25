@@ -56,6 +56,7 @@ namespace VTS.Core {
 		/// <param name="resubscribe">Callback that executes a resubscription.</param>
 		/// <typeparam name="T">The request type.</typeparam>
 		/// <typeparam name="K">The response type.</typeparam>
+		/// <typeparam name="V">The config options type.</typeparam>
 		/// <returns></returns>
 		void SendEventSubscription<T, K, V>(T request, Action<K> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError, Action resubscribe)
 			where T : VTSEventSubscriptionRequestData<V>
