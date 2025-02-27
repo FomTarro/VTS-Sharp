@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace VTS.Core {
@@ -29,6 +30,7 @@ namespace VTS.Core {
 
 		// UDP 
 		private const int UDP_DEFAULT_PORT = 47779;
+		private static readonly IPEndPoint LOCAL_PT = new IPEndPoint(IPAddress.Any, UDP_DEFAULT_PORT);
 		private static UdpClient UDP_CLIENT = null;
 		private static Task<UdpReceiveResult> UDP_RESULT = null;
 		private static readonly Dictionary<IPAddress, Dictionary<int, VTSStateBroadcastData>> PORTS_BY_IP = new Dictionary<IPAddress, Dictionary<int, VTSStateBroadcastData>>();
@@ -66,6 +68,7 @@ namespace VTS.Core {
 		public void Dispose() {
 			GLOBAL_PORT_DISCOVERY_EVENT -= OnPortDiscovered;
 			Disconnect();
+			UDP_CLIENT.Dispose();
 		}
 
 		#endregion
@@ -116,7 +119,11 @@ namespace VTS.Core {
 				}
 				// If our result has been collected and disposed of, start again
 				if (UDP_RESULT == null) {
-					UDP_RESULT = UDP_CLIENT.ReceiveAsync();
+					UDP_RESULT = Task.Run(() => {
+						IPEndPoint ep = null;
+						var bytes = UDP_CLIENT.Receive(ref ep);
+						return new UdpReceiveResult(bytes, ep);
+					});
 				}
 			}
 		}
@@ -125,10 +132,10 @@ namespace VTS.Core {
 			try {
 				if (UDP_CLIENT == null) {
 					// This configuration should prevent the UDP client from blocking other connections to the port
-					IPEndPoint LOCAL_PT = new IPEndPoint(IPAddress.Any, UDP_DEFAULT_PORT);
 					UDP_CLIENT = new UdpClient();
 					UDP_CLIENT.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
 					UDP_CLIENT.Client.Bind(LOCAL_PT);
+					UDP_CLIENT.Client.ReceiveTimeout = (int)(DEFAULT_PORT_DISCOVERY_TIMEOUT * 2);
 				}
 			} catch (Exception e) {
 				this._logger.LogError(e.ToString());
