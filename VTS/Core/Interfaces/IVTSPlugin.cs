@@ -369,21 +369,15 @@ namespace VTS.Core {
 		/// <summary>
 		/// Selects the Websocket, JSON utility, and Token Storage implementations, then attempts to Authenticate the plugin.
 		/// </summary>
-		/// <param name="webSocket">The WebSocket implementation.</param>
-		/// <param name="jsonUtility">The JSON serializer/deserializer implementation.</param>
-		/// <param name="tokenStorage">The Token Storage implementation.</param>
 		/// <param name="onConnect">Callback executed upon successful initialization.</param>
 		/// <param name="onDisconnect">Callback executed upon disconnecting from VTS.</param>
 		/// <param name="onError">Callback executed upon failed initialization.</param>
-		void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onConnect, Action onDisconnect, Action<VTSErrorData> onError);
+		void Initialize(Action onConnect, Action onDisconnect, Action<VTSErrorData> onError);
 		/// <summary>
 		/// Selects the Websocket, JSON utility, and Token Storage implementations, then attempts to Authenticate the plugin.
 		/// </summary>
-		/// <param name="webSocket">The WebSocket implementation.</param>
-		/// <param name="jsonUtility">The JSON serializer/deserializer implementation.</param>
-		/// <param name="tokenStorage">The Token Storage implementation.</param>
 		/// <param name="onDisconnect">Callback executed upon disconnecting from VTS.</param>
-		Task InitializeAsync(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onDisconnect);
+		Task InitializeAsync(Action onDisconnect);
 		/// <summary>
 		/// Sends a list of parameter names and corresponding values to assign to them.
 		/// 

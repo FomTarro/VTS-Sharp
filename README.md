@@ -141,9 +141,6 @@ Is the plugin currently authenticated?
 ### Methods
 #### `void Initialize`
 Connects to VTube Studio, authenticates the plugin, and also selects the WebSocket, JSON Utility, and Token Storage implementations. Takes the following args:
-* `IWebSocket webSocket`: The WebSocket implementation.
-* `IJsonUtility jsonUtility`: The JSON serializer/deserializer implementation.
-* `ITokenStorage tokenStorage`: The Token Storage implementation.
 * `Action onConnect`: Callback executed upon successful initialization.
 * `Action onDisconnect`: Callback executed upon disconnecting from VTS (accidental or otherwise).
 * `Action<VTSErrorData> onError`: Callback executed upon failed initialization.
@@ -155,8 +152,6 @@ The plugin will attempt to intelligently choose a port to connect to, using the 
 
 #### `Task InitializeAsync`
 Connects to VTube Studio, authenticates the plugin, and also selects the WebSocket, JSON Utility, and Token Storage implementations. Takes the following args:
-* `IWebSocket webSocket`: The WebSocket implementation.
-* `IJsonUtility jsonUtility`: The JSON serializer/deserializer implementation.
 * `ITokenStorage tokenStorage`: The Token Storage implementation.
 * `Action onDisconnect`: Callback executed upon disconnecting from VTS (accidental or otherwise).
 
