@@ -25,6 +25,13 @@ namespace VTS.Unity.Examples {
 		[SerializeField]
 		private Text _connectionText = null;
 
+		public override IWebSocket Socket => new WebSocketImpl(this.Logger);
+
+		public override IJsonUtility JsonUtility => new NewtonsoftJsonUtilityImpl();
+
+		public override ITokenStorage TokenStorage => new TokenStorageImpl(Application.persistentDataPath);
+
+		public override IVTSLogger Logger => new UnityVTSLoggerImpl();
 
 		private void Awake() {
 			Connect();
@@ -33,7 +40,7 @@ namespace VTS.Unity.Examples {
 		public void Connect() {
 			this._connectionLight.color = Color.yellow;
 			this._connectionText.text = "Connecting...";
-			Initialize(new WebSocketSharpImpl(this.Logger), new NewtonsoftJsonUtilityImpl(), new TokenStorageImpl(Application.persistentDataPath),
+			Initialize(
 			() => {
 				this.Logger.Log("Connected!");
 				this._connectionLight.color = Color.green;
@@ -53,24 +60,21 @@ namespace VTS.Unity.Examples {
 
 		public void PrintAPIStats() {
 			GetStatistics(
-				(r) => { _text.text = this.JsonUtility.ToJson(r); },
-				(e) => { _text.text = e.data.message; }
-			);
+				(r) => _text.text = this.JsonUtility.ToJson(r),
+				(e) => _text.text = e.data.message);
 		}
 
 		public void PrintCurentModelHotkeys() {
 			GetHotkeysInCurrentModel(
 				null,
-				(r) => { _text.text = this.JsonUtility.ToJson(r); },
-				(e) => { _text.text = e.data.message; }
-			);
+				(r) => _text.text = this.JsonUtility.ToJson(r),
+				(e) => _text.text = e.data.message);
 		}
 
 		public void PrintScreenColorData() {
 			GetSceneColorOverlayInfo(
-				(r) => { _text.text = this.JsonUtility.ToJson(r); },
-				(e) => { _text.text = e.data.message; }
-			);
+				(r) => _text.text = this.JsonUtility.ToJson(r),
+				(e) => _text.text = e.data.message);
 		}
 
 		public void PrintPostProcessingEffects() {
@@ -80,8 +84,7 @@ namespace VTS.Unity.Examples {
 					Debug.Log(this.JsonUtility.ToJson(r));
 					_text.text = this.JsonUtility.ToJson(r);
 				},
-				(e) => { _text.text = e.data.message; }
-			);
+				(e) => _text.text = e.data.message);
 		}
 
 		public void TintColor() {
@@ -91,9 +94,8 @@ namespace VTS.Unity.Examples {
 				_color,
 				0.0f,
 				matcher,
-				(r) => { _text.text = this.JsonUtility.ToJson(r); },
-				(e) => { _text.text = e.data.message; }
-			);
+				(r) => _text.text = this.JsonUtility.ToJson(r),
+				(e) => _text.text = e.data.message);
 		}
 
 		public void AdjustAnalogGlitch(float f) {
@@ -104,8 +106,8 @@ namespace VTS.Unity.Examples {
 			PostProcessingValue value2 = new PostProcessingValue(EffectConfigs.AnalogGlitch_ScanlineJitter, f);
 			PostProcessingValue[] values = (new[] { value, value2 });
 			SetPostProcessingEffectValues(opts, values,
-				(r) => { _text.text = this.JsonUtility.ToJson(r); },
-				(e) => { _text.text = e.data.message; });
+				(r) => _text.text = this.JsonUtility.ToJson(r),
+				(e) => _text.text = e.data.message);
 		}
 
 		public void ToggleHeadRoll() {
@@ -119,76 +121,70 @@ namespace VTS.Unity.Examples {
 					ExpressionData expression = new List<ExpressionData>(r.data.expressions).Find((e) => { return e.file.ToLower().Contains(expressionName.ToLower()); });
 					if (expression != null) {
 						SetExpressionState(expression.file, true,
-							(x) => { _text.text = this.JsonUtility.ToJson(x); },
-							(e2) => { _text.text = e2.data.message; });
+							(x) => _text.text = this.JsonUtility.ToJson(x),
+							(e2) => _text.text = e2.data.message);
 					} else {
 						throw new System.Exception("No Expression with " + expressionName + " in the file name was found.");
 					}
 				},
-				(e) => { _text.text = e.data.message; }
-			);
+				(e) => _text.text = e.data.message);
 		}
 
 		public void GetPhysicsData() {
 			GetCurrentModelPhysics(
-				(r) => { _text.text = this.JsonUtility.ToJson(r); },
-				(e) => { _text.text = e.data.message; }
-			);
+				(r) => _text.text = this.JsonUtility.ToJson(r),
+				(e) => _text.text = e.data.message);
 		}
 
 		public void GetArtMeshes() {
 			this.RequestArtMeshSelection("", "", 2, new List<string>(),
-			(s) => {
-				this._text.text = this.JsonUtility.ToJson(s);
-			},
-			(e) => {
-				this._text.text = this.JsonUtility.ToJson(e);
-			});
+			(s) => this._text.text = this.JsonUtility.ToJson(s),
+			(e) => this._text.text = this.JsonUtility.ToJson(e));
 		}
 
 		public void SubTestEvent() {
 			VTSTestEventConfigOptions config = new VTSTestEventConfigOptions("ECHO!");
 			this.SubscribeToTestEvent(
 				config,
-				(s) => { _eventText.text = string.Format("{0} - {1}", s.data.counter, s.data.yourTestMessage); },
+				(s) => _eventText.text = string.Format("{0} - {1}", s.data.counter, s.data.yourTestMessage),
 				DoNothingCallback,
-				(e) => { _eventText.text = e.data.message; });
+				(e) => _eventText.text = e.data.message);
 		}
 
 		public void UnsubTestEvent() {
 			this.UnsubscribeFromTestEvent(
-				(s) => { _eventText.text = "[Event Output]"; },
-				(e) => { _eventText.text = e.data.message; });
+				(s) => _eventText.text = "[Event Output]",
+				(e) => _eventText.text = e.data.message);
 		}
 
 		public void SubOutlineEvent() {
 			VTSModelOutlineEventConfigOptions config = new VTSModelOutlineEventConfigOptions(true);
 			this.SubscribeToModelOutlineEvent(
 				config,
-				(s) => { _eventText.text = string.Format("Model center: ({0}, {1})", s.data.convexHullCenter.x, s.data.convexHullCenter.y); },
+				(s) => _eventText.text = string.Format("Model center: ({0}, {1})", s.data.convexHullCenter.x, s.data.convexHullCenter.y),
 				DoNothingCallback,
-				(e) => { _eventText.text = e.data.message; });
+				(e) => _eventText.text = e.data.message);
 		}
 
 		public void UnsubOutlineEvent() {
 			this.UnsubscribeFromModelOutlineEvent(
-				(s) => { _eventText.text = "[Event Output]"; },
-				(e) => { _eventText.text = e.data.message; });
+				(s) => _eventText.text = "[Event Output]",
+				(e) => _eventText.text = e.data.message);
 		}
 
 		public void SubAnimationEvent() {
 			VTSModelAnimationEventConfigOptions config = new VTSModelAnimationEventConfigOptions();
 			this.SubscribeToModelAnimationEvent(
 				config,
-				(s) => { _eventText.text = string.Format(s.data.animationEventType + " "); },
-				(g) => { this.Logger.Log("Subscribed!"); },
-				(e) => { _eventText.text = e.data.message; });
+				(s) => _eventText.text = string.Format(s.data.animationEventType + " "),
+				(g) => this.Logger.Log("Subscribed!"),
+				(e) => _eventText.text = e.data.message);
 		}
 
 		public void UnsubAnimationEvent() {
 			this.UnsubscribeFromModelAnimationEvent(
-				(s) => { _eventText.text = "[Event Output]"; },
-				(e) => { _eventText.text = e.data.message; });
+				(s) => _eventText.text = "[Event Output]",
+				(e) => _eventText.text = e.data.message);
 		}
 
 
@@ -197,8 +193,7 @@ namespace VTS.Unity.Examples {
 				values,
 				VTSInjectParameterMode.ADD,
 				(r) => { },
-				(e) => { this.Logger.LogError(e.data.message); }
-			);
+				(e) => this.Logger.LogError(e.data.message));
 		}
 
 		private void FixedUpdate() {
@@ -207,13 +202,13 @@ namespace VTS.Unity.Examples {
 				float x = Mathf.Sin(Time.realtimeSinceStartup);
 				float y = Mathf.Cos(Time.realtimeSinceStartup);
 				SyncValues(new VTSParameterInjectionValue[] {
-					new VTSParameterInjectionValue { id = "FaceAngleX", value = x*20, weight = 1 },
-					new VTSParameterInjectionValue { id = "FaceAngleY", value = y*20, weight = 1 },
-					new VTSParameterInjectionValue { id = "FaceAngleZ", value = x*20, weight = 1 },
-					new VTSParameterInjectionValue { id = "EyeLeftX", value = x/2, weight = 1 },
-					new VTSParameterInjectionValue { id = "EyeLeftY", value = y/2, weight = 1 },
-					new VTSParameterInjectionValue { id = "EyeRightX", value = x/2, weight = 1 },
-					new VTSParameterInjectionValue { id = "EyeRightY", value = y/2, weight = 1 },
+					new() { id = "FaceAngleX", value = x*20, weight = 1 },
+					new() { id = "FaceAngleY", value = y*20, weight = 1 },
+					new() { id = "FaceAngleZ", value = x*20, weight = 1 },
+					new() { id = "EyeLeftX", value = x/2, weight = 1 },
+					new() { id = "EyeLeftY", value = y/2, weight = 1 },
+					new() { id = "EyeRightX", value = x/2, weight = 1 },
+					new() { id = "EyeRightY", value = y/2, weight = 1 },
 				});
 			}
 		}

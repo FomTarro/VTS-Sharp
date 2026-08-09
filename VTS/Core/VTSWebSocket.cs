@@ -20,9 +20,9 @@ namespace VTS.Core {
 		private const int DEFAULT_PORT = 8001;
 		private int _port = DEFAULT_PORT;
 		public int Port { get { return this._port; } }
-		private IWebSocket _ws = null;
-		private IJsonUtility _json = null;
-		private IVTSLogger _logger = null;
+		private readonly IWebSocket _ws = null;
+		private readonly IJsonUtility _json = null;
+		private readonly IVTSLogger _logger = null;
 
 		// API Callbacks
 		private readonly Dictionary<string, VTSCallbacks> _callbacks = new Dictionary<string, VTSCallbacks>();
@@ -43,16 +43,16 @@ namespace VTS.Core {
 
 		#region Lifecycle
 
-		public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, IVTSLogger logger) {
-			if (this._ws == null) {
-				// Only add this listener to the event the first time we initialize.
-				GLOBAL_PORT_DISCOVERY_EVENT += OnPortDiscovered;
-			}
-			// Stop existing socket.
-			Disconnect();
+		public VTSWebSocket(IWebSocket webSocket, IJsonUtility jsonUtility, IVTSLogger logger) {
+			GLOBAL_PORT_DISCOVERY_EVENT += OnPortDiscovered;
 			this._ws = webSocket;
 			this._json = jsonUtility;
 			this._logger = logger;
+		}
+
+		public void Initialize() {
+			// Stop existing socket.
+			Disconnect();
 			StartUDP();
 		}
 
@@ -60,9 +60,7 @@ namespace VTS.Core {
 			ProcessResponses();
 			CheckPorts();
 			UpdatePortDiscoveryTimeout(timeDelta);
-			if (this._ws != null) {
-				this._ws.Tick(timeDelta);
-			}
+			this._ws?.Tick(timeDelta);
 		}
 
 		public void Dispose() {
@@ -118,13 +116,11 @@ namespace VTS.Core {
 					}
 				}
 				// If our result has been collected and disposed of, start again
-				if (UDP_RESULT == null) {
-					UDP_RESULT = Task.Run(() => {
-						IPEndPoint ep = null;
-						var bytes = UDP_CLIENT.Receive(ref ep);
-						return new UdpReceiveResult(bytes, ep);
-					});
-				}
+				UDP_RESULT ??= Task.Run(() => {
+					IPEndPoint ep = null;
+					var bytes = UDP_CLIENT.Receive(ref ep);
+					return new UdpReceiveResult(bytes, ep);
+				});
 			}
 		}
 
@@ -155,9 +151,7 @@ namespace VTS.Core {
 			if (this._portDiscoveryTimer > 0f) {
 				this._portDiscoveryTimer -= timeDelta;
 				if (this._portDiscoveryTimer <= 0f) {
-					if (this._onPortDiscoveryTimeout != null) {
-						this._onPortDiscoveryTimeout.Invoke();
-					}
+					this._onPortDiscoveryTimeout?.Invoke();
 					this._portDiscoveryTimer = 0f;
 				}
 			}
@@ -181,9 +175,8 @@ namespace VTS.Core {
 		}
 
 		public bool SetIPAddress(string ipString) {
-			IPAddress address;
 			this._logger.Log(string.Format("Setting IP address: {0}...", ipString));
-			if (IPAddress.TryParse(ipString, out address)) {
+			if (IPAddress.TryParse(ipString, out IPAddress address)) {
 				this._ip = MapAddress(address);
 				this._logger.Log(string.Format("IP address {0} is valid IPv4 format.", ipString));
 				return true;

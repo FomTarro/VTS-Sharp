@@ -22,7 +22,9 @@ namespace VTS.Core {
 		public ITokenStorage TokenStorage { get; private set; }
 		public IJsonUtility JsonUtility { get; private set; }
 		public IVTSLogger Logger { get; private set; }
-		public IVTSWebSocket Socket { get; private set; }
+		public IWebSocket Socket { get; private set; }
+
+		private readonly VTSWebSocket _vtsSocket;
 
 		private readonly CancellationTokenSource _cancelToken;
 		private readonly Task _tickLoop = null;
@@ -37,9 +39,12 @@ namespace VTS.Core {
 		/// <param name="pluginName">The plugin name. Must be between 3 and 32 characters.</param>
 		/// <param name="pluginAuthor">The plugin author. Must be between 3 and 32 characters.</param>
 		/// <param name="pluginIcon">The plugin icon, encoded as a base64 string. Must be 128*128 pixels exactly.</param>
-		public CoreVTSPlugin(IVTSLogger logger, int updateIntervalMs, string pluginName, string pluginAuthor, string pluginIcon) {
-			this.Socket = new VTSWebSocket();
+		public CoreVTSPlugin(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, IVTSLogger logger, int updateIntervalMs, string pluginName, string pluginAuthor, string pluginIcon) {
+			this.Socket = webSocket;
+			this.TokenStorage = tokenStorage;
+			this.JsonUtility = jsonUtility;
 			this.Logger = logger;
+			this._vtsSocket = new VTSWebSocket(webSocket, jsonUtility, logger);
 			this.PluginName = pluginName;
 			this.PluginAuthor = pluginAuthor;
 			this.PluginIcon = pluginIcon;
@@ -58,34 +63,32 @@ namespace VTS.Core {
 		public void Dispose() {
 			this.Logger.Log(string.Format("Disposing of VTS Plugin: {0}...", this.PluginName));
 			this._cancelToken.Cancel();
-			this.Socket.Dispose();
+			this._vtsSocket.Dispose();
 		}
 
 		#region Initialization
 
-		public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onConnect, Action onDisconnect, Action<VTSErrorData> onError) {
-			this.TokenStorage = tokenStorage;
-			this.JsonUtility = jsonUtility;
-			this.Socket.Initialize(webSocket, this.JsonUtility, this.Logger);
-			Action onCombinedConnect = () => {
-				this.Socket.ResubscribeToEvents();
+		public void Initialize(Action onConnect, Action onDisconnect, Action<VTSErrorData> onError) {
+			this._vtsSocket.Initialize();
+			void OnCombinedConnect() {
+				this._vtsSocket.ResubscribeToEvents();
 				onConnect();
-			};
-			this.Socket.Connect(() => {
+			}
+			this._vtsSocket.Connect(() => {
 				// If API enabled, authenticate
 				Authenticate(
 					(r) => {
 						if (!r.data.authenticated) {
-							Reauthenticate(onCombinedConnect, onError);
+							Reauthenticate(OnCombinedConnect, onError);
 						} else {
 							this.IsAuthenticated = true;
-							onCombinedConnect();
+							OnCombinedConnect();
 						}
 					},
 					(r) => {
 						// If initial authentication fails, try again
 						// (Likely just needs fresh token)
-						Reauthenticate(onCombinedConnect, onError);
+						Reauthenticate(OnCombinedConnect, onError);
 					}
 				);
 			},
@@ -102,13 +105,10 @@ namespace VTS.Core {
 			});
 		}
 
-		public Task InitializeAsync(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onDisconnect) {
+		public Task InitializeAsync(Action onDisconnect) {
 			var tcs = new TaskCompletionSource<object>();
 
 			Initialize(
-				webSocket,
-				jsonUtility,
-				tokenStorage,
 				() => tcs.SetResult(null),
 				onDisconnect,
 				error => tcs.SetException(error.ToException())
@@ -118,15 +118,11 @@ namespace VTS.Core {
 		}
 
 		public void Disconnect() {
-			if (this.Socket != null) {
-				this.Socket.Disconnect();
-			}
+			this._vtsSocket?.Disconnect();
 		}
 
 		private void Tick(float timeDelta) {
-			if (this.Socket != null) {
-				this.Socket.Tick(timeDelta);
-			}
+			this._vtsSocket?.Tick(timeDelta);
 		}
 
 		private async Task TickLoop(CancellationToken token) {
@@ -178,24 +174,23 @@ namespace VTS.Core {
 			tokenRequest.data.pluginName = this.PluginName;
 			tokenRequest.data.pluginDeveloper = this.PluginAuthor;
 			tokenRequest.data.pluginIcon = this.PluginIcon;
-			this.Socket.Send<VTSAuthData, VTSAuthData>(tokenRequest,
+			this._vtsSocket.Send<VTSAuthData, VTSAuthData>(tokenRequest,
 			(a) => {
 				this._token = a.data.authenticationToken;
-				if (this.TokenStorage != null) {
-					this.TokenStorage.SaveToken(this._token);
-				}
+				this.TokenStorage?.SaveToken(this._token);
 				UseToken(onSuccess, onError);
 			},
 			onError);
 		}
 
 		private void UseToken(Action<VTSAuthData> onSuccess, Action<VTSErrorData> onError) {
-			VTSAuthData authRequest = new VTSAuthData();
-			authRequest.messageType = "AuthenticationRequest";
+			VTSAuthData authRequest = new() {
+				messageType = "AuthenticationRequest"
+			};
 			authRequest.data.pluginName = this.PluginName;
 			authRequest.data.pluginDeveloper = this.PluginAuthor;
 			authRequest.data.authenticationToken = this._token;
-			this.Socket.Send<VTSAuthData, VTSAuthData>(authRequest, onSuccess, onError);
+			this._vtsSocket.Send<VTSAuthData, VTSAuthData>(authRequest, onSuccess, onError);
 		}
 
 		#endregion
@@ -203,19 +198,19 @@ namespace VTS.Core {
 		#region Port Discovery
 
 		public Dictionary<int, VTSStateBroadcastData> GetPorts() {
-			return this.Socket.GetPorts();
+			return this._vtsSocket.GetPorts();
 		}
 
 		public int GetPort() {
-			return this.Socket.Port;
+			return this._vtsSocket.Port;
 		}
 
 		public bool SetPort(int port) {
-			return this.Socket.SetPort(port);
+			return this._vtsSocket.SetPort(port);
 		}
 
 		public bool SetIPAddress(string ipString) {
-			return this.Socket.SetIPAddress(ipString);
+			return this._vtsSocket.SetIPAddress(ipString);
 		}
 
 		#endregion
@@ -225,8 +220,8 @@ namespace VTS.Core {
 		// Get API State
 
 		public void GetAPIState(Action<VTSStateData> onSuccess, Action<VTSErrorData> onError) {
-			VTSStateData request = new VTSStateData();
-			this.Socket.Send<VTSStateData, VTSStateData>(request, onSuccess, onError);
+			VTSStateData request = new();
+			this._vtsSocket.Send<VTSStateData, VTSStateData>(request, onSuccess, onError);
 		}
 		public async Task<VTSStateData> GetAPIState() {
 			return await VTSExtensions.Async<VTSStateData, VTSErrorData>(GetAPIState);
@@ -235,8 +230,8 @@ namespace VTS.Core {
 		// Get Statistics
 
 		public void GetStatistics(Action<VTSStatisticsData> onSuccess, Action<VTSErrorData> onError) {
-			VTSStatisticsData request = new VTSStatisticsData();
-			this.Socket.Send<VTSStatisticsData, VTSStatisticsData>(request, onSuccess, onError);
+			VTSStatisticsData request = new();
+			this._vtsSocket.Send<VTSStatisticsData, VTSStatisticsData>(request, onSuccess, onError);
 		}
 		public async Task<VTSStatisticsData> GetStatistics() {
 			return await VTSExtensions.Async<VTSStatisticsData, VTSErrorData>(GetStatistics);
@@ -245,8 +240,8 @@ namespace VTS.Core {
 		// Get Folder Info
 
 		public void GetFolderInfo(Action<VTSFolderInfoData> onSuccess, Action<VTSErrorData> onError) {
-			VTSFolderInfoData request = new VTSFolderInfoData();
-			this.Socket.Send<VTSFolderInfoData, VTSFolderInfoData>(request, onSuccess, onError);
+			VTSFolderInfoData request = new();
+			this._vtsSocket.Send<VTSFolderInfoData, VTSFolderInfoData>(request, onSuccess, onError);
 		}
 		public async Task<VTSFolderInfoData> GetFolderInfo() {
 			return await VTSExtensions.Async<VTSFolderInfoData, VTSErrorData>(GetFolderInfo);
@@ -255,8 +250,8 @@ namespace VTS.Core {
 		// Get Current Model
 
 		public void GetCurrentModel(Action<VTSCurrentModelData> onSuccess, Action<VTSErrorData> onError) {
-			VTSCurrentModelData request = new VTSCurrentModelData();
-			this.Socket.Send<VTSCurrentModelData, VTSCurrentModelData>(request, onSuccess, onError);
+			VTSCurrentModelData request = new();
+			this._vtsSocket.Send<VTSCurrentModelData, VTSCurrentModelData>(request, onSuccess, onError);
 		}
 		public Task<VTSCurrentModelData> GetCurrentModel() {
 			return VTSExtensions.Async<VTSCurrentModelData, VTSErrorData>(GetCurrentModel);
@@ -265,8 +260,8 @@ namespace VTS.Core {
 		// Get Available Models
 
 		public void GetAvailableModels(Action<VTSAvailableModelsData> onSuccess, Action<VTSErrorData> onError) {
-			VTSAvailableModelsData request = new VTSAvailableModelsData();
-			this.Socket.Send<VTSAvailableModelsData, VTSAvailableModelsData>(request, onSuccess, onError);
+			VTSAvailableModelsData request = new();
+			this._vtsSocket.Send<VTSAvailableModelsData, VTSAvailableModelsData>(request, onSuccess, onError);
 		}
 		public Task<VTSAvailableModelsData> GetAvailableModels() {
 			return VTSExtensions.Async<VTSAvailableModelsData, VTSErrorData>(GetAvailableModels);
@@ -275,9 +270,9 @@ namespace VTS.Core {
 		// Load Model
 
 		public void LoadModel(string modelID, Action<VTSModelLoadData> onSuccess, Action<VTSErrorData> onError) {
-			VTSModelLoadData request = new VTSModelLoadData();
+			VTSModelLoadData request = new();
 			request.data.modelID = modelID;
-			this.Socket.Send<VTSModelLoadData, VTSModelLoadData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSModelLoadData, VTSModelLoadData>(request, onSuccess, onError);
 		}
 		public Task<VTSModelLoadData> LoadModel(string modelId) {
 			return VTSExtensions.Async<string, VTSModelLoadData, VTSErrorData>(LoadModel, modelId);
@@ -286,9 +281,10 @@ namespace VTS.Core {
 		// Move Model
 
 		public void MoveModel(VTSMoveModelData.Data position, Action<VTSMoveModelData> onSuccess, Action<VTSErrorData> onError) {
-			VTSMoveModelData request = new VTSMoveModelData();
-			request.data = position;
-			this.Socket.Send<VTSMoveModelData, VTSMoveModelData>(request, onSuccess, onError);
+			VTSMoveModelData request = new() {
+				data = position
+			};
+			this._vtsSocket.Send<VTSMoveModelData, VTSMoveModelData>(request, onSuccess, onError);
 		}
 		public async Task<VTSMoveModelData> MoveModel(VTSMoveModelData.Data position) {
 			return await VTSExtensions.Async<VTSMoveModelData.Data, VTSMoveModelData, VTSErrorData>(MoveModel, position);
@@ -297,9 +293,9 @@ namespace VTS.Core {
 		// Get Hotkeys in Model
 
 		public void GetHotkeysInCurrentModel(string modelID, Action<VTSHotkeysInCurrentModelData> onSuccess, Action<VTSErrorData> onError) {
-			VTSHotkeysInCurrentModelData request = new VTSHotkeysInCurrentModelData();
+			VTSHotkeysInCurrentModelData request = new();
 			request.data.modelID = modelID;
-			this.Socket.Send<VTSHotkeysInCurrentModelData, VTSHotkeysInCurrentModelData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSHotkeysInCurrentModelData, VTSHotkeysInCurrentModelData>(request, onSuccess, onError);
 		}
 		public async Task<VTSHotkeysInCurrentModelData> GetHotkeysInCurrentModel(string modelId) {
 			return await VTSExtensions.Async<string, VTSHotkeysInCurrentModelData, VTSErrorData>(GetHotkeysInCurrentModel, modelId);
@@ -308,9 +304,9 @@ namespace VTS.Core {
 		// Get Hotkeys in Item
 
 		public void GetHotkeysInLive2DItem(string live2DItemFileName, Action<VTSHotkeysInCurrentModelData> onSuccess, Action<VTSErrorData> onError) {
-			VTSHotkeysInCurrentModelData request = new VTSHotkeysInCurrentModelData();
+			VTSHotkeysInCurrentModelData request = new();
 			request.data.live2DItemFileName = live2DItemFileName;
-			this.Socket.Send<VTSHotkeysInCurrentModelData, VTSHotkeysInCurrentModelData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSHotkeysInCurrentModelData, VTSHotkeysInCurrentModelData>(request, onSuccess, onError);
 		}
 		public async Task<VTSHotkeysInCurrentModelData> GetHotkeysInLive2DItem(string live2DItemFileName) {
 			return await VTSExtensions.Async<string, VTSHotkeysInCurrentModelData, VTSErrorData>(GetHotkeysInLive2DItem, live2DItemFileName);
@@ -319,9 +315,9 @@ namespace VTS.Core {
 		// Trigger Hotkey		
 
 		public void TriggerHotkey(string hotkeyID, Action<VTSHotkeyTriggerData> onSuccess, Action<VTSErrorData> onError) {
-			VTSHotkeyTriggerData request = new VTSHotkeyTriggerData();
+			VTSHotkeyTriggerData request = new();
 			request.data.hotkeyID = hotkeyID;
-			this.Socket.Send<VTSHotkeyTriggerData, VTSHotkeyTriggerData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSHotkeyTriggerData, VTSHotkeyTriggerData>(request, onSuccess, onError);
 		}
 		public async Task<VTSHotkeyTriggerData> TriggerHotkey(string hotkeyId) {
 			return await VTSExtensions.Async<string, VTSHotkeyTriggerData, VTSErrorData>(TriggerHotkey, hotkeyId);
@@ -330,10 +326,10 @@ namespace VTS.Core {
 		// Trigger Hotkey in Item
 
 		public void TriggerHotkeyForLive2DItem(string itemInstanceID, string hotkeyID, Action<VTSHotkeyTriggerData> onSuccess, Action<VTSErrorData> onError) {
-			VTSHotkeyTriggerData request = new VTSHotkeyTriggerData();
+			VTSHotkeyTriggerData request = new();
 			request.data.hotkeyID = hotkeyID;
 			request.data.itemInstanceID = itemInstanceID;
-			this.Socket.Send<VTSHotkeyTriggerData, VTSHotkeyTriggerData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSHotkeyTriggerData, VTSHotkeyTriggerData>(request, onSuccess, onError);
 		}
 		public async Task<VTSHotkeyTriggerData> TriggerHotkeyForLive2DItem(string itemInstanceId, string hotkeyId) {
 			return await VTSExtensions.Async<string, string, VTSHotkeyTriggerData, VTSErrorData>(TriggerHotkeyForLive2DItem, itemInstanceId, hotkeyId);
@@ -342,8 +338,8 @@ namespace VTS.Core {
 		// Get Art Mesh List
 
 		public void GetArtMeshList(Action<VTSArtMeshListData> onSuccess, Action<VTSErrorData> onError) {
-			VTSArtMeshListData request = new VTSArtMeshListData();
-			this.Socket.Send<VTSArtMeshListData, VTSArtMeshListData>(request, onSuccess, onError);
+			VTSArtMeshListData request = new();
+			this._vtsSocket.Send<VTSArtMeshListData, VTSArtMeshListData>(request, onSuccess, onError);
 		}
 		public async Task<VTSArtMeshListData> GetArtMeshList() {
 			return await VTSExtensions.Async<VTSArtMeshListData, VTSErrorData>(GetArtMeshList);
@@ -352,8 +348,8 @@ namespace VTS.Core {
 		// Tint Art Mesh
 
 		public void TintArtMesh(ColorTint tint, float mixWithSceneLightingColor, ArtMeshMatcher matcher, Action<VTSColorTintData> onSuccess, Action<VTSErrorData> onError) {
-			VTSColorTintData request = new VTSColorTintData();
-			ArtMeshColorTint colorTint = new ArtMeshColorTint() {
+			VTSColorTintData request = new();
+			ArtMeshColorTint colorTint = new() {
 				colorR = tint.colorR,
 				colorG = tint.colorG,
 				colorB = tint.colorB,
@@ -362,7 +358,7 @@ namespace VTS.Core {
 			};
 			request.data.colorTint = colorTint;
 			request.data.artMeshMatcher = matcher;
-			this.Socket.Send<VTSColorTintData, VTSColorTintData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSColorTintData, VTSColorTintData>(request, onSuccess, onError);
 		}
 		public async Task<VTSColorTintData> TintArtMesh(ColorTint tint, float mixWithSceneLightingColor, ArtMeshMatcher matcher) {
 			return await VTSExtensions.Async<ColorTint, float, ArtMeshMatcher, VTSColorTintData, VTSErrorData>(TintArtMesh, tint, mixWithSceneLightingColor, matcher);
@@ -371,8 +367,8 @@ namespace VTS.Core {
 		// Get Scene Color Overlay Info
 
 		public void GetSceneColorOverlayInfo(Action<VTSSceneColorOverlayData> onSuccess, Action<VTSErrorData> onError) {
-			VTSSceneColorOverlayData request = new VTSSceneColorOverlayData();
-			this.Socket.Send<VTSSceneColorOverlayData, VTSSceneColorOverlayData>(request, onSuccess, onError);
+			VTSSceneColorOverlayData request = new();
+			this._vtsSocket.Send<VTSSceneColorOverlayData, VTSSceneColorOverlayData>(request, onSuccess, onError);
 		}
 		public async Task<VTSSceneColorOverlayData> GetSceneColorOverlayInfo() {
 			return await VTSExtensions.Async<VTSSceneColorOverlayData, VTSErrorData>(GetSceneColorOverlayInfo);
@@ -381,8 +377,8 @@ namespace VTS.Core {
 		// Get Found Face
 
 		public void GetFaceFound(Action<VTSFaceFoundData> onSuccess, Action<VTSErrorData> onError) {
-			VTSFaceFoundData request = new VTSFaceFoundData();
-			this.Socket.Send<VTSFaceFoundData, VTSFaceFoundData>(request, onSuccess, onError);
+			VTSFaceFoundData request = new();
+			this._vtsSocket.Send<VTSFaceFoundData, VTSFaceFoundData>(request, onSuccess, onError);
 		}
 		public async Task<VTSFaceFoundData> GetFaceFound() {
 			return await VTSExtensions.Async<VTSFaceFoundData, VTSErrorData>(GetFaceFound);
@@ -391,8 +387,8 @@ namespace VTS.Core {
 		// Get Input Parameter List
 
 		public void GetInputParameterList(Action<VTSInputParameterListData> onSuccess, Action<VTSErrorData> onError) {
-			VTSInputParameterListData request = new VTSInputParameterListData();
-			this.Socket.Send<VTSInputParameterListData, VTSInputParameterListData>(request, onSuccess, onError);
+			VTSInputParameterListData request = new();
+			this._vtsSocket.Send<VTSInputParameterListData, VTSInputParameterListData>(request, onSuccess, onError);
 		}
 		public async Task<VTSInputParameterListData> GetInputParameterList() {
 			return await VTSExtensions.Async<VTSInputParameterListData, VTSErrorData>(GetInputParameterList);
@@ -401,9 +397,9 @@ namespace VTS.Core {
 		// Get Parameter Value
 
 		public void GetParameterValue(string parameterName, Action<VTSParameterValueData> onSuccess, Action<VTSErrorData> onError) {
-			VTSParameterValueData request = new VTSParameterValueData();
+			VTSParameterValueData request = new();
 			request.data.name = parameterName;
-			this.Socket.Send<VTSParameterValueData, VTSParameterValueData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSParameterValueData, VTSParameterValueData>(request, onSuccess, onError);
 		}
 		public async Task<VTSParameterValueData> GetParameterValue(string parameterName) {
 			return await VTSExtensions.Async<string, VTSParameterValueData, VTSErrorData>(GetParameterValue, parameterName);
@@ -412,8 +408,8 @@ namespace VTS.Core {
 		// Get Live2D Parameter List
 
 		public void GetLive2DParameterList(Action<VTSLive2DParameterListData> onSuccess, Action<VTSErrorData> onError) {
-			VTSLive2DParameterListData request = new VTSLive2DParameterListData();
-			this.Socket.Send<VTSLive2DParameterListData, VTSLive2DParameterListData>(request, onSuccess, onError);
+			VTSLive2DParameterListData request = new();
+			this._vtsSocket.Send<VTSLive2DParameterListData, VTSLive2DParameterListData>(request, onSuccess, onError);
 		}
 		public async Task<VTSLive2DParameterListData> GetLive2DParameterList() {
 			return await VTSExtensions.Async<VTSLive2DParameterListData, VTSErrorData>(GetLive2DParameterList);
@@ -422,13 +418,13 @@ namespace VTS.Core {
 		// Add Custom Parameter
 
 		public void AddCustomParameter(VTSCustomParameter parameter, Action<VTSParameterCreationData> onSuccess, Action<VTSErrorData> onError) {
-			VTSParameterCreationData request = new VTSParameterCreationData();
+			VTSParameterCreationData request = new();
 			request.data.parameterName = SanitizeParameterName(parameter.parameterName);
 			request.data.explanation = parameter.explanation;
 			request.data.min = parameter.min;
 			request.data.max = parameter.max;
 			request.data.defaultValue = parameter.defaultValue;
-			this.Socket.Send<VTSParameterCreationData, VTSParameterCreationData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSParameterCreationData, VTSParameterCreationData>(request, onSuccess, onError);
 		}
 		public async Task<VTSParameterCreationData> AddCustomParameter(VTSCustomParameter parameter) {
 			return await VTSExtensions.Async<VTSCustomParameter, VTSParameterCreationData, VTSErrorData>(AddCustomParameter, parameter);
@@ -437,9 +433,9 @@ namespace VTS.Core {
 		// Remove Custom Parameter
 
 		public void RemoveCustomParameter(string parameterName, Action<VTSParameterDeletionData> onSuccess, Action<VTSErrorData> onError) {
-			VTSParameterDeletionData request = new VTSParameterDeletionData();
+			VTSParameterDeletionData request = new();
 			request.data.parameterName = SanitizeParameterName(parameterName);
-			this.Socket.Send<VTSParameterDeletionData, VTSParameterDeletionData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSParameterDeletionData, VTSParameterDeletionData>(request, onSuccess, onError);
 		}
 		public async Task<VTSParameterDeletionData> RemoveCustomParameter(string parameterName) {
 			return await VTSExtensions.Async<string, VTSParameterDeletionData, VTSErrorData>(RemoveCustomParameter, parameterName);
@@ -462,14 +458,14 @@ namespace VTS.Core {
 		}
 
 		public void InjectParameterValues(VTSParameterInjectionValue[] values, VTSInjectParameterMode mode, bool faceFound, Action<VTSInjectParameterData> onSuccess, Action<VTSErrorData> onError) {
-			VTSInjectParameterData request = new VTSInjectParameterData();
+			VTSInjectParameterData request = new();
 			foreach (VTSParameterInjectionValue value in values) {
 				value.id = SanitizeParameterName(value.id);
 			}
 			request.data.faceFound = faceFound;
 			request.data.parameterValues = values;
 			request.data.mode = InjectParameterModeToString(mode);
-			this.Socket.Send<VTSInjectParameterData, VTSInjectParameterData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSInjectParameterData, VTSInjectParameterData>(request, onSuccess, onError);
 		}
 		public async Task<VTSInjectParameterData> InjectParameterValues(VTSParameterInjectionValue[] values, VTSInjectParameterMode mode, bool faceFound) {
 			return await VTSExtensions.Async<VTSParameterInjectionValue[], VTSInjectParameterMode, bool, VTSInjectParameterData, VTSErrorData>(InjectParameterValues, values, mode, faceFound);
@@ -478,9 +474,9 @@ namespace VTS.Core {
 		// Get Expression State List
 
 		public void GetExpressionStateList(Action<VTSExpressionStateData> onSuccess, Action<VTSErrorData> onError) {
-			VTSExpressionStateData request = new VTSExpressionStateData();
+			VTSExpressionStateData request = new();
 			request.data.details = true;
-			this.Socket.Send<VTSExpressionStateData, VTSExpressionStateData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSExpressionStateData, VTSExpressionStateData>(request, onSuccess, onError);
 		}
 		public async Task<VTSExpressionStateData> GetExpressionStateList() {
 			return await VTSExtensions.Async<VTSExpressionStateData, VTSErrorData>(GetExpressionStateList);
@@ -489,10 +485,10 @@ namespace VTS.Core {
 		// Set Expression State
 
 		public void SetExpressionState(string expression, bool active, Action<VTSExpressionActivationData> onSuccess, Action<VTSErrorData> onError) {
-			VTSExpressionActivationData request = new VTSExpressionActivationData();
+			VTSExpressionActivationData request = new();
 			request.data.expressionFile = expression;
 			request.data.active = active;
-			this.Socket.Send<VTSExpressionActivationData, VTSExpressionActivationData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSExpressionActivationData, VTSExpressionActivationData>(request, onSuccess, onError);
 		}
 		public async Task<VTSExpressionActivationData> SetExpressionState(string expression, bool active) {
 			return await VTSExtensions.Async<string, bool, VTSExpressionActivationData, VTSErrorData>(SetExpressionState, expression, active);
@@ -501,8 +497,8 @@ namespace VTS.Core {
 		// Get Current Model Physics
 
 		public void GetCurrentModelPhysics(Action<VTSCurrentModelPhysicsData> onSuccess, Action<VTSErrorData> onError) {
-			VTSCurrentModelPhysicsData request = new VTSCurrentModelPhysicsData();
-			this.Socket.Send<VTSCurrentModelPhysicsData, VTSCurrentModelPhysicsData>(request, onSuccess, onError);
+			VTSCurrentModelPhysicsData request = new();
+			this._vtsSocket.Send<VTSCurrentModelPhysicsData, VTSCurrentModelPhysicsData>(request, onSuccess, onError);
 		}
 		public async Task<VTSCurrentModelPhysicsData> GetCurrentModelPhysics() {
 			return await VTSExtensions.Async<VTSCurrentModelPhysicsData, VTSErrorData>(GetCurrentModelPhysics);
@@ -511,10 +507,10 @@ namespace VTS.Core {
 		// Set Current Model Physics
 
 		public void SetCurrentModelPhysics(VTSPhysicsOverride[] strengthOverrides, VTSPhysicsOverride[] windOverrides, Action<VTSOverrideModelPhysicsData> onSuccess, Action<VTSErrorData> onError) {
-			VTSOverrideModelPhysicsData request = new VTSOverrideModelPhysicsData();
+			VTSOverrideModelPhysicsData request = new();
 			request.data.strengthOverrides = strengthOverrides;
 			request.data.windOverrides = windOverrides;
-			this.Socket.Send<VTSOverrideModelPhysicsData, VTSOverrideModelPhysicsData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSOverrideModelPhysicsData, VTSOverrideModelPhysicsData>(request, onSuccess, onError);
 		}
 		public async Task<VTSOverrideModelPhysicsData> SetCurrentModelPhysics(VTSPhysicsOverride[] strengthOverrides, VTSPhysicsOverride[] windOverrides) {
 			return await VTSExtensions.Async<VTSPhysicsOverride[], VTSPhysicsOverride[], VTSOverrideModelPhysicsData, VTSErrorData>(SetCurrentModelPhysics, strengthOverrides, windOverrides);
@@ -523,7 +519,7 @@ namespace VTS.Core {
 		// Set NDI Config
 
 		public void SetNDIConfig(VTSNDIConfigData config, Action<VTSNDIConfigData> onSuccess, Action<VTSErrorData> onError) {
-			this.Socket.Send<VTSNDIConfigData, VTSNDIConfigData>(config, onSuccess, onError);
+			this._vtsSocket.Send<VTSNDIConfigData, VTSNDIConfigData>(config, onSuccess, onError);
 		}
 		public async Task<VTSNDIConfigData> SetNDIConfig(VTSNDIConfigData config) {
 			return await VTSExtensions.Async<VTSNDIConfigData, VTSNDIConfigData, VTSErrorData>(SetNDIConfig, config);
@@ -532,13 +528,13 @@ namespace VTS.Core {
 		// Get Item List
 
 		public void GetItemList(VTSItemListOptions options, Action<VTSItemListResponseData> onSuccess, Action<VTSErrorData> onError) {
-			VTSItemListRequestData request = new VTSItemListRequestData();
+			VTSItemListRequestData request = new();
 			request.data.includeAvailableSpots = options.includeAvailableSpots;
 			request.data.includeItemInstancesInScene = options.includeItemInstancesInScene;
 			request.data.includeAvailableItemFiles = options.includeAvailableItemFiles;
 			request.data.onlyItemsWithFileName = options.onlyItemsWithFileName;
 			request.data.onlyItemsWithInstanceID = options.onlyItemsWithInstanceID;
-			this.Socket.Send<VTSItemListRequestData, VTSItemListResponseData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSItemListRequestData, VTSItemListResponseData>(request, onSuccess, onError);
 		}
 		public async Task<VTSItemListResponseData> GetItemList(VTSItemListOptions options) {
 			return await VTSExtensions.Async<VTSItemListOptions, VTSItemListResponseData, VTSErrorData>(GetItemList, options);
@@ -547,7 +543,7 @@ namespace VTS.Core {
 		// Load Item
 
 		public void LoadItem(string fileName, VTSItemLoadOptions options, Action<VTSItemLoadResponseData> onSuccess, Action<VTSErrorData> onError) {
-			VTSItemLoadRequestData request = new VTSItemLoadRequestData();
+			VTSItemLoadRequestData request = new();
 			request.data.fileName = fileName;
 			request.data.positionX = options.positionX;
 			request.data.positionY = options.positionY;
@@ -561,14 +557,14 @@ namespace VTS.Core {
 			request.data.flipped = options.flipped;
 			request.data.locked = options.locked;
 			request.data.unloadWhenPluginDisconnects = options.unloadWhenPluginDisconnects;
-			this.Socket.Send<VTSItemLoadRequestData, VTSItemLoadResponseData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSItemLoadRequestData, VTSItemLoadResponseData>(request, onSuccess, onError);
 		}
 		public async Task<VTSItemLoadResponseData> LoadItem(string fileName, VTSItemLoadOptions options) {
 			return await VTSExtensions.Async<string, VTSItemLoadOptions, VTSItemLoadResponseData, VTSErrorData>(LoadItem, fileName, options);
 		}
 
 		public void LoadCustomDataItem(string fileName, string base64, VTSCustomDataItemLoadOptions options, Action<VTSItemLoadResponseData> onSuccess, Action<VTSErrorData> onError) {
-			VTSItemLoadRequestData request = new VTSItemLoadRequestData();
+			VTSItemLoadRequestData request = new();
 			request.data.fileName = fileName;
 			request.data.positionX = options.positionX;
 			request.data.positionY = options.positionY;
@@ -587,7 +583,7 @@ namespace VTS.Core {
 			request.data.customDataAskUserFirst = options.askUserFirst;
 			request.data.customDataSkipAskingUserIfWhitelisted = options.skipAskingUserIfWhitelisted;
 			request.data.customDataAskTimer = options.askTimer;
-			this.Socket.Send<VTSItemLoadRequestData, VTSItemLoadResponseData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSItemLoadRequestData, VTSItemLoadResponseData>(request, onSuccess, onError);
 		}
 		public async Task<VTSItemLoadResponseData> LoadCustomDataItem(string fileName, string base64, VTSCustomDataItemLoadOptions options) {
 			return await VTSExtensions.Async<string, string, VTSCustomDataItemLoadOptions, VTSItemLoadResponseData, VTSErrorData>(LoadCustomDataItem, fileName, base64, options);
@@ -596,13 +592,13 @@ namespace VTS.Core {
 		// Unload Item
 
 		public void UnloadItem(VTSItemUnloadOptions options, Action<VTSItemUnloadResponseData> onSuccess, Action<VTSErrorData> onError) {
-			VTSItemUnloadRequestData request = new VTSItemUnloadRequestData();
+			VTSItemUnloadRequestData request = new();
 			request.data.instanceIDs = options.itemInstanceIDs;
 			request.data.fileNames = options.fileNames;
 			request.data.unloadAllInScene = options.unloadAllInScene;
 			request.data.unloadAllLoadedByThisPlugin = options.unloadAllLoadedByThisPlugin;
 			request.data.allowUnloadingItemsLoadedByUserOrOtherPlugins = options.allowUnloadingItemsLoadedByUserOrOtherPlugins;
-			this.Socket.Send<VTSItemUnloadRequestData, VTSItemUnloadResponseData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSItemUnloadRequestData, VTSItemUnloadResponseData>(request, onSuccess, onError);
 		}
 		public async Task<VTSItemUnloadResponseData> UnloadItem(VTSItemUnloadOptions options) {
 			return await VTSExtensions.Async<VTSItemUnloadOptions, VTSItemUnloadResponseData, VTSErrorData>(UnloadItem, options);
@@ -611,7 +607,7 @@ namespace VTS.Core {
 		// Animate Item
 
 		public void AnimateItem(string itemInstanceID, VTSItemAnimationControlOptions options, Action<VTSItemAnimationControlResponseData> onSuccess, Action<VTSErrorData> onError) {
-			VTSItemAnimationControlRequestData request = new VTSItemAnimationControlRequestData();
+			VTSItemAnimationControlRequestData request = new();
 			request.data.itemInstanceID = itemInstanceID;
 			request.data.framerate = options.framerate;
 			request.data.frame = options.frame;
@@ -621,7 +617,7 @@ namespace VTS.Core {
 			request.data.autoStopFrames = options.autoStopFrames;
 			request.data.setAnimationPlayState = options.setAnimationPlayState;
 			request.data.animationPlayState = options.animationPlayState;
-			this.Socket.Send<VTSItemAnimationControlRequestData, VTSItemAnimationControlResponseData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSItemAnimationControlRequestData, VTSItemAnimationControlResponseData>(request, onSuccess, onError);
 		}
 		public async Task<VTSItemAnimationControlResponseData> AnimateItem(string itemInstanceId, VTSItemAnimationControlOptions options) {
 			return await VTSExtensions.Async<string, VTSItemAnimationControlOptions, VTSItemAnimationControlResponseData, VTSErrorData>(AnimateItem, itemInstanceId, options);
@@ -630,7 +626,7 @@ namespace VTS.Core {
 		// Move Item
 
 		public void MoveItem(VTSItemMoveEntry[] items, Action<VTSItemMoveResponseData> onSuccess, Action<VTSErrorData> onError) {
-			VTSItemMoveRequestData request = new VTSItemMoveRequestData();
+			VTSItemMoveRequestData request = new();
 			request.data.itemsToMove = new VTSItemToMove[items.Length];
 			for (int i = 0; i < items.Length; i++) {
 				VTSItemMoveEntry entry = items[i];
@@ -648,7 +644,7 @@ namespace VTS.Core {
 					entry.options.userCanStop
 				);
 			}
-			this.Socket.Send<VTSItemMoveRequestData, VTSItemMoveResponseData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSItemMoveRequestData, VTSItemMoveResponseData>(request, onSuccess, onError);
 		}
 		public async Task<VTSItemMoveResponseData> MoveItem(VTSItemMoveEntry[] items) {
 			return await VTSExtensions.Async<VTSItemMoveEntry[], VTSItemMoveResponseData, VTSErrorData>(MoveItem, items);
@@ -657,18 +653,18 @@ namespace VTS.Core {
 		// Pin/Unpin Items
 
 		private void PinItem(string itemInstanceID, VTSItemAngleRelativityMode angleRelativeTo, VTSItemSizeRelativityMode sizeRelativeTo, VTSVertexPinMode vertexPinType, ArtMeshCoordinate pinInfo, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
-			VTSItemPinRequestData request = new VTSItemPinRequestData();
+			VTSItemPinRequestData request = new();
 			request.data.pin = true;
 			request.data.itemInstanceID = itemInstanceID;
 			request.data.vertexPinType = vertexPinType;
 			request.data.angleRelativeTo = angleRelativeTo;
 			request.data.sizeRelativeTo = sizeRelativeTo;
 			request.data.pinInfo = pinInfo;
-			this.Socket.Send<VTSItemPinRequestData, VTSItemPinResponseData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSItemPinRequestData, VTSItemPinResponseData>(request, onSuccess, onError);
 		}
 
 		public void PinItemToCenter(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
-			ArtMeshCoordinate coordinate = new ArtMeshCoordinate {
+			ArtMeshCoordinate coordinate = new() {
 				modelID = modelID,
 				artMeshID = artMeshID,
 				angle = angle,
@@ -683,7 +679,7 @@ namespace VTS.Core {
 		}
 
 		public void PinItemToRandom(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
-			ArtMeshCoordinate coordinate = new ArtMeshCoordinate {
+			ArtMeshCoordinate coordinate = new() {
 				modelID = modelID,
 				artMeshID = artMeshID,
 				angle = angle,
@@ -699,7 +695,7 @@ namespace VTS.Core {
 
 
 		public void PinItemToPoint(string itemInstanceID, string modelID, string artMeshID, float angle, VTSItemAngleRelativityMode angleRelativeTo, float size, VTSItemSizeRelativityMode sizeRelativeTo, BarycentricCoordinate point, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
-			ArtMeshCoordinate coordinate = new ArtMeshCoordinate {
+			ArtMeshCoordinate coordinate = new() {
 				modelID = modelID,
 				artMeshID = artMeshID,
 				angle = angle,
@@ -716,10 +712,10 @@ namespace VTS.Core {
 
 
 		public void UnpinItem(string itemInsanceID, Action<VTSItemPinResponseData> onSuccess, Action<VTSErrorData> onError) {
-			VTSItemPinRequestData request = new VTSItemPinRequestData();
+			VTSItemPinRequestData request = new();
 			request.data.pin = false;
 			request.data.itemInstanceID = itemInsanceID;
-			this.Socket.Send<VTSItemPinRequestData, VTSItemPinResponseData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSItemPinRequestData, VTSItemPinResponseData>(request, onSuccess, onError);
 		}
 
 		public async Task<VTSItemPinResponseData> UnpinItem(string itemInstanceID) {
@@ -731,14 +727,14 @@ namespace VTS.Core {
 		// Request Art Mesh Selection
 
 		public void RequestArtMeshSelection(string textOverride, string helpOverride, int count, ICollection<string> activeArtMeshes, Action<VTSArtMeshSelectionResponseData> onSuccess, Action<VTSErrorData> onError) {
-			VTSArtMeshSelectionRequestData request = new VTSArtMeshSelectionRequestData();
+			VTSArtMeshSelectionRequestData request = new();
 			request.data.textOverride = textOverride;
 			request.data.helpOverride = helpOverride;
 			request.data.requestedArtMeshCount = count;
 			string[] array = new string[activeArtMeshes.Count];
 			activeArtMeshes.CopyTo(array, 0);
 			request.data.activeArtMeshes = array;
-			this.Socket.Send<VTSArtMeshSelectionRequestData, VTSArtMeshSelectionResponseData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSArtMeshSelectionRequestData, VTSArtMeshSelectionResponseData>(request, onSuccess, onError);
 		}
 		public async Task<VTSArtMeshSelectionResponseData> RequestArtMeshSelection(string textOverride, string helpOverride, int count, ICollection<string> activeArtMeshes) {
 			return await VTSExtensions.Async<string, string, int, ICollection<string>, VTSArtMeshSelectionResponseData, VTSErrorData>(
@@ -748,9 +744,9 @@ namespace VTS.Core {
 		// Request Permissions
 
 		public void RequestPermission(VTSPermission permission, Action<VTSPermissionResponseData> onSuccess, Action<VTSErrorData> onError) {
-			VTSPermissionRequestData request = new VTSPermissionRequestData();
+			VTSPermissionRequestData request = new();
 			request.data.requestedPermission = permission;
-			this.Socket.Send<VTSPermissionRequestData, VTSPermissionResponseData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSPermissionRequestData, VTSPermissionResponseData>(request, onSuccess, onError);
 		}
 
 		public async Task<VTSPermissionResponseData> RequestPermission(VTSPermission permission) {
@@ -758,11 +754,11 @@ namespace VTS.Core {
 		}
 
 		public void GetPostProcessingEffectStateList(bool fillPostProcessingPresetsArray, bool fillPostProcessingEffectsArray, Effects[] effectIDFilter, Action<VTSPostProcessingStateResponseData> onSuccess, Action<VTSErrorData> onError) {
-			VTSPostProcessingStateRequestData request = new VTSPostProcessingStateRequestData();
+			VTSPostProcessingStateRequestData request = new();
 			request.data.fillPostProcessingPresetsArray = fillPostProcessingPresetsArray;
 			request.data.fillPostProcessingEffectsArray = fillPostProcessingEffectsArray;
 			request.data.effectIDFilter = effectIDFilter;
-			this.Socket.Send<VTSPostProcessingStateRequestData, VTSPostProcessingStateResponseData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSPostProcessingStateRequestData, VTSPostProcessingStateResponseData>(request, onSuccess, onError);
 		}
 
 		public async Task<VTSPostProcessingStateResponseData> GetPostProcessingEffectStateList(bool fillPostProcessingPresetsArray, bool fillPostProcessingEffectsArray, Effects[] effectIDFilter) {
@@ -770,7 +766,7 @@ namespace VTS.Core {
 		}
 
 		public void SetPostProcessingEffectValues(VTSPostProcessingUpdateOptions options, PostProcessingValue[] values, Action<VTSPostProcessingUpdateResponseData> onSuccess, Action<VTSErrorData> onError) {
-			VTSPostProcssingUpdateRequestData request = new VTSPostProcssingUpdateRequestData();
+			VTSPostProcssingUpdateRequestData request = new();
 			request.data.postProcessingOn = options.postProcessingOn;
 			request.data.setPostProcessingPreset = options.setPostProcessingPreset;
 			request.data.setPostProcessingValues = options.setPostProcessingValues;
@@ -781,7 +777,7 @@ namespace VTS.Core {
 			request.data.randomizeAll = options.randomizeAll;
 			request.data.randomizeAllChaosLevel = options.randomizeAllChaosLevel;
 			request.data.postProcessingValues = values;
-			this.Socket.Send<VTSPostProcssingUpdateRequestData, VTSPostProcessingUpdateResponseData>(request, onSuccess, onError);
+			this._vtsSocket.Send<VTSPostProcssingUpdateRequestData, VTSPostProcessingUpdateResponseData>(request, onSuccess, onError);
 		}
 
 		public async Task<VTSPostProcessingUpdateResponseData> SetPostProcessingEffectValues(VTSPostProcessingUpdateOptions options, PostProcessingValue[] values) {
@@ -793,12 +789,12 @@ namespace VTS.Core {
 		#region VTS Event Subscription API Wrapper
 
 		private void SubscribeToEvent<T, K, V>(bool subscribed, V config, Action<K> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) where T : VTSEventSubscriptionRequestData<V>, new() where K : VTSEventData where V : VTSEventConfigData {
-			T request = new T();
+			T request = new();
 			request.SetSubscribed(subscribed);
 			if (config != null) {
 				request.SetConfig(config);
 			}
-			this.Socket.SendEventSubscription<T, K, V>(request, onEvent, onSubscribe, onError, () => {
+			this._vtsSocket.SendEventSubscription<T, K, V>(request, onEvent, onSubscribe, onError, () => {
 				SubscribeToEvent<T, K, V>(subscribed, config, onEvent, onSubscribe, onError);
 			});
 		}
@@ -1060,7 +1056,7 @@ namespace VTS.Core {
 			return "linear";
 		}
 
-		private static readonly Regex ALPHANUMERIC = new Regex(@"\W|");
+		private static readonly Regex ALPHANUMERIC = new(@"\W|");
 		private static string SanitizeParameterName(string name) {
 			// between 4 and 32 chars, alphanumeric, underscores allowed
 			string output = name;

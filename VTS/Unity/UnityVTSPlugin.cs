@@ -17,12 +17,12 @@ namespace VTS.Unity {
 		private IVTSPlugin _plugin;
 		private IVTSPlugin Plugin {
 			get {
-				if (this._plugin == null) {
-					this._plugin = new CoreVTSPlugin(this.Logger, 100, this.PluginName, this.PluginAuthor, this.PluginIcon);
-				}
+				this._plugin ??= new CoreVTSPlugin(this.Socket, this.JsonUtility, this.TokenStorage, this.Logger, 100, this.PluginName, this.PluginAuthor, this.PluginIcon);
 				return this._plugin;
 			}
 		}
+
+		public bool IsAuthenticated { get { return this.Plugin.IsAuthenticated; } }
 
 		[SerializeField]
 		protected string _pluginName = "ExamplePlugin";
@@ -38,25 +38,24 @@ namespace VTS.Unity {
 		/// The underlying WebSocket for connecting to VTS.
 		/// </summary>
 		/// <value></value>
-		public IVTSWebSocket Socket { get { return this.Plugin.Socket; } }
+		// public IVTSWebSocket Socket { get { return this.Plugin.Socket; } }
 
-		public bool IsAuthenticated { get { return this.Plugin.IsAuthenticated; } }
+		public abstract IWebSocket Socket { get; }
+		public abstract IJsonUtility JsonUtility { get; }
+		public abstract ITokenStorage TokenStorage { get; }
 
-		public IJsonUtility JsonUtility { get { return this.Plugin.JsonUtility; } }
-		public ITokenStorage TokenStorage { get { return this.Plugin.TokenStorage; } }
-		private readonly IVTSLogger _logger = new UnityVTSLoggerImpl();
-		public IVTSLogger Logger { get { return this._logger; } }
+		public abstract IVTSLogger Logger { get; }
 
 		#endregion
 
 		#region Initialization
 
-		public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onConnect, Action onDisconnect, Action<VTSErrorData> onError) {
-			this.Plugin.Initialize(webSocket, jsonUtility, tokenStorage, onConnect, onDisconnect, onError);
+		public void Initialize(Action onConnect, Action onDisconnect, Action<VTSErrorData> onError) {
+			this.Plugin.Initialize(onConnect, onDisconnect, onError);
 		}
 
-		public Task InitializeAsync(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onDisconnect) {
-			return this.Plugin.InitializeAsync(webSocket, jsonUtility, tokenStorage, onDisconnect);
+		public Task InitializeAsync(Action onDisconnect) {
+			return this.Plugin.InitializeAsync(onDisconnect);
 		}
 
 		public void Disconnect() {

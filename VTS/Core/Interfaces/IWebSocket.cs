@@ -14,12 +14,12 @@ namespace VTS.Core {
 		/// <summary>
 		/// Connects to the given URL and executes the relevant callback on completion.
 		/// </summary>
-		/// <param name="URL">URL to connect to.</param>
+		/// <param name="url">URL to connect to.</param>
 		/// <param name="onConnect">Callback executed upon conencting to the URL.</param>
 		/// <param name="onDisconnect">Callback executed upon disconnecting from the URL.</param>
 		/// <param name="onError">Callback executed upon receiving an error.</param>
 		/// <returns></returns>
-		void Start(string URL, Action onConnect, Action onDisconnect, Action<Exception> onError);
+		void Start(string url, Action onConnect, Action onDisconnect, Action<Exception> onError);
 		/// <summary>
 		/// Closes the websocket.
 		/// 
