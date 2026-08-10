@@ -17,7 +17,7 @@ namespace VTS.Unity {
 		private IVTSPlugin _plugin;
 		private IVTSPlugin Plugin {
 			get {
-				this._plugin ??= new CoreVTSPlugin(this.Socket, this.JsonUtility, this.TokenStorage, this.Logger, 100, this.PluginName, this.PluginAuthor, this.PluginIcon);
+				this._plugin ??= new CoreVTSPlugin(this.Socket, this.JsonUtility, this.TokenStorage, this.Logger, (int)(1000f / Application.targetFrameRate), this.PluginName, this.PluginAuthor, this.PluginIcon);
 				return this._plugin;
 			}
 		}

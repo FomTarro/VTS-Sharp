@@ -5,9 +5,7 @@ A C# client interface for creating VTube Studio Plugins with the [official VTube
 If you are updating your project from using a 1.x.x version of the library to using a 2.x.x version of the library, please read [the migration guide](#what-changed-in-200), as the project was restructured in version 2.0.0 to decouple it from the Unity Engine, allowing it to be more easily used in other C# environments!
  
 ## About
-This library is maintained by Tom "Skeletom" Farro. If you need to contact him, the best way to do so is via [Twitter](https://www.twitter.com/fomtarro) or by leaving an issue ticket on this repo.
-
-If you're more of an email-oriented person, you can contact his support email: [tom@skeletom.net](mailto:tom@skeletom.net).
+This library is maintained by Tom "Skeletom" Farro. You can contact him via email at [tom@skeletom.net](mailto:tom@skeletom.net) or by leaving an issue ticket on this repo.
 
 This library can also be found on the [Unity Asset Store](https://assetstore.unity.com/packages/tools/integration/vts-sharp-203218), and the core library (with no Unity-specific components) can be downloaded as a [NuGet Package](https://www.nuget.org/packages/VTS-Sharp/2.1.0), but this repo will always be the most up-to-date version.
  
@@ -126,8 +124,8 @@ The name of this plugin. Required for authorization purposes.
 The name of this plugin's author. Required for authorization purposes.
 #### `string PluginIcon`
 The icon of this for this plugin, as a base64 string. Optional, must be exactly 128*128 pixels in size.
-#### `VTSWebSocket Socket`
-The underlying WebSocket for connecting to VTS.
+#### `IWebSocket Socket`
+The underlying WebSocket implementation.
 #### `ITokenStorage TokenStorage`
 The underlying Token Storage mechanism for connecting to VTS.
 #### `IJsonUtility JsonUtility`
@@ -140,10 +138,7 @@ Is the plugin currently authenticated?
 
 ### Methods
 #### `void Initialize`
-Connects to VTube Studio, authenticates the plugin, and also selects the WebSocket, JSON Utility, and Token Storage implementations. Takes the following args:
-* `IWebSocket webSocket`: The WebSocket implementation.
-* `IJsonUtility jsonUtility`: The JSON serializer/deserializer implementation.
-* `ITokenStorage tokenStorage`: The Token Storage implementation.
+Connects to VTube Studio, ans authenticates the plugin. Takes the following args:
 * `Action onConnect`: Callback executed upon successful initialization.
 * `Action onDisconnect`: Callback executed upon disconnecting from VTS (accidental or otherwise).
 * `Action<VTSErrorData> onError`: Callback executed upon failed initialization.
@@ -154,10 +149,8 @@ The plugin will attempt to intelligently choose a port to connect to, using the 
 * If that takes too long and times out, it will attempt to connect to the default port (8001).
 
 #### `Task InitializeAsync`
-Connects to VTube Studio, authenticates the plugin, and also selects the WebSocket, JSON Utility, and Token Storage implementations. Takes the following args:
-* `IWebSocket webSocket`: The WebSocket implementation.
-* `IJsonUtility jsonUtility`: The JSON serializer/deserializer implementation.
-* `ITokenStorage tokenStorage`: The Token Storage implementation.
+Connects to VTube Studio, and authenticates the plugin. Takes the following args:
+
 * `Action onDisconnect`: Callback executed upon disconnecting from VTS (accidental or otherwise).
 
 If this method fails to execute, it will throw a `VTSException`.
@@ -192,7 +185,6 @@ Event subscription methods can be inferred from the [official VTube Studio Event
 ## `interface IWebSocket`
 
 ### Provided Implementations
-* `VTS.Core.WebSocketSharpImpl`
 * `VTS.Core.WebSocketImpl`
 
 ### Methods
@@ -219,7 +211,6 @@ Send a payload to the websocket server. Takes the following args:
 
 ### Provided Implementations
 * `VTS.Core.NewtonsoftJsonUtilityImpl`
-* `VTS.Unity.UnityJsonUtilityImpl` (deprecated)
 
 ### Methods
 #### `T FromJson<T>`
@@ -271,9 +262,6 @@ Logs an error. Takes the following args:
 
 ## [DenchiSoft](https://github.com/DenchiSoft/VTubeStudio)
 None of this would be possible without Denchi's tireless work on VTube Studio itself.
-
-## [WebSocketSharp](https://github.com/sta/websocket-sharp)
-An implementation of IWebSocket using WebSocketSharp has been included for use, adhering to the [library's MIT license](https://github.com/sta/websocket-sharp/blob/master/LICENSE.txt).
 
 ## [Newtonsoft JSON.NET](https://www.newtonsoft.com/json)
 An implementation of IJsonUtility using Newtonsoft's JSON.NET has been included for use, adhering to the [library's MIT license](https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md).

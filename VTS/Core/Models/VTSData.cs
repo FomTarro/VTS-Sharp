@@ -5,7 +5,7 @@ namespace VTS.Core {
 	#region Common
 
 	[System.Serializable]
-	public class VTSMessageData {
+	public abstract class VTSMessageData {
 		public string apiName = "VTubeStudioPublicAPI";
 		public long timestamp;
 		public string apiVersion = "1.0";
@@ -1395,7 +1395,6 @@ namespace VTS.Core {
 			public bool fillPostProcessingEffectsArray = true;
 			public Effects[] effectIDFilter;
 		}
-
 	}
 
 	[System.Serializable]
@@ -1577,6 +1576,28 @@ namespace VTS.Core {
 		public bool usingRestrictedEffects;
 		public bool randomizeAll;
 		public float randomizeAllChaosLevel;
+	}
+
+	[System.Serializable]
+	public class VTSItemSortRequestData : VTSMessageData {
+		public VTSItemSortRequestData() {
+			this.messageType = "ItemSortRequest";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public string itemInstanceID;
+			public bool frontOn = true;
+			public bool backOn = true;
+			public string setSplitPoint;
+			public string setFrontOrder;
+			public string splitAt;
+			public string withinModelOrderFront;
+			public string withinModelOrderBack;
+
+		}
 	}
 
 	#endregion
