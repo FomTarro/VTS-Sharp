@@ -5,13 +5,20 @@ using VTS.Core;
 namespace VTS.Unity.Examples {
 
 	public class MyFirstPlugin : UnityVTSPlugin {
-		public override IWebSocket Socket => new WebSocketImpl(this.Logger);
-
-		public override IJsonUtility JsonUtility => new NewtonsoftJsonUtilityImpl();
-
-		public override ITokenStorage TokenStorage => new TokenStorageImpl(Application.persistentDataPath);
-
-		public override IVTSLogger Logger => new UnityVTSLoggerImpl();
+		protected override VTSPluginDependencies DependencyImplementations
+		{
+			get
+			{
+				IVTSLogger logger = new UnityVTSLoggerImpl();
+				return new()
+				{
+					socket=new WebSocketImpl(logger),
+					jsonUtility=new NewtonsoftJsonUtilityImpl(),
+					tokenStorage=new TokenStorageImpl(Application.persistentDataPath),
+					logger=logger
+				};
+			}
+		}
 
 		// Start is called before the first frame update
 		private void Start() {
