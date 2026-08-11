@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace VTS.Core {
+namespace VTS.Core
+{
 
 	/// <summary>
 	/// Interface for providing Plugin implementation.
 	/// </summary>
-	public interface IVTSPlugin {
+	public interface IVTSPlugin
+	{
 		/// <summary>
 		/// The name of this plugin. Required for authorization purposes.
 		/// </summary>
@@ -1265,5 +1267,22 @@ namespace VTS.Core {
 		/// <param name="options">Configuration options about the request.</param>
 		/// <param name="values">A list of post processing parameters to update.</param>
 		Task<VTSPostProcessingUpdateResponseData> SetPostProcessingEffectValues(VTSPostProcessingUpdateOptions options, PostProcessingValue[] values);
+
+		/// <summary>
+		/// Sets the sorting behavior of an item within the layers of the model it is loaded on.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio#set-item-within-model-sorting-order">https://github.com/DenchiSoft/VTubeStudio#set-item-within-model-sorting-order</a>
+		/// </summary>
+		/// <param name="options">Configuration options about the request.</param>
+		void SortItemWithinModel(VTSItemSortOptions options, Action<VTSItemSortResponseData> onSuccess, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Sets the sorting behavior of an item within the layers of the model it is loaded on.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio#set-item-within-model-sorting-order">https://github.com/DenchiSoft/VTubeStudio#set-item-within-model-sorting-order</a>
+		/// </summary>
+		/// <param name="options">Configuration options about the request.</param>
+		Task<VTSItemSortResponseData> SortItemWithinModel(VTSItemSortOptions options);
 	}
 }

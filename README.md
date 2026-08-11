@@ -242,6 +242,7 @@ Deletes the auth token.
 ### Provided Implementations
 * `VTS.Core.ConsoleVTSLoggerImpl`
 * `VTS.Unity.UnityVTSLoggerImpl`
+* `VTS.Godot.GodotVTSLoggerImpl`
 
 ### Methods
 #### `void Log`
