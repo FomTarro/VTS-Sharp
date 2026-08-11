@@ -1,48 +1,53 @@
 # VTS-Sharp v2.4.0
-A C# client interface for creating VTube Studio Plugins with the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio), for use in Unity and other C# runtime environments!
+A C# client interface for creating VTube Studio Plugins with the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio), for use in Unity, Godot, and other C# development environments!
 
 ## IMPORTANT! 
-If you are updating your project from using a 1.x.x version of the library to using a 2.x.x version of the library, please read [the migration guide](#what-changed-in-200), as the project was restructured in version 2.0.0 to decouple it from the Unity Engine, allowing it to be more easily used in other C# environments!
+If you are updating your project from using a `1.x.x` version of the library to using a `2.x.x` version of the library, please read [the migration guide](#what-changed-in-200), as the project was restructured in version `2.0.0` to decouple it from the Unity Engine, allowing it to be more easily used in other C# environments!
  
 ## About
-This library is maintained by Tom "Skeletom" Farro. You can contact him via email at [tom@skeletom.net](mailto:tom@skeletom.net) or by leaving an issue ticket on this repo.
+This library is maintained by [Tom "Skeletom" Farro](https://www.skeletom.net). You can contact him via email at [tom@skeletom.net](mailto:tom@skeletom.net) or by leaving an issue ticket on this repo.
 
-This library can also be found on the [Unity Asset Store](https://assetstore.unity.com/packages/tools/integration/vts-sharp-203218), and the core library (with no Unity-specific components) can be downloaded as a [NuGet Package](https://www.nuget.org/packages/VTS-Sharp/2.1.0), but this repo will always be the most up-to-date version.
+<!-- This library can also be found on the [Unity Asset Store](https://assetstore.unity.com/packages/tools/integration/vts-sharp-203218), and the core library (with no Unity-specific components) can be downloaded as a [NuGet Package](https://www.nuget.org/packages/VTS-Sharp/2.1.0), but this repo will always be the most up-to-date version. -->
  
 ## Usage
 In order to start making a plugin, follow these simple steps:
 1. [Check to see which packages from this library you need for your project based on your C# environment](#packages). 
-    * If you are using Unity, make a class which extends `VTS.Unity.UnityVTSPlugin`. 
+    * If you are using Unity and want your plugin to be a MonoBehaviour, make a class which extends `VTS.Unity.UnityVTSPlugin`. 
     * If you are using any other C# environment, make a class which extends `VTS.Core.CoreVTSPlugin`, or which has one as a member variable. 
+
 2. In your class, call the [`Initialize`](#void-initialize) method on the plugin, which will attempt to connect to VTube Studio and authenticate the plugin. 
     
-    This method has you pass in your preferred implementations of:
-    * A [JSON utility](#interface-ijsonutility)
-    * A [websocket](#interface-iwebsocket)
-    * A [mechanism to store the authorization token](#interface-itokenstorage). 
-    
     It also has you specify what happens when:
-    * The plugin connects to VTube Studio successfully
-    * The plugin disconnects from VTube Studio
-    * The plugin encounters an error while attempting to connect to VTube Studio 
+    * The plugin connects to VTube Studio successfully.
+    * The plugin disconnects from VTube Studio.
+    * The plugin encounters an error while attempting to connect to VTube Studio.
+
 3. Once your plugin is authenticated, you can call any method found in the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio), which are built-in as appropriately named methods on the `VTSPlugin` class!
 
 And that's it! In fact, if you're using Unity, these steps are all done for you already, out of the box, in the `MyFirstPlugin` class found in the `Examples/Unity` folder!.
  
 You can find a video tutorial that demonstrates [how to get started in under 90 seconds here](https://www.youtube.com/watch?v=lUGeMEVzjAU).
 
-## Design Pattern and Considerations
+## Design Patterns and Considerations
  
 ### Swappable Components
-In order to afford the most flexibility (and to be as decoupled from Unity as possible), the underlying components of the [`VTSPlugin`](#interface-ivtsplugin) are all defined as interfaces. This allows you to swap out the built-in implementations with more robust or platform-compliant ones. By default, the `MyFirstPlugin` class features working implementations of all needed components, but if you want, you can pass in your own implementations via the [`Initialize`](#void-initialize) method.
+In order to afford the most flexibility (and to be as decoupled from Unity as possible), the underlying components of the [`VTSPlugin`](#interface-ivtsplugin) are all defined as interfaces. This allows you to swap out the built-in implementations with custom ones to suit your specific constraints. For example, maybe you need your auth token to save to a database instead of a local file, or need your logs to output to Godot's logging utility instead of the default C# console. These components are provided to the constructor of the [`VTS.Core.CoreVTSPlugin`](#interface-ivtsplugin).
 
-### Asynchronous Design
-Because the VTube Studio API is websocket-based, all calls to it are inherently asynchronous. As of version 2.1.0, there are now two design patterns included in this library. You can use the one that suits your perferences and needs the best!
+Because Unity MonoBehaviors are *not* created with constructors, the `VTS.Unity.UnityVTSPlugin` provides an accessor called `DependencyImplementations` which returns a struct containing references to implementations for all underlying components. The `VTS.Unity.UnityVTSPlugin` class defines this accessor with working implementations by default, but if you want to use something different, you can override the accessor in your extended class.
+
+These components include:
+* [`IWebSocket`](#interface-iwebsocket), the WebSocket transport.
+* [`ITokenStorage`](#interface-itokenstorage), the mechanism for saving the VTube Studio authentication token.
+* [`IJsonUtility`](#interface-ijsonutility), the mehcanism for serializing and dserializing JSON messages over the socket.
+* [`IVTSLogger`](#interface-ivtslogger), the logger for printing debug and error messages.
+
+### Asynchronous Code
+Because the VTube Studio API is websocket-based, all calls to it are inherently asynchronous. As of version `2.1.0`, there are now two design patterns included in this library. You can use the one that suits your perferences and needs the best!
 
 This library also supports the [VTube Studio Event Subscription API](https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md). With this feature, you can subscribe to various events to make sure your plugin gets a message when something happens in VTube Studio. Event Subscription follows a similar asynchronous design pattern.
 
 ### Callback-based Design Pattern
-The initial implementation of this library revolves around callbacks to achieve asynchronous results.
+The initial implementation of this library revolves around callbacks to achieve asynchronous results. This is similar to the `resolve` and `reject` functions of a JavaScript `Promise`.
 
 #### API Calls
 Take, for example, the following method signature, found in the [`VTSPlugin`](#interface-ivtsplugin) class:
@@ -98,16 +103,12 @@ Upon successfully subscribing to the event in VTube Studio, the method will reso
 As of version 2.0.0, the library has been split into two folders/packages: `VTS/Core` and `VTS/Unity`. The `VTS/Core` folder contains everything needed to build a plugin in any C# runtime environment, with no engine-specific code. The `VTS/Unity` folder contains Unity-specific wrappers for the core classes, allowing you to easily build a plugin as a Unity GameObject, following the original design of this library. If you are not looking to use Unity for your project, you can completely discard the `VTS/Unity` folder. However, if you *are* using Unity for your project, you will need both the `VTS/Core` and `VTS/Unity` folders, as the Unity components serve as wrappers for the Core library.
  
 ### Breaking Changes
-As of version 2.0.0, a few fundamental and breaking changes have been introduced in the interest of decoupling the library from Unity. If you are updating your project from using a 1.x.x version of the library to using a 2.x.x version of the library, please completely remove the library from your project, and re-import it while being aware of the following changes:
+As of version `2.0.0`, a few fundamental and breaking changes have been introduced in the interest of decoupling the library from Unity. If you are updating your project from using a `1.x.x` version of the library to using a `2.x.x` version of the library, please completely remove the library from your project, and re-import it while being aware of the following changes:
 
 * Namespaces have been totally reorganized. The two remaining namespaces are `VTS.Core` and `VTS.Unity`. These correspond to the aformentioned [packages](#packages).
 * The `VTSPlugin` MonoBehaviour class has been renamed to `UnityVTSPlugin`, and moved into the `VTS.Unity` namespace. As such, please update your plugin classes to extend `VTS.Unity.UnityVTSPlugin`.
 * The `VTSWebSocket` MonoBehaviour class has been totally removed. You may safely remove it from any game objects. This class now exists as a pure C# equivalent.
-* Several of the built-in dependencies of the `Initialize` method have changed in various ways:
-    * The `IJsonUtility` interface now has a `NewtonsoftJsonUtilityImpl` implementation that is suitable for all uses, leveraging the much more robust [Newtonsoft JSON library](#newtonsoft-jsonnet).
-    * The existing `ITokenStorage` implementation `TokenStorageImpl` now requires a root path to be passed in via the constructor. For Unity applications, you likely want to use `Application.persistentDataPath`, ex `new TokenStorageImpl(Application.persistentDataPath)`.
-    * The existing `IWebSocket` implementation `WebSocketSharpImpl` now requires an `IVTSLogger` to be passed in via the constructor. For Unity applications, you can use the builtin logger from the `VTSPlugin` MonoBehaviour, ex `new WebSocketSharpImpl(this.Logger)`
-    * The `onError` callback method now accepts an `VTSErrorData` argument.
+* The `onError` callback method now accepts an `VTSErrorData` argument.
 
 # API
 
@@ -180,7 +181,6 @@ Request methods can be inferred from the [official VTube Studio API](https://git
 
 #### `VTube Studio API Events`
 Event subscription methods can be inferred from the [official VTube Studio Event Subscription API](https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md).
-
 
 ## `interface IWebSocket`
 
@@ -272,18 +272,20 @@ Below is a list of some plugins which were made using this library! If you have 
 
 | Plugin | Developer | Explanation |
 | --- | --- | --- |
+|[VConnect](https://store.steampowered.com/app/4818300/VConnect/) ([Video](https://www.youtube.com/watch?v=pq_h3gT2vY0)) | [Remasuri3](https://twitter.com/Remasuri32) | An app with a streaming overlay and automation studio where you connect any live event to any on-screen reaction using a visual node editor. No coding knowledge necessary. Just drag, connect, and sit back to watch as your stream reacts.|
+|[VBridger](https://store.steampowered.com/app/1898830/VBridger/) ([Video](https://www.youtube.com/watch?v=mFUG4L4Lgfo)) | [PiPuProductions](https://twitter.com/PiPuProductions) | An app designed for VTube Studio and Live2D, which allows the user to make better use of iPhoneX ARKit tracking on their Live2D model. |
+|[VInput](https://store.steampowered.com/app/2174170/VInput/) ([Video](https://twitter.com/xiaoye1997/status/1611374527988256770)) | [xiaoye1997](https://twitter.com/xiaoye1997) | An app for sending data to VTubeStudio, such as game controller inputs, racing steering wheel data, time data, hardware monitoring data and data derived from custom LUA scripting.|
+|[Twitch Integrated Throwing System (T.I.T.S)](https://remasuri3.itch.io/tits) ([Video](https://www.youtube.com/watch?v=hWOIZqv-u50)) | [Remasuri3](https://twitter.com/Remasuri32) | An app which allows your chat to bully you as much as possible >:D It can be used with or without VTube Studio to let people throw items at your face!|
+|[VTS-Heartrate](https://github.com/FomTarro/vts-heartrate) ([Video](https://www.youtube.com/watch?v=tV1kK0uSjFE))| [Skeletom](https://twitter.com/FomTarro) | An app which allows users to connect their heartrate data to VTube Studio, to cause their model to become flushed under stress and breathe more heavily, among other things. |
+|[Camera Optical Flow Tracking Into VTube Studio](https://github.com/BluePengcho/Camera-Optical-Flow-Tracking-Into-VTube-Studio) | [PengCho](https://twitter.com/Blue_Pengcho) | An app for real-time vlogging with just a single, forward-facing camera. It automatically points your model's gaze towards the direction that the video feed is moving using Optical Flow techniques! No tracking camera needed.|
+
 | [PentabInfoPickerForVTS](https://github.com/Ganeesya/PentabInfoPickerForVTS) ([Video](https://www.youtube.com/watch?v=kklcAzTequ)) | [Ganeesya](https://twitter.com/Ganeesya) | An app which allows users to control their model with a tablet and pen. |
 | [VTS-ChangeEyeColor](https://yataya2000.booth.pm/items/3551421) ([Github](https://github.com/TaniNatsumi/VTS-ChangeEyeColor)) | [TaniNatsumi](https://twitter.com/BURAI_VC2008) | An app which allows users to change the eye colors of their model. Can change each eye color individually (heterochromia).|
 | [VTSLive](https://github.com/fastestyukkuri/VTSLivePlugins) | [fastest_yukkuri](https://twitter.com/fastest_yukkuri) | An app which allows VTube Studio to reflect the movement of analog and digital clocks, the movement of the sun and moon, and weather information from around the world.|
 |[VTS-Mod](https://github.com/MechaWolfVtuberShin/VTS-Mod/releases/tag/vts-mod)| [MechaWolfVtuberShin](https://twitter.com/ShinChannel3) | An app which allows users to change the surface color of the model including RGB. It can also change the rotation of the model.|
-|[Twitch Integrated Throwing System (T.I.T.S)](https://remasuri3.itch.io/tits) ([Video](https://www.youtube.com/watch?v=hWOIZqv-u50)) | [Remasuri3](https://twitter.com/Remasuri32) | An app which allows your chat to bully you as much as possible >:D It can be used with or without VTube Studio to let people throw items at your face!|
-|[VTS-Heartrate](https://github.com/FomTarro/vts-heartrate) ([Video](https://www.youtube.com/watch?v=tV1kK0uSjFE))| [Skeletom](https://twitter.com/FomTarro) | An app which allows users to connect their heartrate data to VTube Studio, to cause their model to become flushed under stress and breathe more heavily, among other things. |
 |[ViewLink](https://kawaentertainment.itch.io/viewlink)| [Kawa Entertainment](https://twitter.com/kawa_entertain) | An app for translating 3D VR movement into Live2D motion tracking, allowing you to stream VR games with your Live2D model. |
-|[VBridger](https://store.steampowered.com/app/1898830/VBridger/) ([Video](https://www.youtube.com/watch?v=mFUG4L4Lgfo)) | [PiPuProductions](https://twitter.com/PiPuProductions) | An app designed for VTube Studio and Live2D, which allows the user to make better use of iPhoneX ARKit tracking on their Live2D model. |
 |[Audiomimi](https://artemiz.booth.pm/items/3800791/) ([Video](https://twitter.com/ArtemizComs/status/1522834869247651840)) | [Artemiz](https://twitter.com/ArtemizComs) | An app that allows you to use SFX based on VTS parameter movement. |
 |[VTS Desktop Audio](https://lualucky.itch.io/vts-desktop-audio-plugin) ([Video](https://twitter.com/LuaVLucky/status/1592741024509853696)) | [Lua V. Lucky](https://twitter.com/LuaVLucky) | An app that allows you to control your model with your desktop audio! Converts various parts of the audio spectrum to custom tracking parameters. |
 |[Twitch High Intensity Color Changer (T.H.I.C.C)](https://remasuri3.itch.io/thicc) | [Remasuri3](https://twitter.com/Remasuri32) | An app which allows your chat to change colors on your model via point redeems and other events!|
 |[Winter Wonderland Twitch Overlay](https://lualucky.itch.io/winter-wonderland-twitch-overlay) ([Video](https://youtu.be/htP9_D6Z5Qg)) | [Lua V. Lucky](https://twitter.com/LuaVLucky) | An app which provides numerous festive elements for any stream. Decorate a Christmas tree, pelt the streamer with snowballs, and more!|
-|[VInput](https://store.steampowered.com/app/2174170/VInput/) ([Video](https://twitter.com/xiaoye1997/status/1611374527988256770)) | [xiaoye1997](https://twitter.com/xiaoye1997) | An app for sending data to VTubeStudio, such as game controller inputs, racing steering wheel data, time data, hardware monitoring data and data derived from custom LUA scripting.|
 |[VtubeStudioSimpleSETool](https://mononobe-monoko.booth.pm/items/3468381) ([Video](https://twitter.com/mononobe_monoko/status/1465310301570551808)) | [Mononobe Monoko](https://twitter.com/mononobe_monoko) | An app for playing Sound Effects (SE) and displaying particle effects based on your movement.|
-|[Camera Optical Flow Tracking Into VTube Studio](https://github.com/BluePengcho/Camera-Optical-Flow-Tracking-Into-VTube-Studio) | [PengCho](https://twitter.com/Blue_Pengcho) | An app for real-time vlogging with just a single, forward-facing camera. It automatically points your model's gaze towards the direction that the video feed is moving using Optical Flow techniques! No tracking camera needed.|

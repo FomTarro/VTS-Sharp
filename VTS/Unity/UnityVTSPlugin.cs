@@ -26,7 +26,7 @@ namespace VTS.Unity
 
 		/// <summary>
 		/// Accessor which provides the implementations for the various dependencies needed for plugin creation.
-		/// Default implementations are provided, but this accessor can be overriden in order to specify custom components.
+		/// Default implementations are provided, but this accessor can be overridden in order to specify custom implementations.
 		/// </summary>
 		protected virtual VTSPluginDependencies DependencyImplementations
 		{
