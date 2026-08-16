@@ -347,6 +347,9 @@ namespace VTS.Core {
 									case "ArtMeshTrackingEvent":
 										this._events[response.messageType].onEvent(this._json.FromJson<VTSArtMeshPointTrackingEventData>(data));
 										break;
+									case "ArtMeshOutlineEvent":
+										this._events[response.messageType].onEvent(this._json.FromJson<VTSArtMeshOutlineTrackingEventData>(data));
+										break;
 								}
 							} catch (Exception e) {
 								// Neatly handle errors in case the deserialization or success callback throw an exception

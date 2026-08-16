@@ -2350,7 +2350,6 @@ namespace VTS.Core {
 			public string modelID;
 			public Pair windowSize;
 			public int subscribedPointCount;
-
 			public int foundPointCount;
 			public ArtMeshTrackedPoint[] trackingPoints;
 		}
@@ -2366,6 +2365,75 @@ namespace VTS.Core {
 	}
 
 	// Art Mesh Outline Tracking Event
+
+
+	[System.Serializable]
+	public class VTSArtMeshOutlineTrackingEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSArtMeshOutlineTrackingEventConfigOptions> {
+		public VTSArtMeshOutlineTrackingEventSubscriptionRequestData() {
+			this.data.eventName = "ArtMeshOutlineEvent";
+		}
+	}
+
+	/// <summary>
+	/// A container for providing subscription options for an Art Mesh Point Tracking Event subscription.
+	/// 
+	/// For more info about what each field does, see 
+	/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#track-artmesh-outline-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#track-artmesh-outline-event</a>
+	/// </summary>
+	[System.Serializable]
+	public class VTSArtMeshOutlineTrackingEventConfigOptions : VTSEventConfigData {
+		public int frequency;
+		public ArtMeshOutlineTracker[] artMeshes;
+		public VTSArtMeshOutlineTrackingEventConfigOptions() {
+			this.frequency = 30;
+			this.artMeshes = new ArtMeshOutlineTracker[0];
+		}
+
+		public VTSArtMeshOutlineTrackingEventConfigOptions(int frequency, ArtMeshOutlineTracker[] artMeshes) {
+			this.frequency = frequency;
+			this.artMeshes = artMeshes;
+		}
+	}
+
+	[System.Serializable]
+	public class ArtMeshOutlineTracker {
+		public string modelID;
+		public string artMeshID;
+	}
+
+	[System.Serializable]
+	public class VTSArtMeshOutlineTrackingEventData : VTSEventData {
+		public VTSArtMeshOutlineTrackingEventData() {
+			this.messageType = "ArtMeshOutlineEvent";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public bool modelLoaded;
+			public string modelID;
+			public Pair windowSize;
+			public int subscribedArtMeshCount;
+			public int foundArtMeshCount;
+			public int eventCounter;
+			public ArtMeshTrackedPoint[] trackingPoints;
+		}
+	}
+
+	[System.Serializable]
+	public class ArtMeshTrackedOutline {
+		public string artMeshID;
+		public bool artMeshVisible;
+		public int outlineCount;
+		public float outlineArea;
+		public ArtMeshTrackedOutlinePoints[] outlinePoints;
+	}
+
+	[System.Serializable]
+	public class ArtMeshTrackedOutlinePoints {
+		public float[] points;
+	}
 
 	#endregion
 }
