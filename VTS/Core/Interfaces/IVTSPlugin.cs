@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace VTS.Core
-{
+namespace VTS.Core {
 
 	/// <summary>
 	/// Interface for providing Plugin implementation.
 	/// </summary>
-	public interface IVTSPlugin
-	{
+	public interface IVTSPlugin {
 		/// <summary>
 		/// The name of this plugin. Required for authorization purposes.
 		/// </summary>
@@ -1284,5 +1282,24 @@ namespace VTS.Core
 		/// </summary>
 		/// <param name="options">Configuration options about the request.</param>
 		Task<VTSItemSortResponseData> SortItemWithinModel(VTSItemSortOptions options);
+
+		/// <summary>
+		/// Requests a list of Art Meshes at the given position.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master#requesting-list-of-artmeshes-at-position">https://github.com/DenchiSoft/VTubeStudio/tree/master#requesting-list-of-artmeshes-at-position</a>
+		/// </summary>
+		/// <param name="position">The position to check.</param>
+		/// <param name="visualize">How strongly the point will be visualized in VTube Studio.</param>
+		void GetArtMeshesAtPosition(Pair position, float visualize, Action<VTSArtMeshAtPositionResponseData> onSuccess, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Requests a list of Art Meshes at the given position.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master#requesting-list-of-artmeshes-at-position">https://github.com/DenchiSoft/VTubeStudio/tree/master#requesting-list-of-artmeshes-at-position</a>
+		/// </summary>
+		/// <param name="position">The position to check.</param>
+		/// <param name="visualize">How strongly the point will be visualized in VTube Studio.</param>
+		Task<VTSArtMeshAtPositionResponseData> GetArtMeshesAtPosition(Pair position, float visualize);
 	}
 }

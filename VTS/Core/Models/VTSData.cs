@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+
+using UnityEditor.Tilemaps;
 
 namespace VTS.Core {
 
@@ -1681,7 +1684,7 @@ namespace VTS.Core {
 		public class Data {
 			public float x;
 			public float y;
-			public float vizualize = 0.0f;
+			public float visualize = 0.0f;
 		}
 	}
 
@@ -2290,6 +2293,74 @@ namespace VTS.Core {
 			public string currentPreset;
 		}
 	}
+
+	// Art Mesh Point Tracking Event
+
+	[System.Serializable]
+	public class VTSArtMeshPointTrackingEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSPostProcessingEventConfigOptions> {
+		public VTSArtMeshPointTrackingEventSubscriptionRequestData() {
+			this.data.eventName = "ArtMeshTrackingEvent";
+		}
+	}
+
+	/// <summary>
+	/// A container for providing subscription options for an Art Mesh Point Tracking Event subscription.
+	/// 
+	/// For more info about what each field does, see 
+	/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#track-custom-point-on-artmesh-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#track-custom-point-on-artmesh-event</a>
+	/// </summary>
+	[System.Serializable]
+	public class VTSArtMeshPointTrackingEventConfigOptions : VTSEventConfigData {
+		public int frequency;
+		public ArtMeshPointTracker[] trackingPoints;
+		public VTSArtMeshPointTrackingEventConfigOptions() {
+			this.frequency = 30;
+			this.trackingPoints = new ArtMeshPointTracker[0];
+		}
+
+		public VTSArtMeshPointTrackingEventConfigOptions(int frequency, ArtMeshPointTracker[] trackingPoints) {
+			this.frequency = frequency;
+			this.trackingPoints = trackingPoints;
+		}
+	}
+
+	[System.Serializable]
+	public class ArtMeshPointTracker {
+		public string trackingPointID;
+		public bool visualize;
+		public ArtMeshCoordinate artMeshCoords;
+	}
+
+	[System.Serializable]
+	public class VTSArtMeshPointTrackingEventData : VTSEventData {
+		public VTSArtMeshPointTrackingEventData() {
+			this.messageType = "ArtMeshTrackingEvent";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public bool modelLoaded;
+			public string modelID;
+			public Pair windowSize;
+			public int subscribedPointCount;
+
+			public int foundPointCount;
+			public ArtMeshTrackedPoint[] trackingPoints;
+		}
+	}
+
+	[System.Serializable]
+	public class ArtMeshTrackedPoint {
+		public string trackingPointID;
+		public bool artMeshVisible;
+		public Pair position;
+		public float rotation;
+		public float size;
+	}
+
+	// Art Mesh Outline Tracking Event
 
 	#endregion
 }

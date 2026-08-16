@@ -6,13 +6,11 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VTS.Core
-{
+namespace VTS.Core {
 	/// <summary>
 	/// The wrapper class for websocket operations between the plugin and VTS.
 	/// </summary>
-	public class VTSWebSocket : IVTSWebSocket
-	{
+	public class VTSWebSocket : IVTSWebSocket {
 		// Dependencies
 		private const string VTS_WS_URL = "ws://{0}:{1}";
 		private IPAddress _ip = IPAddress.Loopback;
@@ -42,31 +40,27 @@ namespace VTS.Core
 
 		#region Lifecycle
 
-		public VTSWebSocket(IWebSocket webSocket, IJsonUtility jsonUtility, IVTSLogger logger)
-		{
+		public VTSWebSocket(IWebSocket webSocket, IJsonUtility jsonUtility, IVTSLogger logger) {
 			GLOBAL_PORT_DISCOVERY_EVENT += OnPortDiscovered;
 			this._ws = webSocket;
 			this._json = jsonUtility;
 			this._logger = logger;
 		}
 
-		public void Initialize()
-		{
+		public void Initialize() {
 			// Stop existing socket.
 			Disconnect();
 			StartUDP();
 		}
 
-		public void Tick(float timeDelta)
-		{
+		public void Tick(float timeDelta) {
 			ProcessResponses();
 			CheckPorts();
 			UpdatePortDiscoveryTimeout(timeDelta);
 			this._ws?.Tick(timeDelta);
 		}
 
-		public void Dispose()
-		{
+		public void Dispose() {
 			GLOBAL_PORT_DISCOVERY_EVENT -= OnPortDiscovered;
 			Disconnect();
 			UDP_CLIENT.Dispose();
@@ -76,24 +70,18 @@ namespace VTS.Core
 
 		#region UDP
 
-		private void CheckPorts()
-		{
+		private void CheckPorts() {
 			StartUDP();
 			// Port Discovery is global, so any plugin instance with capacity can pick up this task.
 			// If another plugin isn't already servicing this task...
-			if (UDP_CLIENT != null && this._json != null)
-			{
+			if (UDP_CLIENT != null && this._json != null) {
 				// If we have a result...
-				if (UDP_RESULT != null)
-				{
-					if (UDP_RESULT.IsCanceled || UDP_RESULT.IsFaulted)
-					{
+				if (UDP_RESULT != null) {
+					if (UDP_RESULT.IsCanceled || UDP_RESULT.IsFaulted) {
 						// If the task faults, try again
 						UDP_RESULT.Dispose();
 						UDP_RESULT = null;
-					}
-					else if (UDP_RESULT.IsCompleted)
-					{
+					} else if (UDP_RESULT.IsCompleted) {
 						// Otherwise, collect the result
 						string text = Encoding.UTF8.GetString(UDP_RESULT.Result.Buffer);
 						IPAddress address = MapAddress(UDP_RESULT.Result.RemoteEndPoint.Address);
@@ -101,41 +89,31 @@ namespace VTS.Core
 						UDP_RESULT = null;
 						VTSStateBroadcastData data = this._json.FromJson<VTSStateBroadcastData>(text);
 						// New IP addresses get new records made
-						if (!PORTS_BY_IP.ContainsKey(address))
-						{
+						if (!PORTS_BY_IP.ContainsKey(address)) {
 							PORTS_BY_IP.Add(address, new Dictionary<int, VTSStateBroadcastData>());
 						}
 						// If this IP already knows about this port...
-						if (PORTS_BY_IP[address].ContainsKey(data.data.port))
-						{
-							if (data.data.active)
-							{
+						if (PORTS_BY_IP[address].ContainsKey(data.data.port)) {
+							if (data.data.active) {
 								// Update record if active
 								PORTS_BY_IP[address][data.data.port] = data;
-							}
-							else
-							{
+							} else {
 								// Remove record if inactive
 								PORTS_BY_IP[address].Remove(data.data.port);
 							}
-						}
-						else
-						{
-							if (data.data.active)
-							{
+						} else {
+							if (data.data.active) {
 								PORTS_BY_IP[address].Add(data.data.port, data);
 							}
 						}
 
-						if (data.data.active)
-						{
+						if (data.data.active) {
 							GLOBAL_PORT_DISCOVERY_EVENT.Invoke(address, data.data.port);
 						}
 					}
 				}
 				// If our result has been collected and disposed of, start again
-				UDP_RESULT ??= Task.Run(() =>
-				{
+				UDP_RESULT ??= Task.Run(() => {
 					IPEndPoint ep = null;
 					var bytes = UDP_CLIENT.Receive(ref ep);
 					return new UdpReceiveResult(bytes, ep);
@@ -143,63 +121,49 @@ namespace VTS.Core
 			}
 		}
 
-		private void StartUDP()
-		{
-			try
-			{
-				if (UDP_CLIENT == null)
-				{
+		private void StartUDP() {
+			try {
+				if (UDP_CLIENT == null) {
 					// This configuration should prevent the UDP client from blocking other connections to the port
 					UDP_CLIENT = new UdpClient();
 					UDP_CLIENT.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
 					UDP_CLIENT.Client.Bind(LOCAL_PT);
 					UDP_CLIENT.Client.ReceiveTimeout = (int)(DEFAULT_PORT_DISCOVERY_TIMEOUT * 2);
 				}
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				this._logger.LogError(e.ToString());
 			}
 		}
 
-		private void OnPortDiscovered(IPAddress address, int port)
-		{
-			if (MapAddress(address).Equals(MapAddress(this._ip)))
-			{
-				if (this._onLocalPortDiscovered != null)
-				{
+		private void OnPortDiscovered(IPAddress address, int port) {
+			if (MapAddress(address).Equals(MapAddress(this._ip))) {
+				if (this._onLocalPortDiscovered != null) {
 					this._logger.Log(string.Format("Available VTube Studio port discovered: {0}!", port));
 					this._onLocalPortDiscovered.Invoke(port);
 				}
 			}
 		}
 
-		private void UpdatePortDiscoveryTimeout(float timeDelta)
-		{
-			if (this._portDiscoveryTimer > 0f)
-			{
+		private void UpdatePortDiscoveryTimeout(float timeDelta) {
+			if (this._portDiscoveryTimer > 0f) {
 				this._portDiscoveryTimer -= timeDelta;
-				if (this._portDiscoveryTimer <= 0f)
-				{
+				if (this._portDiscoveryTimer <= 0f) {
 					this._onPortDiscoveryTimeout?.Invoke();
 					this._portDiscoveryTimer = 0f;
 				}
 			}
 		}
 
-		public Dictionary<int, VTSStateBroadcastData> GetPorts()
-		{
+		public Dictionary<int, VTSStateBroadcastData> GetPorts() {
 			return PORTS_BY_IP.ContainsKey(this._ip)
 				? new Dictionary<int, VTSStateBroadcastData>(PORTS_BY_IP[this._ip])
 				: new Dictionary<int, VTSStateBroadcastData>();
 		}
 
-		public bool SetPort(int port)
-		{
+		public bool SetPort(int port) {
 			_logger.Log(string.Format("Setting port: {0}...", port));
 			this._port = port;
-			if (PORTS_BY_IP.ContainsKey(this._ip) && PORTS_BY_IP[this._ip].ContainsKey(port))
-			{
+			if (PORTS_BY_IP.ContainsKey(this._ip) && PORTS_BY_IP[this._ip].ContainsKey(port)) {
 				this._logger.Log(string.Format("Port {0} is a known VTube Studio Port.", port));
 				return true;
 			}
@@ -207,11 +171,9 @@ namespace VTS.Core
 			return false;
 		}
 
-		public bool SetIPAddress(string ipString)
-		{
+		public bool SetIPAddress(string ipString) {
 			this._logger.Log(string.Format("Setting IP address: {0}...", ipString));
-			if (IPAddress.TryParse(ipString, out IPAddress address))
-			{
+			if (IPAddress.TryParse(ipString, out IPAddress address)) {
 				this._ip = MapAddress(address);
 				this._logger.Log(string.Format("IP address {0} is valid IPv4 format.", ipString));
 				return true;
@@ -224,14 +186,10 @@ namespace VTS.Core
 		/// Maps all forms of loopback IP to 127.0.0.1. Non-loopback addresses are returned as-is.
 		/// </summary>
 		/// <returns>The mapped IP Address.</returns>
-		private static IPAddress MapAddress(IPAddress address)
-		{
-			foreach (NetworkInterface ip in NetworkInterface.GetAllNetworkInterfaces())
-			{
-				foreach (UnicastIPAddressInformation unicast in ip.GetIPProperties().UnicastAddresses)
-				{
-					if (address.Equals(unicast.Address) && unicast.Address.AddressFamily == AddressFamily.InterNetwork)
-					{
+		private static IPAddress MapAddress(IPAddress address) {
+			foreach (NetworkInterface ip in NetworkInterface.GetAllNetworkInterfaces()) {
+				foreach (UnicastIPAddressInformation unicast in ip.GetIPProperties().UnicastAddresses) {
+					if (address.Equals(unicast.Address) && unicast.Address.AddressFamily == AddressFamily.InterNetwork) {
 						// If the provided address is one of the local machine's addresses,
 						// Then it is effectively loopback, so let's always use loopback for simplicity.
 						return IPAddress.Loopback;
@@ -245,94 +203,72 @@ namespace VTS.Core
 
 		#region I/O
 
-		public void Connect(Action onConnect, Action onDisconnect, Action<Exception> onError)
-		{
+		public void Connect(Action onConnect, Action onDisconnect, Action<Exception> onError) {
 			// If the port we're trying to connect to isn't a known port...
-			if (!(PORTS_BY_IP.ContainsKey(this._ip) && PORTS_BY_IP[this._ip].ContainsKey(this._port)))
-			{
+			if (!(PORTS_BY_IP.ContainsKey(this._ip) && PORTS_BY_IP[this._ip].ContainsKey(this._port))) {
 				// First try to connect to the port we proclaim...
-				ConnectImpl(this._port, onConnect, onDisconnect, (e) =>
-				{
+				ConnectImpl(this._port, onConnect, onDisconnect, (e) => {
 					// If that fails, let's try the first port we can find on UDP!
 					this._logger.Log(string.Format("Unable to connect to VTube Studio port {0}, waiting for port discovery...", this._port));
 					// Create a callback that will forcibly try to connect to the default port, if we cannot discover a port in time.
 					this._portDiscoveryTimer = DEFAULT_PORT_DISCOVERY_TIMEOUT;
-					this._onPortDiscoveryTimeout = () =>
-					{
+					this._onPortDiscoveryTimeout = () => {
 						this._logger.LogError(string.Format("Wait for port discovery has timed out. Finally, attempting connection on default port {1}.", this._port, DEFAULT_PORT));
 						ClearConnectionCallbacks();
 						ConnectImpl(DEFAULT_PORT, onConnect, onDisconnect, onError);
 					};
 					// Wait until we discover a functional port, then try to connect.
-					this._onLocalPortDiscovered = (port) =>
-					{
-						if (port != this._port)
-						{
+					this._onLocalPortDiscovered = (port) => {
+						if (port != this._port) {
 							ClearConnectionCallbacks();
 							ConnectImpl(port, onConnect, onDisconnect, onError);
 						}
 					};
 				});
-			}
-			else
-			{
+			} else {
 				ConnectImpl(this._port, onConnect, onDisconnect, onError);
 			}
 		}
 
-		private void ConnectImpl(int port, Action onConnect, Action onDisconnect, Action<Exception> onError)
-		{
-			if (this._ws != null)
-			{
+		private void ConnectImpl(int port, Action onConnect, Action onDisconnect, Action<Exception> onError) {
+			if (this._ws != null) {
 				Disconnect();
 				SetPort(port);
 				this._ws.Start(string.Format(VTS_WS_URL, this._ip.ToString(), this._port), onConnect, onDisconnect, onError);
-			}
-			else
-			{
+			} else {
 				onError.Invoke(new Exception("WebSocket not initialized."));
 			}
 		}
 
-		public void Disconnect()
-		{
-			if (this._ws != null)
-			{
+		public void Disconnect() {
+			if (this._ws != null) {
 				ClearConnectionCallbacks();
 				this._ws.Stop();
 			}
 		}
 
-		private void ClearConnectionCallbacks()
-		{
+		private void ClearConnectionCallbacks() {
 			// Wipe the callbacks so we don't keep re-firing them after a successful connection or disconnect.
 			this._onLocalPortDiscovered = null;
 			this._onPortDiscoveryTimeout = null;
 			this._portDiscoveryTimer = 0f;
 		}
 
-		public void Send<T, K>(T request, Action<K> onSuccess, Action<VTSErrorData> onError) where T : VTSMessageData where K : VTSMessageData
-		{
-			if (this._ws != null)
-			{
-				try
-				{
+		public void Send<T, K>(T request, Action<K> onSuccess, Action<VTSErrorData> onError) where T : VTSMessageData where K : VTSMessageData {
+			if (this._ws != null) {
+				try {
 					this._callbacks.Add(request.requestID, new VTSCallbacks((k) => { onSuccess((K)k); }, onError));
 					// make sure to remove null properties
 					string output = this._json.ToJson(request);
 					this._ws.Send(output);
-				}
-				catch (Exception e)
-				{
+				} catch (Exception e) {
 					this._logger.LogError(e.ToString());
 					VTSErrorData error = new();
 					error.data.errorID = ErrorID.InternalServerError;
 					error.data.message = e.Message;
 					onError(error);
 				}
-			}
-			else
-			{
+			} else {
 				VTSErrorData error = new();
 				error.data.errorID = ErrorID.InternalServerError;
 				error.data.message = "No websocket data";
@@ -340,19 +276,15 @@ namespace VTS.Core
 			}
 		}
 
-		public void SendEventSubscription<T, K, V>(T request, Action<K> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError, Action resubscribe) where T : VTSEventSubscriptionRequestData<V> where K : VTSEventData where V : VTSEventConfigData
-		{
+		public void SendEventSubscription<T, K, V>(T request, Action<K> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError, Action resubscribe) where T : VTSEventSubscriptionRequestData<V> where K : VTSEventData where V : VTSEventConfigData {
 			this.Send<T, VTSEventSubscriptionResponseData>(
 				request,
-				(s) =>
-				{
+				(s) => {
 					// add event or remove event from register
-					if (this._events.ContainsKey(request.data.eventName))
-					{
+					if (this._events.ContainsKey(request.data.eventName)) {
 						this._events.Remove(request.data.eventName);
 					}
-					if (request.GetSubscribed())
-					{
+					if (request.GetSubscribed()) {
 						this._events.Add(request.data.eventName, new VTSEventCallbacks((k) => { onEvent((K)k); }, onError, resubscribe));
 					}
 					onSubscribe(s);
@@ -360,31 +292,22 @@ namespace VTS.Core
 				onError);
 		}
 
-		public void ResubscribeToEvents()
-		{
-			foreach (VTSEventCallbacks callback in this._events.Values)
-			{
+		public void ResubscribeToEvents() {
+			foreach (VTSEventCallbacks callback in this._events.Values) {
 				callback.resubscribe();
 			}
 		}
 
-		private void ProcessResponses()
-		{
+		private void ProcessResponses() {
 			string data = null;
-			do
-			{
-				if (this._ws != null)
-				{
+			do {
+				if (this._ws != null) {
 					data = this._ws.GetNextResponse();
-					if (data != null)
-					{
+					if (data != null) {
 						VTSMessageData response = this._json.FromJson<VTSMessageData>(data);
-						if (this._events.ContainsKey(response.messageType))
-						{
-							try
-							{
-								switch (response.messageType)
-								{
+						if (this._events.ContainsKey(response.messageType)) {
+							try {
+								switch (response.messageType) {
 									case "TestEvent":
 										this._events[response.messageType].onEvent(this._json.FromJson<VTSTestEventData>(data));
 										break;
@@ -421,25 +344,21 @@ namespace VTS.Core
 									case "PostProcessingEvent":
 										this._events[response.messageType].onEvent(this._json.FromJson<VTSPostProcessingEventData>(data));
 										break;
+									case "ArtMeshTrackingEvent":
+										this._events[response.messageType].onEvent(this._json.FromJson<VTSArtMeshPointTrackingEventData>(data));
+										break;
 								}
-							}
-							catch (Exception e)
-							{
-                                // Neatly handle errors in case the deserialization or success callback throw an exception
-                                VTSErrorData error = new()
-                                {
-                                    requestID = response.requestID
-                                };
-                                error.data.message = e.Message;
+							} catch (Exception e) {
+								// Neatly handle errors in case the deserialization or success callback throw an exception
+								VTSErrorData error = new() {
+									requestID = response.requestID
+								};
+								error.data.message = e.Message;
 								this._events[response.messageType].onError(error);
 							}
-						}
-						else if (this._callbacks.ContainsKey(response.requestID))
-						{
-							try
-							{
-								switch (response.messageType)
-								{
+						} else if (this._callbacks.ContainsKey(response.requestID)) {
+							try {
+								switch (response.messageType) {
 									case "APIError":
 										// this._logger.LogError(data);
 										this._callbacks[response.requestID].onError(this._json.FromJson<VTSErrorData>(data));
@@ -550,7 +469,7 @@ namespace VTS.Core
 									case "PostProcessingUpdateResponse":
 										this._callbacks[response.requestID].onSuccess(this._json.FromJson<VTSPostProcessingUpdateResponseData>(data));
 										break;
-									case "ItemSorteResponse":
+									case "ItemSortResponse":
 										this._callbacks[response.requestID].onSuccess(this._json.FromJson<VTSItemSortResponseData>(data));
 										break;
 									case "ArtMeshAtPositionResponse":
@@ -565,15 +484,12 @@ namespace VTS.Core
 										this._callbacks[response.requestID].onError(error);
 										break;
 								}
-							}
-							catch (Exception e)
-							{
-                                // Neatly handle errors in case the deserialization or success callback throw an exception
-                                VTSErrorData error = new()
-                                {
-                                    requestID = response.requestID
-                                };
-                                error.data.message = e.Message;
+							} catch (Exception e) {
+								// Neatly handle errors in case the deserialization or success callback throw an exception
+								VTSErrorData error = new() {
+									requestID = response.requestID
+								};
+								error.data.message = e.Message;
 								this._callbacks[response.requestID].onError(error);
 							}
 							this._callbacks.Remove(response.requestID);
@@ -585,24 +501,20 @@ namespace VTS.Core
 
 		#endregion
 
-		private struct VTSCallbacks
-		{
+		private struct VTSCallbacks {
 			public Action<VTSMessageData> onSuccess;
 			public Action<VTSErrorData> onError;
-			public VTSCallbacks(Action<VTSMessageData> onSuccess, Action<VTSErrorData> onError)
-			{
+			public VTSCallbacks(Action<VTSMessageData> onSuccess, Action<VTSErrorData> onError) {
 				this.onSuccess = onSuccess;
 				this.onError = onError;
 			}
 		}
 
-		private struct VTSEventCallbacks
-		{
+		private struct VTSEventCallbacks {
 			public Action<VTSEventData> onEvent;
 			public Action<VTSErrorData> onError;
 			public Action resubscribe;
-			public VTSEventCallbacks(Action<VTSEventData> onEvent, Action<VTSErrorData> onError, Action resubscribe)
-			{
+			public VTSEventCallbacks(Action<VTSEventData> onEvent, Action<VTSErrorData> onError, Action resubscribe) {
 				this.onEvent = onEvent;
 				this.onError = onError;
 				this.resubscribe = resubscribe;

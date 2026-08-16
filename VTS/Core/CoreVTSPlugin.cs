@@ -4,6 +4,8 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
+using UnityEngine.UIElements;
+
 namespace VTS.Core {
 
 	/// <summary>
@@ -752,6 +754,8 @@ namespace VTS.Core {
 			return await VTSExtensions.Async<VTSPermission, VTSPermissionResponseData, VTSErrorData>(RequestPermission, permission);
 		}
 
+		// Get Post Processing State
+
 		public void GetPostProcessingEffectStateList(bool fillPostProcessingPresetsArray, bool fillPostProcessingEffectsArray, Effects[] effectIDFilter, Action<VTSPostProcessingStateResponseData> onSuccess, Action<VTSErrorData> onError) {
 			VTSPostProcessingStateRequestData request = new();
 			request.data.fillPostProcessingPresetsArray = fillPostProcessingPresetsArray;
@@ -763,6 +767,8 @@ namespace VTS.Core {
 		public async Task<VTSPostProcessingStateResponseData> GetPostProcessingEffectStateList(bool fillPostProcessingPresetsArray, bool fillPostProcessingEffectsArray, Effects[] effectIDFilter) {
 			return await VTSExtensions.Async<bool, bool, Effects[], VTSPostProcessingStateResponseData, VTSErrorData>(GetPostProcessingEffectStateList, fillPostProcessingPresetsArray, fillPostProcessingEffectsArray, effectIDFilter);
 		}
+
+		// Set Post Processing Values
 
 		public void SetPostProcessingEffectValues(VTSPostProcessingUpdateOptions options, PostProcessingValue[] values, Action<VTSPostProcessingUpdateResponseData> onSuccess, Action<VTSErrorData> onError) {
 			VTSPostProcssingUpdateRequestData request = new();
@@ -782,6 +788,8 @@ namespace VTS.Core {
 		public async Task<VTSPostProcessingUpdateResponseData> SetPostProcessingEffectValues(VTSPostProcessingUpdateOptions options, PostProcessingValue[] values) {
 			return await VTSExtensions.Async<VTSPostProcessingUpdateOptions, PostProcessingValue[], VTSPostProcessingUpdateResponseData, VTSErrorData>(SetPostProcessingEffectValues, options, values);
 		}
+
+		// Sort Item Within Model
 
 		public void SortItemWithinModel(VTSItemSortOptions options, Action<VTSItemSortResponseData> onSuccess, Action<VTSErrorData> onError) {
 			VTSItemSortRequestData request = new();
@@ -811,6 +819,21 @@ namespace VTS.Core {
 		public async Task<VTSItemSortResponseData> SortItemWithinModel(VTSItemSortOptions options) {
 			return await VTSExtensions.Async<VTSItemSortOptions, VTSItemSortResponseData, VTSErrorData>(SortItemWithinModel, options);
 		}
+
+		// Get Art Meshes At Position
+
+		public void GetArtMeshesAtPosition(Pair position, float visualize, Action<VTSArtMeshAtPositionResponseData> onSuccess, Action<VTSErrorData> onError) {
+			VTSArtMeshAtPositionRequestData request = new();
+			request.data.x = position.x;
+			request.data.y = position.y;
+			request.data.visualize = visualize;
+			this._vtsSocket.Send<VTSArtMeshAtPositionRequestData, VTSArtMeshAtPositionResponseData>(request, onSuccess, onError);
+		}
+
+		public async Task<VTSArtMeshAtPositionResponseData> GetArtMeshesAtPosition(Pair position, float visualize) {
+			return await VTSExtensions.Async<Pair, float, VTSArtMeshAtPositionResponseData, VTSErrorData>(GetArtMeshesAtPosition, position, visualize);
+		}
+
 
 		#endregion
 
