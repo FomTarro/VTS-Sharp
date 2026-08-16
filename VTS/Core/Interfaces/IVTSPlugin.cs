@@ -1301,5 +1301,37 @@ namespace VTS.Core {
 		/// <param name="position">The position to check.</param>
 		/// <param name="visualize">How strongly the point will be visualized in VTube Studio.</param>
 		Task<VTSArtMeshAtPositionResponseData> GetArtMeshesAtPosition(Pair position, float visualize);
+
+		/// <summary>
+		/// Subscribes to the Art Mesh Point Tracking Event.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#track-custom-point-on-artmesh-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#track-custom-point-on-artmesh-event</a>
+		/// </summary>
+		/// <param name="config">Configuration options about the subscription.</param>
+		/// <param name="onEvent">Callback to execute upon receiving an event.</param>
+		/// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void SubscribeToArtMeshPointTrackingEvent(VTSArtMeshPointTrackingEventConfigOptions config, Action<VTSArtMeshPointTrackingEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Subscribes to the Art Mesh Point Tracking Event.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#track-custom-point-on-artmesh-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#track-custom-point-on-artmesh-event</a>
+		/// </summary>
+		/// <param name="config">Configuration options about the subscription.</param>
+		/// <param name="onEvent">Callback to execute upon receiving an event.</param>
+		Task<VTSEventSubscriptionResponseData> SubscribeToArtMeshPointTrackingEvent(VTSArtMeshPointTrackingEventConfigOptions config, Action<VTSArtMeshPointTrackingEventData> onEvent);
+
+		/// <summary>
+		/// Unsubscribes from the Art Mesh Point Tracking Event.
+		/// </summary>
+		/// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing from the event.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void UnsubscribeFromArtMeshPointTrackingEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Unsubscribes from the Art Mesh Tracking Event..
+		/// </summary>
+		Task<VTSEventSubscriptionResponseData> UnsubscribeFromArtMeshPointTrackingEvent();
 	}
 }

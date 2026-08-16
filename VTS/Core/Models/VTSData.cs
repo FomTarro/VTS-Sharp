@@ -47,6 +47,11 @@ namespace VTS.Core {
 	public struct Pair {
 		public float x;
 		public float y;
+
+		public Pair(float x, float y) {
+			this.x = x;
+			this.y = y;
+		}
 	}
 
 	[System.Serializable]
@@ -2297,7 +2302,7 @@ namespace VTS.Core {
 	// Art Mesh Point Tracking Event
 
 	[System.Serializable]
-	public class VTSArtMeshPointTrackingEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSPostProcessingEventConfigOptions> {
+	public class VTSArtMeshPointTrackingEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSArtMeshPointTrackingEventConfigOptions> {
 		public VTSArtMeshPointTrackingEventSubscriptionRequestData() {
 			this.data.eventName = "ArtMeshTrackingEvent";
 		}

@@ -1071,6 +1071,23 @@ namespace VTS.Core {
 
 		// Art Mesh Point Tracking Event
 
+		public void SubscribeToArtMeshPointTrackingEvent(VTSArtMeshPointTrackingEventConfigOptions config, Action<VTSArtMeshPointTrackingEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
+			SubscribeToEvent<VTSArtMeshPointTrackingEventSubscriptionRequestData, VTSArtMeshPointTrackingEventData, VTSArtMeshPointTrackingEventConfigOptions>(true, config, onEvent, onSubscribe, onError);
+		}
+
+		public async Task<VTSEventSubscriptionResponseData> SubscribeToArtMeshPointTrackingEvent(VTSArtMeshPointTrackingEventConfigOptions config, Action<VTSArtMeshPointTrackingEventData> onEvent) {
+			return await VTSExtensions.Async<VTSArtMeshPointTrackingEventConfigOptions, Action<VTSArtMeshPointTrackingEventData>, VTSEventSubscriptionResponseData, VTSErrorData>(
+				SubscribeToArtMeshPointTrackingEvent, config, onEvent);
+		}
+
+		public void UnsubscribeFromArtMeshPointTrackingEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
+			SubscribeToEvent<VTSArtMeshPointTrackingEventSubscriptionRequestData, VTSArtMeshPointTrackingEventData, VTSArtMeshPointTrackingEventConfigOptions>(false, null, DoNothingCallback, onUnsubscribe, onError);
+		}
+
+		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromArtMeshPointTrackingEvent() {
+			return await VTSExtensions.Async<VTSEventSubscriptionResponseData, VTSErrorData>(UnsubscribeFromPostProcessingEvent);
+		}
+
 		// Art Mesh Outline Tracking Event
 
 		#endregion
