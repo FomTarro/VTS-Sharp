@@ -1273,6 +1273,8 @@ namespace VTS.Core {
 		/// <a href="https://github.com/DenchiSoft/VTubeStudio#set-item-within-model-sorting-order">https://github.com/DenchiSoft/VTubeStudio#set-item-within-model-sorting-order</a>
 		/// </summary>
 		/// <param name="options">Configuration options about the request.</param>
+		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
 		void SortItemWithinModel(VTSItemSortOptions options, Action<VTSItemSortResponseData> onSuccess, Action<VTSErrorData> onError);
 		/// <summary>
 		/// Sets the sorting behavior of an item within the layers of the model it is loaded on.
@@ -1291,6 +1293,8 @@ namespace VTS.Core {
 		/// </summary>
 		/// <param name="position">The position to check.</param>
 		/// <param name="visualize">How strongly the point will be visualized in VTube Studio.</param>
+		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
 		void GetArtMeshesAtPosition(Pair position, float visualize, Action<VTSArtMeshAtPositionResponseData> onSuccess, Action<VTSErrorData> onError);
 		/// <summary>
 		/// Requests a list of Art Meshes at the given position.
