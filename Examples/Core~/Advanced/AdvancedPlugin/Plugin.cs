@@ -7,13 +7,13 @@ public class Plugin(IServiceProvider services, VTSLogger logger, PluginInfo plug
 {
     public async void Start()
     {
-        WebSocketImpl websocket = new(logger);
-        NewtonsoftJsonUtilityImpl jsonUtility = new();
-        TokenStorageImpl tokenStorage = new("");
-        CoreVTSPlugin plugin = new(logger, pluginInfo.Value.UpdateInterval, pluginInfo.Value.PluginName, pluginInfo.Value.PluginAuthor, pluginInfo.Value.PluginIcon);
+        WebSocketImpl socket = new(logger);
+        NewtonsoftJsonUtilityImpl json = new(); 
+        TokenStorageImpl token = new ("");
+        CoreVTSPlugin plugin = new(socket, json, token, logger, pluginInfo.Value.UpdateInterval, pluginInfo.Value.PluginName, pluginInfo.Value.PluginAuthor, pluginInfo.Value.PluginIcon);
         logger.Log($"Plugin Version: {pluginInfo.Value.PluginVersion}");
         try {
-            await plugin.InitializeAsync(websocket, jsonUtility, tokenStorage, () => logger.LogWarning("Disconnected!")); 
+            await plugin.InitializeAsync(() => logger.LogWarning("Disconnected!")); 
             logger.Log("Connected!");
         } catch (VTSException e) {
             logger.LogError(e); // VTS probably isn't running

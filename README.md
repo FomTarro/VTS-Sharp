@@ -113,7 +113,7 @@ As of version `2.0.0`, the library has been reorganized into various packages, m
     * For `VTSPlugin` implementations that do not leverage constructors, such as `VTS.Unity.UnityVTSPlugin` and `VTS.Godot.GodotVTSPlugin`, an accessor called `DependencyImplementations` exists and can be overridden to specify components for just-in-time injection.
 
 ### In Version 2.0.0
-* Namespaces have been totally reorganized. The two remaining namespaces are `VTS.Core` and `VTS.Unity`. These correspond to the aformentioned [packages](#packages).
+* Namespaces have been totally reorganized. The two resulting namespaces in this version are `VTS.Core` and `VTS.Unity`. These correspond to the aformentioned [packages](#packages).
 * The `VTSPlugin` MonoBehaviour class has been renamed to `UnityVTSPlugin`, and moved into the `VTS.Unity` namespace. As such, please update your plugin classes to extend `VTS.Unity.UnityVTSPlugin`.
 * The `VTSWebSocket` MonoBehaviour class has been totally removed. You may safely remove it from any game objects. This class now exists as a pure C# equivalent.
 
