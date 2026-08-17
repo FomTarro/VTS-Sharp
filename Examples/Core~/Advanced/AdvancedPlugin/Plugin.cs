@@ -9,7 +9,7 @@ public class Plugin(IServiceProvider services, VTSLogger logger, PluginInfo plug
     {
         WebSocketImpl socket = new(logger);
         NewtonsoftJsonUtilityImpl json = new(); 
-        TokenStorageImpl token = new ("");
+        TokenStorageImpl token = new("");
         CoreVTSPlugin plugin = new(socket, json, token, logger, pluginInfo.Value.UpdateInterval, pluginInfo.Value.PluginName, pluginInfo.Value.PluginAuthor, pluginInfo.Value.PluginIcon);
         logger.Log($"Plugin Version: {pluginInfo.Value.PluginVersion}");
         try {
