@@ -1,21 +1,21 @@
-﻿#if UNITY_EDITOR || UNITY_2017_1_OR_NEWER
+#if GODOT
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading.Tasks;
-
-using UnityEngine;
-
+using Godot;
 using VTS.Core;
 
-namespace VTS.Unity {
+namespace VTS.Godot {
 	/// <summary>
-	/// The base class for VTS plugin creation as a MonoBehaviour in Unity.
+	/// The base class for VTS plugin creation as a Node in Godot.
 	/// </summary>
-	public abstract class UnityVTSPlugin : MonoBehaviour, IVTSPlugin {
+	[GlobalClass]
+	public partial class GodotVTSPlugin : Node, IVTSPlugin {
 		/// <summary>
 		/// Struct that provides the implementations for the various dependencies needed.
-		/// </summary>
+		/// </summary>Description("The base class for VTube Studio plugin creation as a Node in Godot.")
 		protected struct VTSPluginDependencies {
 			public IWebSocket socket;
 			public IJsonUtility jsonUtility;
@@ -29,11 +29,11 @@ namespace VTS.Unity {
 		/// </summary>
 		protected virtual VTSPluginDependencies DependencyImplementations {
 			get {
-				IVTSLogger logger = new UnityVTSLoggerImpl();
+				IVTSLogger logger = new GodotVTSLoggerImpl();
 				return new() {
 					socket = new WebSocketImpl(logger),
 					jsonUtility = new NewtonsoftJsonUtilityImpl(),
-					tokenStorage = new TokenStorageImpl(Application.persistentDataPath),
+					tokenStorage = new TokenStorageImpl(ProjectSettings.GlobalizePath("user://")),
 					logger = logger
 				};
 			}
@@ -50,7 +50,7 @@ namespace VTS.Unity {
 						deps.jsonUtility,
 						deps.tokenStorage,
 						deps.logger,
-						(int)(1000f / Application.targetFrameRate),
+						(int)(1000f / Engine.MaxFps),
 						this.PluginName,
 						this.PluginAuthor,
 						this.PluginIcon
@@ -62,13 +62,13 @@ namespace VTS.Unity {
 
 		public bool IsAuthenticated { get { return this.Plugin.IsAuthenticated; } }
 
-		[SerializeField]
+		[Export]
 		private string _pluginName = "ExamplePlugin";
 		public string PluginName { get { return this._pluginName; } }
-		[SerializeField]
+		[Export]
 		private string _pluginAuthor = "ExampleAuthor";
 		public string PluginAuthor { get { return this._pluginAuthor; } }
-		[SerializeField]
+		[Export]
 		private Texture2D _pluginIcon = null;
 		public string PluginIcon { get { return EncodeIcon(this._pluginIcon, this.Logger); } }
 
@@ -165,7 +165,7 @@ namespace VTS.Unity {
 			this.Plugin.GetArtMeshList(onSuccess, onError);
 		}
 
-		public void TintArtMesh(Color32 tint, float mixWithSceneLightingColor, ArtMeshMatcher matcher, Action<VTSColorTintData> onSuccess, Action<VTSErrorData> onError) {
+		public void TintArtMesh(Color tint, float mixWithSceneLightingColor, ArtMeshMatcher matcher, Action<VTSColorTintData> onSuccess, Action<VTSErrorData> onError) {
 			this.Plugin.TintArtMesh(ColorToColorTint(tint), mixWithSceneLightingColor, matcher, onSuccess, onError);
 		}
 
@@ -728,11 +728,11 @@ namespace VTS.Unity {
 
 		private static string EncodeIcon(Texture2D icon, IVTSLogger logger) {
 			try {
-				if (icon.width != 128 && icon.height != 128) {
+				if (icon.GetWidth() != 128 && icon.GetHeight() != 128) {
 					logger.LogWarning("Icon resolution must be exactly 128*128 pixels!");
 					return null;
 				}
-				return Convert.ToBase64String(icon.EncodeToPNG());
+				return Convert.ToBase64String(icon.GetImage().SavePngToBuffer());
 			} catch (Exception e) {
 				logger.LogError(e);
 			}
@@ -740,7 +740,7 @@ namespace VTS.Unity {
 		}
 
 		/// <summary>
-		/// Converts the VTS Pair struct to a Unity Vector2 struct.
+		/// Converts the VTS Pair struct to a Godot Vector2 struct.
 		/// </summary>
 		/// <param name="pair">The Pair to convert</param>
 		/// <returns></returns>
@@ -749,21 +749,21 @@ namespace VTS.Unity {
 		}
 
 		/// <summary>
-		/// Converts the VTS Pair struct to a Unity Vector2 struct.
+		/// Converts the Godot Vector2 struct to a VTS Pair struct.
 		/// </summary>
 		/// <param name="pair">The Pair to convert</param>
 		/// <returns></returns>
 		public static Pair Vector2ToPair(Vector2 vector) {
-			return new Pair(vector.x, vector.y);
+			return new Pair(vector.X, vector.Y);
 		}
 
 		/// <summary>
-		/// Converts the VTS Color struct to a Unity Color32 struct.
+		/// Converts the VTS Color struct to a Godot Color struct.
 		/// </summary>
 		/// <param name="color">The color to convert</param>
 		/// <returns></returns>
-		public static Color32 ColorTintToColor(ColorTint color) {
-			return new Color32(
+		public static Color ColorTintToColor(ColorTint color) {
+			return new Color(
 				color.colorR,
 				color.colorG,
 				color.colorB,
@@ -772,16 +772,16 @@ namespace VTS.Unity {
 		}
 
 		/// <summary>
-		/// Converts the Unity Color32 struct to a VTS ColorTint struct.
+		/// Converts the Godot Color struct to a VTS ColorTint struct.
 		/// </summary>
 		/// <param name="color">The color to convert</param>
 		/// <returns></returns>
-		public static ColorTint ColorToColorTint(Color32 color) {
+		public static ColorTint ColorToColorTint(Color color) {
 			return new ColorTint() {
-				colorR = color.r,
-				colorG = color.g,
-				colorB = color.b,
-				colorA = color.a
+				colorR = (byte)(0xFF * color.R),
+				colorG = (byte)(0xFF *color.G),
+				colorB = (byte)(0xFF * color.B),
+				colorA = (byte)(0xFF * color.A)
 			};
 		}
 

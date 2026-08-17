@@ -1,7 +1,7 @@
-﻿using System;
+﻿#if UNITY_EDITOR || UNITY_2017_1_OR_NEWER
 
+using System;
 using UnityEngine;
-
 using VTS.Core;
 
 namespace VTS.Unity {
@@ -24,3 +24,5 @@ namespace VTS.Unity {
 		}
 	}
 }
+
+#endif

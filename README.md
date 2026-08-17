@@ -1,8 +1,8 @@
-# VTS-Sharp v2.4.0
+# VTS-Sharp v2.5.0
 A C# client interface for creating VTube Studio Plugins with the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio), for use in Unity, Godot, and other C# development environments!
 
 ## IMPORTANT! 
-If you are updating your project from using a `1.x.x` version of the library to using a `2.x.x` version of the library, please read [the migration guide](#what-changed-in-200), as the project was restructured in version `2.0.0` to decouple it from the Unity Engine, allowing it to be more easily used in other C# environments!
+If you are updating your project from using a `1.x.x` version of the library to using a `2.x.x` version of the library, please read [the migration guide](#breaking-changes), as the project was restructured in version `2.0.0` to decouple it from the Unity Engine, allowing it to be more easily used in other C# environments!
  
 ## About
 This library is maintained by [Tom "Skeletom" Farro](https://www.skeletom.net). You can contact him via email at [tom@skeletom.net](mailto:tom@skeletom.net) or by leaving an issue ticket on this repo.
@@ -12,7 +12,7 @@ This library is maintained by [Tom "Skeletom" Farro](https://www.skeletom.net). 
 ## Usage
 In order to start making a plugin, follow these simple steps:
 1. [Check to see which packages from this library you need for your project based on your C# environment](#packages). 
-    * If you are using Unity and want your plugin to be a MonoBehaviour, make a class which extends `VTS.Unity.UnityVTSPlugin`. 
+    * If you are using Unity or Godot and want your plugin to be a MonoBehaviour or Node, make a class which extends `VTS.Unity.UnityVTSPlugin` or `VTS.Godot.GodotVTSPlugin`. 
     * If you are using any other C# environment, make a class which extends `VTS.Core.CoreVTSPlugin`, or which has one as a member variable. 
 
 2. In your class, call the [`Initialize`](#void-initialize) method on the plugin, which will attempt to connect to VTube Studio and authenticate the plugin. 
@@ -24,7 +24,7 @@ In order to start making a plugin, follow these simple steps:
 
 3. Once your plugin is authenticated, you can call any method found in the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio), which are built-in as appropriately named methods on the `VTSPlugin` class!
 
-And that's it! In fact, if you're using Unity, these steps are all done for you already, out of the box, in the `MyFirstPlugin` class found in the `Examples/Unity` folder!.
+And that's it! In fact these steps are all done for you already, out of the box, in the various examples found in the aptly-named `Examples` folder! Check out the ones suited for your environment of choice.
  
 You can find a video tutorial that demonstrates [how to get started in under 90 seconds here](https://www.youtube.com/watch?v=lUGeMEVzjAU).
 
@@ -33,16 +33,16 @@ You can find a video tutorial that demonstrates [how to get started in under 90 
 ### Swappable Components
 In order to afford the most flexibility (and to be as decoupled from Unity as possible), the underlying components of the [`VTSPlugin`](#interface-ivtsplugin) are all defined as interfaces. This allows you to swap out the built-in implementations with custom ones to suit your specific constraints. For example, maybe you need your auth token to save to a database instead of a local file, or need your logs to output to Godot's logging utility instead of the default C# console. These components are provided to the constructor of the [`VTS.Core.CoreVTSPlugin`](#interface-ivtsplugin).
 
-Because Unity MonoBehaviors are *not* created with constructors, the `VTS.Unity.UnityVTSPlugin` provides an accessor called `DependencyImplementations` which returns a struct containing references to implementations for all underlying components. The `VTS.Unity.UnityVTSPlugin` class defines this accessor with working implementations by default, but if you want to use something different, you can override the accessor in your extended class.
+Because Unity MonoBehaviors are *not* created with constructors, the `VTS.Unity.UnityVTSPlugin` class provides an accessor called `DependencyImplementations` which returns a struct containing references to implementations for all underlying components. The `VTS.Unity.UnityVTSPlugin` class defines this accessor with working implementations by default, but if you want to use something different, you can override the accessor in your extended class. The `VTS.Godot.GodotVTSPlugin` class follows this pattern as well.
 
 These components include:
-* [`IWebSocket`](#interface-iwebsocket), the WebSocket transport.
+* [`IWebSocket`](#interface-iwebsocket), the WebSocket transport layer.
 * [`ITokenStorage`](#interface-itokenstorage), the mechanism for saving the VTube Studio authentication token.
-* [`IJsonUtility`](#interface-ijsonutility), the mehcanism for serializing and dserializing JSON messages over the socket.
+* [`IJsonUtility`](#interface-ijsonutility), the mechanism for serializing and deserializing JSON messages over the socket.
 * [`IVTSLogger`](#interface-ivtslogger), the logger for printing debug and error messages.
 
 ### Asynchronous Code
-Because the VTube Studio API is websocket-based, all calls to it are inherently asynchronous. As of version `2.1.0`, there are now two design patterns included in this library. You can use the one that suits your perferences and needs the best!
+Because the VTube Studio API is websocket-based, all calls to it are inherently asynchronous. As of version `2.1.0`, there are now two design patterns for handling asychnonous calls included in this library. You can use the one that suits your perferences and needs the best!
 
 This library also supports the [VTube Studio Event Subscription API](https://github.com/DenchiSoft/VTubeStudio/blob/master/Events/README.md). With this feature, you can subscribe to various events to make sure your plugin gets a message when something happens in VTube Studio. Event Subscription follows a similar asynchronous design pattern.
 
@@ -71,7 +71,7 @@ The method accepts an optional configuration class, and three callbacks, `onEven
 Upon successfully subscribing to the event in VTube Studio, the `onSubscribe` callback will be invoked, and then `onEvent` will be invoked any time VTube Studio publishes an event of that type. If the subscription fails for any reason, `onError` will be invoked.
 
 ### Async/Await-based Design Pattern
-As of version 2.1.0, the library now supports the `async` and `await` pattern for asynchronous code. 
+As of version `2.1.0`, the library now supports the `async` and `await` pattern for asynchronous code. 
 
 #### API Calls
 Take, for example, the following method signature, found in the [`VTSPlugin`](#interface-ivtsplugin) class:
@@ -97,18 +97,24 @@ The method accepts an optional configuration class, and one callback, `onEvent`.
 
 Upon successfully subscribing to the event in VTube Studio, the method will resolve into a payload of `VTSEventSubscriptionResponseData` and then `onEvent` will be invoked any time VTube Studio publishes an event of that type. If the subscription fails for any reason, a `VTSException` will be thrown.
 
-## What Changed in 2.0.0?
 
-### Packages
-As of version 2.0.0, the library has been split into two folders/packages: `VTS/Core` and `VTS/Unity`. The `VTS/Core` folder contains everything needed to build a plugin in any C# runtime environment, with no engine-specific code. The `VTS/Unity` folder contains Unity-specific wrappers for the core classes, allowing you to easily build a plugin as a Unity GameObject, following the original design of this library. If you are not looking to use Unity for your project, you can completely discard the `VTS/Unity` folder. However, if you *are* using Unity for your project, you will need both the `VTS/Core` and `VTS/Unity` folders, as the Unity components serve as wrappers for the Core library.
+## Packages
+As of version `2.0.0`, the library has been reorganized into various packages, making it easier to extend in to new environments. If you are updating your project from using a `1.x.x` version of the library to using a `2.x.x` version of the library, please completely remove the library from your project, and re-import it, as files have been moved and will not simply overwrite in-place.
+
+ The current packages are as follows:
+- `VTS.Core`: contains the core of the library, and is *required* in all C# environments. Other environment-specific pakages build on top of this.
+- `VTS.Unity`: contains Unity-specific examples, as well as implementations of some plugin components and a wrapper for building a plugin as a MonoBehavior on a GameObject. However, this package is *not required* for working in a Unity environment, and is simply there for convenience.  
+- `VTS.Godot`: contains Godot-specific examples, as well as implementations of some plugin components and a wrapper for building a plugin as a Node. However, this package is *not required* for working in a Godot environment, and is simply there for convenience.
  
-### Breaking Changes
-As of version `2.0.0`, a few fundamental and breaking changes have been introduced in the interest of decoupling the library from Unity. If you are updating your project from using a `1.x.x` version of the library to using a `2.x.x` version of the library, please completely remove the library from your project, and re-import it while being aware of the following changes:
+## Breaking Changes
 
+### In Version 2.5.0
+* The `Initialize` method is no longer repsonsible for [dependency injection](#swappable-components) of plugin components. 
+
+### In Version 2.0.0
 * Namespaces have been totally reorganized. The two remaining namespaces are `VTS.Core` and `VTS.Unity`. These correspond to the aformentioned [packages](#packages).
 * The `VTSPlugin` MonoBehaviour class has been renamed to `UnityVTSPlugin`, and moved into the `VTS.Unity` namespace. As such, please update your plugin classes to extend `VTS.Unity.UnityVTSPlugin`.
 * The `VTSWebSocket` MonoBehaviour class has been totally removed. You may safely remove it from any game objects. This class now exists as a pure C# equivalent.
-* The `onError` callback method now accepts an `VTSErrorData` argument.
 
 # API
 
@@ -117,6 +123,7 @@ As of version `2.0.0`, a few fundamental and breaking changes have been introduc
 ### Provided Implementations
 * `VTS.Core.CoreVTSPlugin`
 * `VTS.Unity.UnityVTSPlugin`
+* `VTS.Godot.GodotVTSPlugin`
 
 ### Properties
 #### `string PluginName`
@@ -145,9 +152,9 @@ Connects to VTube Studio, ans authenticates the plugin. Takes the following args
 * `Action<VTSErrorData> onError`: Callback executed upon failed initialization.
 
 The plugin will attempt to intelligently choose a port to connect to, using the following criteria:
-* It will first attempt to connect to the designated port (8001 by default, can be manually set with [SetPort](#bool-setport)).
+* It will first attempt to connect to the designated port (`8001` by default, can be manually set with [SetPort](#bool-setport)).
 * If that fails, it will attempt to connect to the first port discovered by UDP.
-* If that takes too long and times out, it will attempt to connect to the default port (8001).
+* If that takes too long and times out, it will attempt to connect to the default port (`8001`).
 
 #### `Task InitializeAsync`
 Connects to VTube Studio, and authenticates the plugin. Takes the following args:
@@ -211,7 +218,7 @@ Send a payload to the websocket server. Takes the following args:
 
 ### Provided Implementations
 * `VTS.Core.NewtonsoftJsonUtilityImpl`
-
+ReadMe
 ### Methods
 #### `T FromJson<T>`
 Deserializes a JSON string into an object of the specified type. Takes the following args:

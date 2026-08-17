@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿#if UNITY_EDITOR || UNITY_2017_1_OR_NEWER
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -47,3 +49,5 @@ namespace VTS.Unity.Examples {
 		}
 	}
 }
+
+#endif

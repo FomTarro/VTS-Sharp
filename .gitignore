@@ -10,15 +10,11 @@
 /[Ll]ogs/
 /[Mm]emoryCaptures/
 
+*.meta
+!*.unity.meta
+!*.prefab.meta
 
-VTS/Core/**/*.meta
-LICENSE.meta
-VTS.meta
-Examples.meta
-Examples/**/*.meta
-README.md.meta
-# Asset meta data should only be ignored when the corresponding asset is also ignored
-!/[Aa]ssets/**/*.meta
+*.uid
 
 # Uncomment this line if you wish to ignore the asset store tools plugin
 # /[Aa]ssets/AssetStoreTools*
