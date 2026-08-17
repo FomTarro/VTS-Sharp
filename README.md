@@ -11,7 +11,7 @@ This library is maintained by [Tom "Skeletom" Farro](https://www.skeletom.net). 
  
 ## Usage
 In order to start making a plugin, follow these simple steps:
-1. [Check to see which packages from this library you need for your project based on your C# environment](#packages). 
+1. Check to see [which packages from this library you need](#packages) for your project based on your C# environment. 
     * If you are using Unity or Godot and want your plugin to be a MonoBehaviour or Node, make a class which extends `VTS.Unity.UnityVTSPlugin` or `VTS.Godot.GodotVTSPlugin`. 
     * If you are using any other C# environment, make a class which extends `VTS.Core.CoreVTSPlugin`, or which has one as a member variable. 
 
@@ -110,7 +110,7 @@ As of version `2.0.0`, the library has been reorganized into various packages, m
 
 ### In Version 2.4.0
 * The `Initialize` method is no longer repsonsible for [dependency injection](#swappable-components) of plugin components, as this is now also accomplished by the constructor of the `VTS.Core.VTSPlugin` class and is thus redundant. 
-    * For `VTSPlugin` implementations that do not leverage constructors, such as `VTS.Unity.UnityVTSPlugin` and `VTS.Godot.GodotVTSPlugin`, an accessor named `DependencyImplementations` exists and can be overridden to specify components for just-in-time injection.
+    * For `VTSPlugin` implementations that do not leverage constructors, such as `VTS.Unity.UnityVTSPlugin` and `VTS.Godot.GodotVTSPlugin`, an accessor called `DependencyImplementations` exists and can be overridden to specify components for just-in-time injection.
 
 ### In Version 2.0.0
 * Namespaces have been totally reorganized. The two remaining namespaces are `VTS.Core` and `VTS.Unity`. These correspond to the aformentioned [packages](#packages).
