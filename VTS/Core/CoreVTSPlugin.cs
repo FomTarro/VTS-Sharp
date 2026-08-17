@@ -29,16 +29,18 @@ namespace VTS.Core {
 		private readonly Task _tickLoop = null;
 		private readonly int _tickInterval = 100;
 
-
-		/// <summary>
-		/// Creates a new VTSPlugin.
-		/// </summary>
-		/// <param name="logger">The logger implementation</param>
-		/// <param name="updateIntervalMs">The number of milliseconds between each update cycle of the plugin.</param>
-		/// <param name="pluginName">The plugin name. Must be between 3 and 32 characters.</param>
-		/// <param name="pluginAuthor">The plugin author. Must be between 3 and 32 characters.</param>
-		/// <param name="pluginIcon">The plugin icon, encoded as a base64 string. Must be 128*128 pixels exactly.</param>
-		public CoreVTSPlugin(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, IVTSLogger logger, int updateIntervalMs, string pluginName, string pluginAuthor, string pluginIcon) {
+        /// <summary>
+        /// Creates a new VTSPlugin.
+        /// </summary>
+        /// <param name="webSocket">The websocket transport layer.</param>
+        /// <param name="jsonUtility">The mechanism for serializing and deserializing JSON.</param>
+        /// <param name="tokenStorage">The mechanism for storing a VTube Studio authentication token.</param>
+        /// <param name="logger">The logger implementation</param>
+        /// <param name="updateIntervalMs">The number of milliseconds between each update cycle of the plugin.</param>
+        /// <param name="pluginName">The plugin name. Must be between 3 and 32 characters.</param>
+        /// <param name="pluginAuthor">The plugin author. Must be between 3 and 32 characters.</param>
+        /// <param name="pluginIcon">The plugin icon, encoded as a base64 string. Must be 128*128 pixels exactly.</param>
+        public CoreVTSPlugin(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, IVTSLogger logger, int updateIntervalMs, string pluginName, string pluginAuthor, string pluginIcon) {
 			this.Socket = webSocket;
 			this.TokenStorage = tokenStorage;
 			this.JsonUtility = jsonUtility;
