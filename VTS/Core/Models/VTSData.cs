@@ -2433,6 +2433,15 @@ namespace VTS.Core {
 	[System.Serializable]
 	public class ArtMeshTrackedOutlinePoints {
 		public float[] points;
+		public Pair[] ToCoordinates()
+		{
+			Pair[] coords = new Pair[points.Length/2];	
+			for(int i = 0; i < coords.Length; i ++)
+			{
+				coords[i] = new Pair(points[i], points[i+1]);
+			}
+			return coords;
+		}
 	}
 
 	#endregion

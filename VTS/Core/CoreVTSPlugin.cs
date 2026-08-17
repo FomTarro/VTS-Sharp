@@ -4,8 +4,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-using UnityEngine.UIElements;
-
 namespace VTS.Core {
 
 	/// <summary>
@@ -834,19 +832,18 @@ namespace VTS.Core {
 			return await VTSExtensions.Async<Pair, float, VTSArtMeshAtPositionResponseData, VTSErrorData>(GetArtMeshesAtPosition, position, visualize);
 		}
 
-
 		#endregion
 
 		#region VTS Event Subscription API Wrapper
 
-		private void SubscribeToEvent<T, K, V>(bool subscribed, V config, Action<K> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) where T : VTSEventSubscriptionRequestData<V>, new() where K : VTSEventData where V : VTSEventConfigData {
-			T request = new();
+		private void SubscribeToEvent<R, E, C>(bool subscribed, C config, Action<E> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) where R : VTSEventSubscriptionRequestData<C>, new() where E : VTSEventData where C : VTSEventConfigData {
+			R request = new();
 			request.SetSubscribed(subscribed);
 			if (config != null) {
 				request.SetConfig(config);
 			}
-			this._vtsSocket.SendEventSubscription<T, K, V>(request, onEvent, onSubscribe, onError, () => {
-				SubscribeToEvent<T, K, V>(subscribed, config, onEvent, onSubscribe, onError);
+			this._vtsSocket.SendEventSubscription<R, E, C>(request, onEvent, onSubscribe, onError, () => {
+				SubscribeToEvent<R, E, C>(subscribed, config, onEvent, onSubscribe, onError);
 			});
 		}
 		private async Task<VTSEventSubscriptionResponseData> SubscribeToEventAsync<T, K, V>(bool subscribed, V config, Action<K> onEvent) where T : VTSEventSubscriptionRequestData<V>, new() where K : VTSEventData where V : VTSEventConfigData {
@@ -1085,17 +1082,35 @@ namespace VTS.Core {
 		}
 
 		public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromArtMeshPointTrackingEvent() {
-			return await VTSExtensions.Async<VTSEventSubscriptionResponseData, VTSErrorData>(UnsubscribeFromPostProcessingEvent);
+			return await VTSExtensions.Async<VTSEventSubscriptionResponseData, VTSErrorData>(UnsubscribeFromArtMeshPointTrackingEvent);
 		}
 
 		// Art Mesh Outline Tracking Event
+
+        public void SubscribeToArtMeshOutlineTrackingEvent(VTSArtMeshOutlineTrackingEventConfigOptions config, Action<VTSArtMeshOutlineTrackingEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
+			SubscribeToEvent<VTSArtMeshOutlineTrackingEventSubscriptionRequestData, VTSArtMeshOutlineTrackingEventData, VTSArtMeshOutlineTrackingEventConfigOptions>(true, config, onEvent, onSubscribe, onError);
+        }
+
+        public async Task<VTSEventSubscriptionResponseData> SubscribeToArtMeshOutlineTrackingEvent(VTSArtMeshOutlineTrackingEventConfigOptions config, Action<VTSArtMeshOutlineTrackingEventData> onEvent) {
+			return await VTSExtensions.Async<VTSArtMeshOutlineTrackingEventConfigOptions, Action<VTSArtMeshOutlineTrackingEventData>, VTSEventSubscriptionResponseData, VTSErrorData>(
+				SubscribeToArtMeshOutlineTrackingEvent, config, onEvent);
+        }
+
+        public void UnsubscribeFromArtMeshOutlineTrackingEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
+			SubscribeToEvent<VTSArtMeshOutlineTrackingEventSubscriptionRequestData, VTSArtMeshOutlineTrackingEventData, VTSArtMeshOutlineTrackingEventConfigOptions>(false, null, DoNothingCallback, onUnsubscribe, onError);
+        }
+
+        public async Task<VTSEventSubscriptionResponseData> UnsubscribeFromArtMeshOutlineTrackingEvent() {
+			return await VTSExtensions.Async<VTSEventSubscriptionResponseData, VTSErrorData>(UnsubscribeFromArtMeshOutlineTrackingEvent);
+        }
 
 		#endregion
 
 		#region Helper Methods 
 
 		/// <summary>
-		/// Static VTS API callback method which does nothing. Saves you from needing to make a new inline function each time.
+		/// Static VTS API callback method which does nothing. 
+		/// Saves you from needing to make a new inline function each time.
 		/// </summary>
 		/// <param name="response"></param>
 		public static void DoNothingCallback(VTSMessageData response) {
@@ -1161,6 +1176,6 @@ namespace VTS.Core {
 			return output;
 		}
 
-		#endregion
-	}
+        #endregion
+    }
 }

@@ -408,6 +408,14 @@ namespace VTS.Unity {
 			this.Plugin.UnsubscribeFromArtMeshPointTrackingEvent(onUnsubscribe, onError);
 		}
 
+		public void SubscribeToArtMeshOutlineTrackingEvent(VTSArtMeshOutlineTrackingEventConfigOptions config, Action<VTSArtMeshOutlineTrackingEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
+            this.Plugin.SubscribeToArtMeshOutlineTrackingEvent(config, onEvent, onSubscribe, onError);
+        }
+
+        public void UnsubscribeFromArtMeshOutlineTrackingEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
+			this.Plugin.UnsubscribeFromArtMeshOutlineTrackingEvent(onUnsubscribe, onError);
+        }
+
 		#endregion
 
 		#region Async/Await Wrappers
@@ -696,6 +704,14 @@ namespace VTS.Unity {
 			return this.Plugin.UnsubscribeFromArtMeshPointTrackingEvent();
 		}
 
+        public Task<VTSEventSubscriptionResponseData> SubscribeToArtMeshOutlineTrackingEvent(VTSArtMeshOutlineTrackingEventConfigOptions config, Action<VTSArtMeshOutlineTrackingEventData> onEvent) {
+            return this.Plugin.SubscribeToArtMeshOutlineTrackingEvent(config, onEvent);
+        }
+
+		public Task<VTSEventSubscriptionResponseData> UnsubscribeFromArtMeshOutlineTrackingEvent() {
+            return this.Plugin.UnsubscribeFromArtMeshOutlineTrackingEvent();
+        }
+
 		#endregion
 
 		#region Helper Methods
@@ -767,7 +783,7 @@ namespace VTS.Unity {
 			};
 		}
 
-		#endregion
+        #endregion
 
-	}
+    }
 }
