@@ -30,6 +30,11 @@ namespace VTS.Core {
 		bool IsAuthenticated { get; }
 
 		/// <summary>
+		/// The underlying Websocket implementation.
+		/// </summary>
+		/// <value></value>
+		IWebSocket Socket { get; }
+		/// <summary>
 		/// The underlying Json Utility implementation.
 		/// </summary>
 		/// <value></value>
@@ -45,7 +50,7 @@ namespace VTS.Core {
 		/// <value></value>
 		IVTSLogger Logger { get; }
 
-		IVTSWebSocket Socket { get; }
+		// IVTSWebSocket Socket { get; }
 
 		/// <summary>
 		/// Adds a custom parameter to the currently loaded VTS model.
@@ -367,23 +372,17 @@ namespace VTS.Core {
 		/// </summary>
 		Task<VTSStatisticsData> GetStatistics();
 		/// <summary>
-		/// Selects the Websocket, JSON utility, and Token Storage implementations, then attempts to Authenticate the plugin.
+		/// Defines callback behavior, then attempts to Authenticate the plugin.
 		/// </summary>
-		/// <param name="webSocket">The WebSocket implementation.</param>
-		/// <param name="jsonUtility">The JSON serializer/deserializer implementation.</param>
-		/// <param name="tokenStorage">The Token Storage implementation.</param>
 		/// <param name="onConnect">Callback executed upon successful initialization.</param>
 		/// <param name="onDisconnect">Callback executed upon disconnecting from VTS.</param>
 		/// <param name="onError">Callback executed upon failed initialization.</param>
-		void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onConnect, Action onDisconnect, Action<VTSErrorData> onError);
+		void Initialize(Action onConnect, Action onDisconnect, Action<VTSErrorData> onError);
 		/// <summary>
-		/// Selects the Websocket, JSON utility, and Token Storage implementations, then attempts to Authenticate the plugin.
+		/// Defines callback behavior, then attempts to Authenticate the plugin.
 		/// </summary>
-		/// <param name="webSocket">The WebSocket implementation.</param>
-		/// <param name="jsonUtility">The JSON serializer/deserializer implementation.</param>
-		/// <param name="tokenStorage">The Token Storage implementation.</param>
 		/// <param name="onDisconnect">Callback executed upon disconnecting from VTS.</param>
-		Task InitializeAsync(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onDisconnect);
+		Task InitializeAsync(Action onDisconnect);
 		/// <summary>
 		/// Sends a list of parameter names and corresponding values to assign to them.
 		/// 
@@ -1266,5 +1265,109 @@ namespace VTS.Core {
 		/// <param name="options">Configuration options about the request.</param>
 		/// <param name="values">A list of post processing parameters to update.</param>
 		Task<VTSPostProcessingUpdateResponseData> SetPostProcessingEffectValues(VTSPostProcessingUpdateOptions options, PostProcessingValue[] values);
+
+		/// <summary>
+		/// Sets the sorting behavior of an item within the layers of the model it is loaded on.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio#set-item-within-model-sorting-order">https://github.com/DenchiSoft/VTubeStudio#set-item-within-model-sorting-order</a>
+		/// </summary>
+		/// <param name="options">Configuration options about the request.</param>
+		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void SortItemWithinModel(VTSItemSortOptions options, Action<VTSItemSortResponseData> onSuccess, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Sets the sorting behavior of an item within the layers of the model it is loaded on.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio#set-item-within-model-sorting-order">https://github.com/DenchiSoft/VTubeStudio#set-item-within-model-sorting-order</a>
+		/// </summary>
+		/// <param name="options">Configuration options about the request.</param>
+		Task<VTSItemSortResponseData> SortItemWithinModel(VTSItemSortOptions options);
+
+		/// <summary>
+		/// Requests a list of Art Meshes at the given position.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master#requesting-list-of-artmeshes-at-position">https://github.com/DenchiSoft/VTubeStudio/tree/master#requesting-list-of-artmeshes-at-position</a>
+		/// </summary>
+		/// <param name="position">The position to check.</param>
+		/// <param name="visualize">How strongly the point will be visualized in VTube Studio.</param>
+		/// <param name="onSuccess">Callback executed upon receiving a response.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void GetArtMeshesAtPosition(Pair position, float visualize, Action<VTSArtMeshAtPositionResponseData> onSuccess, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Requests a list of Art Meshes at the given position.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master#requesting-list-of-artmeshes-at-position">https://github.com/DenchiSoft/VTubeStudio/tree/master#requesting-list-of-artmeshes-at-position</a>
+		/// </summary>
+		/// <param name="position">The position to check.</param>
+		/// <param name="visualize">How strongly the point will be visualized in VTube Studio.</param>
+		Task<VTSArtMeshAtPositionResponseData> GetArtMeshesAtPosition(Pair position, float visualize);
+
+		/// <summary>
+		/// Subscribes to the Art Mesh Point Tracking Event.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#track-custom-point-on-artmesh-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#track-custom-point-on-artmesh-event</a>
+		/// </summary>
+		/// <param name="config">Configuration options about the subscription.</param>
+		/// <param name="onEvent">Callback to execute upon receiving an event.</param>
+		/// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void SubscribeToArtMeshPointTrackingEvent(VTSArtMeshPointTrackingEventConfigOptions config, Action<VTSArtMeshPointTrackingEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Subscribes to the Art Mesh Point Tracking Event.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#track-custom-point-on-artmesh-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#track-custom-point-on-artmesh-event</a>
+		/// </summary>
+		/// <param name="config">Configuration options about the subscription.</param>
+		/// <param name="onEvent">Callback to execute upon receiving an event.</param>
+		Task<VTSEventSubscriptionResponseData> SubscribeToArtMeshPointTrackingEvent(VTSArtMeshPointTrackingEventConfigOptions config, Action<VTSArtMeshPointTrackingEventData> onEvent);
+
+		/// <summary>
+		/// Unsubscribes from the Art Mesh Point Tracking Event.
+		/// </summary>
+		/// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing from the event.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void UnsubscribeFromArtMeshPointTrackingEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Unsubscribes from the Art Mesh Tracking Event..
+		/// </summary>
+		Task<VTSEventSubscriptionResponseData> UnsubscribeFromArtMeshPointTrackingEvent();
+
+		/// <summary>
+		/// Subscribes to the Art Mesh Outline Tracking Event.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#track-artmesh-outline-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#track-artmesh-outline-event</a>
+		/// </summary>
+		/// <param name="config">Configuration options about the subscription.</param>
+		/// <param name="onEvent">Callback to execute upon receiving an event.</param>
+		/// <param name="onSubscribe">Callback executed upon successfully subscribing to the event.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void SubscribeToArtMeshOutlineTrackingEvent(VTSArtMeshOutlineTrackingEventConfigOptions config, Action<VTSArtMeshOutlineTrackingEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Subscribes to the Art Mesh Outline Tracking Event.
+		/// 
+		/// For more info, see 
+		/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#track-artmesh-outline-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#track-artmesh-outline-event</a>
+		/// </summary>
+		/// <param name="config">Configuration options about the subscription.</param>
+		/// <param name="onEvent">Callback to execute upon receiving an event.</param>
+		Task<VTSEventSubscriptionResponseData> SubscribeToArtMeshOutlineTrackingEvent(VTSArtMeshOutlineTrackingEventConfigOptions config, Action<VTSArtMeshOutlineTrackingEventData> onEvent);
+
+		/// <summary>
+		/// Unsubscribes from the Art Mesh Point Tracking Event.
+		/// </summary>
+		/// <param name="onUnsubscribe">Callback executed upon successfully unsubscribing from the event.</param>
+		/// <param name="onError">Callback executed upon receiving an error.</param>
+		void UnsubscribeFromArtMeshOutlineTrackingEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError);
+		/// <summary>
+		/// Unsubscribes from the Art Mesh Tracking Event..
+		/// </summary>
+		Task<VTSEventSubscriptionResponseData> UnsubscribeFromArtMeshOutlineTrackingEvent();
 	}
 }

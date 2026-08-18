@@ -44,6 +44,11 @@ namespace VTS.Core {
 	public struct Pair {
 		public float x;
 		public float y;
+
+		public Pair(float x, float y) {
+			this.x = x;
+			this.y = y;
+		}
 	}
 
 	[System.Serializable]
@@ -1395,7 +1400,6 @@ namespace VTS.Core {
 			public bool fillPostProcessingEffectsArray = true;
 			public Effects[] effectIDFilter;
 		}
-
 	}
 
 	[System.Serializable]
@@ -1577,6 +1581,132 @@ namespace VTS.Core {
 		public bool usingRestrictedEffects;
 		public bool randomizeAll;
 		public float randomizeAllChaosLevel;
+	}
+
+	// Item Sort Request
+
+	[System.Serializable]
+	public class VTSItemSortRequestData : VTSMessageData {
+		public VTSItemSortRequestData() {
+			this.messageType = "ItemSortRequest";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public string itemInstanceID;
+			public bool frontOn = true;
+			public bool backOn = true;
+			public string setSplitPoint;
+			public string setFrontOrder;
+			public string setBackOrder;
+			public string splitAt;
+			public string withinModelOrderFront;
+			public string withinModelOrderBack;
+		}
+	}
+
+	[System.Serializable]
+	public class VTSItemSortResponseData : VTSMessageData {
+		public VTSItemSortResponseData() {
+			this.messageType = "ItemSortResponse";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public string itemInstanceID;
+			public bool modelLoaded;
+			public string modelID;
+			public string modelName;
+			public bool loadedModelHadRequestedFrontLayer;
+			public bool loadedModelHadRequestedBackLayer;
+		}
+	}
+
+	/// <summary>
+	/// A container for holding the numerous update options for an Item Sort request.
+	/// 
+	/// For more info about what each field does, see 
+	/// <a href="https://github.com/DenchiSoft/VTubeStudio#set-item-within-model-sorting-order">https://github.com/DenchiSoft/VTubeStudio#set-item-within-model-sorting-order</a>
+	/// </summary>
+	[System.Serializable]
+	public class VTSItemSortOptions {
+		public string itemInstanceID;
+		public bool frontOn = true;
+		public bool backOn = false;
+		public VTSItemSortSplitPoint setSplitPoint;
+		public VTSItemSortOrder setFrontOrder;
+		public VTSItemSortWithinModelOrder withinModelOrderFront;
+		public string withinModelOrderFrontArtmeshID;
+		public VTSItemSortOrder setBackOrder;
+		public VTSItemSortWithinModelOrder withinModelOrderBack;
+		public string withinModelOrderBackArtmeshID;
+		public string splitAtArtmeshID;
+
+		public VTSItemSortOptions() {
+
+		}
+	}
+
+	[System.Serializable]
+	public enum VTSItemSortSplitPoint {
+		Unchanged,
+		UseArtMeshID,
+	}
+
+	[System.Serializable]
+	public enum VTSItemSortOrder {
+		Unchanged,
+		UseArtMeshID,
+		UseSpecialID,
+	}
+
+	[System.Serializable]
+	public enum VTSItemSortWithinModelOrder {
+		FullyInFront,
+		FullyInBack
+	}
+
+	// Art Mesh At Position Request
+
+	[System.Serializable]
+	public class VTSArtMeshAtPositionRequestData : VTSMessageData {
+		public VTSArtMeshAtPositionRequestData() {
+			this.messageType = "ArtMeshAtPositionRequest";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public float x;
+			public float y;
+			public float visualize = 0.0f;
+		}
+	}
+
+	[System.Serializable]
+	public class VTSArtMeshAtPositionResponseData : VTSMessageData {
+		public VTSArtMeshAtPositionResponseData() {
+			this.messageType = "ArtMeshAtPositionResponse";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public bool modelLoaded;
+			public string loadedModelID;
+			public string loadedModelName;
+			public bool modelWasHit;
+			public Pair checkedPosition;
+			public Pair windowSize;
+			public int artMeshHitCount;
+			public ArtMeshHit[] artMeshHits;
+		}
 	}
 
 	#endregion
@@ -2161,6 +2291,149 @@ namespace VTS.Core {
 		public class Data {
 			public bool currentOnState;
 			public string currentPreset;
+		}
+	}
+
+	// Art Mesh Point Tracking Event
+
+	[System.Serializable]
+	public class VTSArtMeshPointTrackingEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSArtMeshPointTrackingEventConfigOptions> {
+		public VTSArtMeshPointTrackingEventSubscriptionRequestData() {
+			this.data.eventName = "ArtMeshTrackingEvent";
+		}
+	}
+
+	/// <summary>
+	/// A container for providing subscription options for an Art Mesh Point Tracking Event subscription.
+	/// 
+	/// For more info about what each field does, see 
+	/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#track-custom-point-on-artmesh-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#track-custom-point-on-artmesh-event</a>
+	/// </summary>
+	[System.Serializable]
+	public class VTSArtMeshPointTrackingEventConfigOptions : VTSEventConfigData {
+		public int frequency;
+		public ArtMeshPointTracker[] trackingPoints;
+		public VTSArtMeshPointTrackingEventConfigOptions() {
+			this.frequency = 30;
+			this.trackingPoints = new ArtMeshPointTracker[0];
+		}
+
+		public VTSArtMeshPointTrackingEventConfigOptions(int frequency, ArtMeshPointTracker[] trackingPoints) {
+			this.frequency = frequency;
+			this.trackingPoints = trackingPoints;
+		}
+	}
+
+	[System.Serializable]
+	public class ArtMeshPointTracker {
+		public string trackingPointID;
+		public bool visualize;
+		public ArtMeshCoordinate artMeshCoords;
+	}
+
+	[System.Serializable]
+	public class VTSArtMeshPointTrackingEventData : VTSEventData {
+		public VTSArtMeshPointTrackingEventData() {
+			this.messageType = "ArtMeshTrackingEvent";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public bool modelLoaded;
+			public string modelID;
+			public Pair windowSize;
+			public int subscribedPointCount;
+			public int foundPointCount;
+			public ArtMeshTrackedPoint[] trackingPoints;
+		}
+	}
+
+	[System.Serializable]
+	public class ArtMeshTrackedPoint {
+		public string trackingPointID;
+		public bool artMeshVisible;
+		public Pair position;
+		public float rotation;
+		public float size;
+	}
+
+	// Art Mesh Outline Tracking Event
+
+
+	[System.Serializable]
+	public class VTSArtMeshOutlineTrackingEventSubscriptionRequestData : VTSEventSubscriptionRequestData<VTSArtMeshOutlineTrackingEventConfigOptions> {
+		public VTSArtMeshOutlineTrackingEventSubscriptionRequestData() {
+			this.data.eventName = "ArtMeshOutlineEvent";
+		}
+	}
+
+	/// <summary>
+	/// A container for providing subscription options for an Art Mesh Point Tracking Event subscription.
+	/// 
+	/// For more info about what each field does, see 
+	/// <a href="https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#track-artmesh-outline-event">https://github.com/DenchiSoft/VTubeStudio/tree/master/Events#track-artmesh-outline-event</a>
+	/// </summary>
+	[System.Serializable]
+	public class VTSArtMeshOutlineTrackingEventConfigOptions : VTSEventConfigData {
+		public int frequency;
+		public ArtMeshOutlineTracker[] artMeshes;
+		public VTSArtMeshOutlineTrackingEventConfigOptions() {
+			this.frequency = 30;
+			this.artMeshes = new ArtMeshOutlineTracker[0];
+		}
+
+		public VTSArtMeshOutlineTrackingEventConfigOptions(int frequency, ArtMeshOutlineTracker[] artMeshes) {
+			this.frequency = frequency;
+			this.artMeshes = artMeshes;
+		}
+	}
+
+	[System.Serializable]
+	public class ArtMeshOutlineTracker {
+		public string modelID;
+		public string artMeshID;
+	}
+
+	[System.Serializable]
+	public class VTSArtMeshOutlineTrackingEventData : VTSEventData {
+		public VTSArtMeshOutlineTrackingEventData() {
+			this.messageType = "ArtMeshOutlineEvent";
+			this.data = new Data();
+		}
+		public Data data;
+
+		[System.Serializable]
+		public class Data {
+			public bool modelLoaded;
+			public string modelID;
+			public Pair windowSize;
+			public int subscribedArtMeshCount;
+			public int foundArtMeshCount;
+			public int eventCounter;
+			public ArtMeshTrackedPoint[] trackingPoints;
+		}
+	}
+
+	[System.Serializable]
+	public class ArtMeshTrackedOutline {
+		public string artMeshID;
+		public bool artMeshVisible;
+		public int outlineCount;
+		public float outlineArea;
+		public ArtMeshTrackedOutlinePoints[] outlinePoints;
+	}
+
+	[System.Serializable]
+	public class ArtMeshTrackedOutlinePoints {
+		public float[] points;
+		public Pair[] ToCoordinates() {
+			Pair[] coords = new Pair[points.Length / 2];
+			for (int i = 0; i < coords.Length; i++) {
+				coords[i] = new Pair(points[i], points[i + 1]);
+			}
+			return coords;
 		}
 	}
 

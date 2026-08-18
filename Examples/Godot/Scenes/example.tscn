@@ -1,0 +1,88 @@
+[gd_scene format=3 uid="uid://deu3gy5y0yggt"]
+
+[ext_resource type="Texture2D" uid="uid://bh61fiakvhx08" path="res://Graphics/Circle.png" id="1_15pbu"]
+[ext_resource type="Script" uid="uid://bv34gmsmbs08y" path="res://VTS-Sharp/Examples/Godot/MyFirstGodotPlugin.cs" id="2_dsk4j"]
+[ext_resource type="Texture2D" uid="uid://blr6m5dhvl7ip" path="res://VTS-Sharp/Examples/Godot/Graphics/vts-sharp-logo-128.png" id="3_dsk4j"]
+
+[node name="UI" type="Control" unique_id=1726851549]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=2057058110]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=274419611]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1514324465]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=951660721]
+custom_maximum_size = Vector2(31, -1)
+layout_mode = 2
+size_flags_horizontal = 3
+stretch_mode = 1
+
+[node name="Status Light" type="TextureRect" parent="MarginContainer/VBoxContainer/HBoxContainer/AspectRatioContainer" unique_id=1829833355]
+layout_mode = 2
+texture = ExtResource("1_15pbu")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="RichTextLabel" type="RichTextLabel" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=824948754]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "VTS Port:"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Port Entry" type="SpinBox" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=1919172496]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 65535.0
+value = 8001.0
+rounded = true
+
+[node name="Connect Button" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=728853310]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_vertical = 0
+text = "Connect"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=349606192]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="Action Button" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1064559290]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+text = "Tint Model Pink"
+
+[node name="MyFirstGodotPlugin" type="Node" parent="." unique_id=2140825216 node_paths=PackedStringArray("_statusLight", "_portInput", "_connectButton", "_actionButton")]
+script = ExtResource("2_dsk4j")
+_statusLight = NodePath("../MarginContainer/VBoxContainer/HBoxContainer/AspectRatioContainer/Status Light")
+_portInput = NodePath("../MarginContainer/VBoxContainer/HBoxContainer/Port Entry")
+_connectButton = NodePath("../MarginContainer/VBoxContainer/HBoxContainer/Connect Button")
+_actionButton = NodePath("../MarginContainer/VBoxContainer/HBoxContainer2/Action Button")
+_pluginName = "Example Godot Plugin"
+_pluginAuthor = "Example Author"
+_pluginIcon = ExtResource("3_dsk4j")
+metadata/_custom_type_script = "uid://bv34gmsmbs08y"

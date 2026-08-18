@@ -168,6 +168,14 @@ namespace VTS.Core {
         PostProcessingUpdateRequestValueListContainsDuplicates = 1205,
         PostProcessingUpdateRequestTriedToLoadRestrictedEffect = 1206, // Tried to configure a restricted effect but user doesn't have those effects enabled/allowed.
 
+        // Errors related to ItemSortRequest
+        ItemSortRequestInstanceIDNotFound = 1250,
+        ItemSortRequestInvalidValueSetType = 1251,
+        ItemSortRequestInvalidFrontOrder = 1252,
+        ItemSortRequestInvalidBackOrder = 1253,
+        ItemSortRequestInvalidSplitPoint = 1254,
+        ItemSortRequestItemConfigWindowOpen = 1255,
+
         // -------------- EVENT CONFIG ERRORS --------------
 
         EVENT_OFFSET = 100000,

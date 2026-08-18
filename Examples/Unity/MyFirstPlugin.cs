@@ -1,23 +1,34 @@
 ﻿using UnityEngine;
 using VTS.Core;
-using VTS.Unity;
 
 namespace VTS.Unity.Examples {
 
 	public class MyFirstPlugin : UnityVTSPlugin {
+		protected override VTSPluginDependencies DependencyImplementations
+		{
+			get
+			{
+				IVTSLogger logger = new UnityVTSLoggerImpl();
+				return new()
+				{
+					socket=new WebSocketImpl(logger),
+					jsonUtility=new NewtonsoftJsonUtilityImpl(),
+					tokenStorage=new TokenStorageImpl(Application.persistentDataPath),
+					logger=logger
+				};
+			}
+		}
+
 		// Start is called before the first frame update
 		private void Start() {
 			// Everything you need to get started!
 			Initialize(
-				new WebSocketSharpImpl(this.Logger),
-				new NewtonsoftJsonUtilityImpl(),
-				new TokenStorageImpl(Application.persistentDataPath),
 				// onConnect
-				() => { this.Logger.Log("Connected!"); },
+				() => this.Logger.Log("Connected!"),
 				// onDisconnect
-				() => { this.Logger.LogWarning("Disconnected!"); },
+				() => this.Logger.LogWarning("Disconnected!"),
 				// onError
-				(error) => { this.Logger.LogError("Error! - " + error.data.message); });
+				(error) => this.Logger.LogError("Error! - " + error.data.message));
 		}
 	}
 }

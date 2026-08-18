@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if UNITY_EDITOR || UNITY_2017_1_OR_NEWER
+
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -7,56 +9,84 @@ using UnityEngine;
 using VTS.Core;
 
 namespace VTS.Unity {
-
 	/// <summary>
-	/// The base class for VTS plugin creation in Unity.
+	/// The base class for VTS plugin creation as a MonoBehaviour in Unity.
 	/// </summary>
 	public abstract class UnityVTSPlugin : MonoBehaviour, IVTSPlugin {
+		/// <summary>
+		/// Struct that provides the implementations for the various dependencies needed.
+		/// </summary>
+		protected struct VTSPluginDependencies {
+			public IWebSocket socket;
+			public IJsonUtility jsonUtility;
+			public ITokenStorage tokenStorage;
+			public IVTSLogger logger;
+		}
+
+		/// <summary>
+		/// Accessor which provides the implementations for the various dependencies needed for plugin creation.
+		/// Default implementations are provided, but this accessor can be overridden in order to specify custom implementations.
+		/// </summary>
+		protected virtual VTSPluginDependencies DependencyImplementations {
+			get {
+				IVTSLogger logger = new UnityVTSLoggerImpl();
+				return new() {
+					socket = new WebSocketImpl(logger),
+					jsonUtility = new NewtonsoftJsonUtilityImpl(),
+					tokenStorage = new TokenStorageImpl(Application.persistentDataPath),
+					logger = logger
+				};
+			}
+		}
 
 		#region Properties
 		private IVTSPlugin _plugin;
 		private IVTSPlugin Plugin {
 			get {
 				if (this._plugin == null) {
-					this._plugin = new CoreVTSPlugin(this.Logger, 100, this.PluginName, this.PluginAuthor, this.PluginIcon);
+					VTSPluginDependencies deps = DependencyImplementations;
+					this._plugin = new CoreVTSPlugin(
+						deps.socket,
+						deps.jsonUtility,
+						deps.tokenStorage,
+						deps.logger,
+						(int)(1000f / Math.Max(30, Application.targetFrameRate)),
+						this.PluginName,
+						this.PluginAuthor,
+						EncodeIcon(this._pluginIcon, deps.logger)
+					);
 				}
 				return this._plugin;
 			}
 		}
 
-		[SerializeField]
-		protected string _pluginName = "ExamplePlugin";
-		public string PluginName { get { return this._pluginName; } }
-		[SerializeField]
-		protected string _pluginAuthor = "ExampleAuthor";
-		public string PluginAuthor { get { return this._pluginAuthor; } }
-		[SerializeField]
-		protected Texture2D _pluginIcon = null;
-		public string PluginIcon { get { return EncodeIcon(this._pluginIcon, this.Logger); } }
-
-		/// <summary>
-		/// The underlying WebSocket for connecting to VTS.
-		/// </summary>
-		/// <value></value>
-		public IVTSWebSocket Socket { get { return this.Plugin.Socket; } }
-
 		public bool IsAuthenticated { get { return this.Plugin.IsAuthenticated; } }
 
-		public IJsonUtility JsonUtility { get { return this.Plugin.JsonUtility; } }
-		public ITokenStorage TokenStorage { get { return this.Plugin.TokenStorage; } }
-		private readonly IVTSLogger _logger = new UnityVTSLoggerImpl();
-		public IVTSLogger Logger { get { return this._logger; } }
+		[SerializeField]
+		private string _pluginName = "ExamplePlugin";
+		public string PluginName { get { return this._pluginName; } }
+		[SerializeField]
+		private string _pluginAuthor = "ExampleAuthor";
+		public string PluginAuthor { get { return this._pluginAuthor; } }
+		[SerializeField]
+		private Texture2D _pluginIcon = null;
+		public string PluginIcon { get { return EncodeIcon(this._pluginIcon, this.Logger); } }
+
+		public IWebSocket Socket => this.Plugin.Socket;
+		public IJsonUtility JsonUtility => this.Plugin.JsonUtility;
+		public ITokenStorage TokenStorage => this.Plugin.TokenStorage;
+		public IVTSLogger Logger => this.Plugin.Logger;
 
 		#endregion
 
 		#region Initialization
 
-		public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onConnect, Action onDisconnect, Action<VTSErrorData> onError) {
-			this.Plugin.Initialize(webSocket, jsonUtility, tokenStorage, onConnect, onDisconnect, onError);
+		public void Initialize(Action onConnect, Action onDisconnect, Action<VTSErrorData> onError) {
+			this.Plugin.Initialize(onConnect, onDisconnect, onError);
 		}
 
-		public Task InitializeAsync(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onDisconnect) {
-			return this.Plugin.InitializeAsync(webSocket, jsonUtility, tokenStorage, onDisconnect);
+		public Task InitializeAsync(Action onDisconnect) {
+			return this.Plugin.InitializeAsync(onDisconnect);
 		}
 
 		public void Disconnect() {
@@ -124,8 +154,6 @@ namespace VTS.Unity {
 		}
 
 		public void TriggerHotkey(string hotkeyID, Action<VTSHotkeyTriggerData> onSuccess, Action<VTSErrorData> onError) {
-			VTSHotkeyTriggerData request = new VTSHotkeyTriggerData();
-			request.data.hotkeyID = hotkeyID;
 			this.Plugin.TriggerHotkey(hotkeyID, onSuccess, onError);
 		}
 
@@ -364,6 +392,30 @@ namespace VTS.Unity {
 
 		public void UnsubscribeFromPostProcessingEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
 			this.Plugin.UnsubscribeFromPostProcessingEvent(onUnsubscribe, onError);
+		}
+
+		public void SortItemWithinModel(VTSItemSortOptions options, Action<VTSItemSortResponseData> onSuccess, Action<VTSErrorData> onError) {
+			this.Plugin.SortItemWithinModel(options, onSuccess, onError);
+		}
+
+		public void GetArtMeshesAtPosition(Pair position, float visualize, Action<VTSArtMeshAtPositionResponseData> onSuccess, Action<VTSErrorData> onError) {
+			this.Plugin.GetArtMeshesAtPosition(position, visualize, onSuccess, onError);
+		}
+
+		public void SubscribeToArtMeshPointTrackingEvent(VTSArtMeshPointTrackingEventConfigOptions config, Action<VTSArtMeshPointTrackingEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
+			this.Plugin.SubscribeToArtMeshPointTrackingEvent(config, onEvent, onSubscribe, onError);
+		}
+
+		public void UnsubscribeFromArtMeshPointTrackingEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
+			this.Plugin.UnsubscribeFromArtMeshPointTrackingEvent(onUnsubscribe, onError);
+		}
+
+		public void SubscribeToArtMeshOutlineTrackingEvent(VTSArtMeshOutlineTrackingEventConfigOptions config, Action<VTSArtMeshOutlineTrackingEventData> onEvent, Action<VTSEventSubscriptionResponseData> onSubscribe, Action<VTSErrorData> onError) {
+			this.Plugin.SubscribeToArtMeshOutlineTrackingEvent(config, onEvent, onSubscribe, onError);
+		}
+
+		public void UnsubscribeFromArtMeshOutlineTrackingEvent(Action<VTSEventSubscriptionResponseData> onUnsubscribe, Action<VTSErrorData> onError) {
+			this.Plugin.UnsubscribeFromArtMeshOutlineTrackingEvent(onUnsubscribe, onError);
 		}
 
 		#endregion
@@ -638,6 +690,30 @@ namespace VTS.Unity {
 			return this.Plugin.SetPostProcessingEffectValues(options, values);
 		}
 
+		public Task<VTSItemSortResponseData> SortItemWithinModel(VTSItemSortOptions options) {
+			return this.Plugin.SortItemWithinModel(options);
+		}
+
+		public Task<VTSArtMeshAtPositionResponseData> GetArtMeshesAtPosition(Pair position, float visualize) {
+			return this.Plugin.GetArtMeshesAtPosition(position, visualize);
+		}
+
+		public Task<VTSEventSubscriptionResponseData> SubscribeToArtMeshPointTrackingEvent(VTSArtMeshPointTrackingEventConfigOptions config, Action<VTSArtMeshPointTrackingEventData> onEvent) {
+			return this.Plugin.SubscribeToArtMeshPointTrackingEvent(config, onEvent);
+		}
+
+		public Task<VTSEventSubscriptionResponseData> UnsubscribeFromArtMeshPointTrackingEvent() {
+			return this.Plugin.UnsubscribeFromArtMeshPointTrackingEvent();
+		}
+
+		public Task<VTSEventSubscriptionResponseData> SubscribeToArtMeshOutlineTrackingEvent(VTSArtMeshOutlineTrackingEventConfigOptions config, Action<VTSArtMeshOutlineTrackingEventData> onEvent) {
+			return this.Plugin.SubscribeToArtMeshOutlineTrackingEvent(config, onEvent);
+		}
+
+		public Task<VTSEventSubscriptionResponseData> UnsubscribeFromArtMeshOutlineTrackingEvent() {
+			return this.Plugin.UnsubscribeFromArtMeshOutlineTrackingEvent();
+		}
+
 		#endregion
 
 		#region Helper Methods
@@ -673,7 +749,16 @@ namespace VTS.Unity {
 		}
 
 		/// <summary>
-		/// Converts the VTS Color struct to a Unity Color32 struct.
+		/// Converts the VTS Pair struct to a Unity Vector2 struct.
+		/// </summary>
+		/// <param name="pair">The Pair to convert</param>
+		/// <returns></returns>
+		public static Pair Vector2ToPair(Vector2 vector) {
+			return new Pair(vector.x, vector.y);
+		}
+
+		/// <summary>
+		/// Converts the VTS ColorTint struct to a Unity Color32 struct.
 		/// </summary>
 		/// <param name="color">The color to convert</param>
 		/// <returns></returns>
@@ -701,5 +786,8 @@ namespace VTS.Unity {
 		}
 
 		#endregion
+
 	}
 }
+
+#endif

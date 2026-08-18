@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿#if UNITY_EDITOR || UNITY_2017_1_OR_NEWER
+
+using System.Collections.Generic;
 
 namespace VTS.Unity.Examples {
     public class PortSelector : RefreshableDropdown
@@ -29,3 +31,5 @@ namespace VTS.Unity.Examples {
         
     }
 }
+
+#endif

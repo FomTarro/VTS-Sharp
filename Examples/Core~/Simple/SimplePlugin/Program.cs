@@ -7,14 +7,14 @@ using VTS.Core;
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args); // Create a host builder so the program doesn't exit immediately
 
 ConsoleVTSLoggerImpl logger = new(); // Create a logger to log messages to the console (you can use your own logger implementation here like in the Advanced example)
+WebSocketImpl socket = new(logger);
+NewtonsoftJsonUtilityImpl json = new(); 
+TokenStorageImpl token = new("");
 
-CoreVTSPlugin plugin = new(logger, 100, "My simple plugin", "Perfect Programmer", "");
+CoreVTSPlugin plugin = new(socket, json, token, logger, 100, "My simple plugin", "Perfect Programmer", "");
 try 
 {
-    await plugin.InitializeAsync(
-        new WebSocketImpl(logger), 
-        new NewtonsoftJsonUtilityImpl(), 
-        new TokenStorageImpl(""), 
+    await plugin.InitializeAsync( 
         () => logger.LogWarning("Disconnected!"));
     logger.Log("Connected!");
     var apiState = await plugin.GetAPIState();
