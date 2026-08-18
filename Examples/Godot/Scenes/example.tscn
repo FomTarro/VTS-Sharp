@@ -44,13 +44,20 @@ texture = ExtResource("1_15pbu")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Port Input" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=1539548340]
+[node name="RichTextLabel" type="RichTextLabel" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=824948754]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 0
-text = "8001"
-placeholder_text = "VTube Studio Port..."
-alignment = 1
+text = "VTS Port:"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Port Entry" type="SpinBox" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=1919172496]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 65535.0
+value = 8001.0
+rounded = true
 
 [node name="Connect Button" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=728853310]
 custom_minimum_size = Vector2(150, 0)
@@ -69,9 +76,10 @@ size_flags_horizontal = 3
 size_flags_vertical = 0
 text = "Tint Model Pink"
 
-[node name="MyFirstGodotPlugin" type="Node" parent="." unique_id=2140825216 node_paths=PackedStringArray("_statusLight", "_connectButton", "_actionButton")]
+[node name="MyFirstGodotPlugin" type="Node" parent="." unique_id=2140825216 node_paths=PackedStringArray("_statusLight", "_portInput", "_connectButton", "_actionButton")]
 script = ExtResource("2_dsk4j")
 _statusLight = NodePath("../MarginContainer/VBoxContainer/HBoxContainer/AspectRatioContainer/Status Light")
+_portInput = NodePath("../MarginContainer/VBoxContainer/HBoxContainer/Port Entry")
 _connectButton = NodePath("../MarginContainer/VBoxContainer/HBoxContainer/Connect Button")
 _actionButton = NodePath("../MarginContainer/VBoxContainer/HBoxContainer2/Action Button")
 _pluginName = "Example Godot Plugin"
