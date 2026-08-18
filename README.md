@@ -1,4 +1,4 @@
-# VTS-Sharp v2.4.0
+# VTS-Sharp v2.4.1
 A C# client interface for creating VTube Studio Plugins with the [official VTube Studio API](https://github.com/DenchiSoft/VTubeStudio), for use in Unity, Godot, and other C# development environments!
 
 ## IMPORTANT! 
@@ -108,7 +108,7 @@ As of version `2.0.0`, the library has been reorganized into various packages, m
  
 ## Breaking Changes
 
-### In Version 2.4.0
+### In Version 2.4.1
 * The `Initialize` method is no longer repsonsible for [dependency injection](#swappable-components) of plugin components, as this is now also accomplished by the constructor of the `VTS.Core.VTSPlugin` class and is thus redundant. 
     * For `VTSPlugin` implementations that do not leverage constructors, such as `VTS.Unity.UnityVTSPlugin` and `VTS.Godot.GodotVTSPlugin`, an accessor called `DependencyImplementations` exists and can be overridden to specify components for just-in-time injection.
 

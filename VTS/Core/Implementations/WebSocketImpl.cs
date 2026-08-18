@@ -78,13 +78,12 @@ namespace VTS.Core {
                         _logger.LogError($"[{_url}] - Socket error...");
                         _logger.LogError($"'{e.Message}', {e}");
                         _onError(e);
-                        // TODO: try to connect again in x seconds
                         try {
                             await Task.Delay(5000, token);
                             if (_attemptReconnect) {
                                 Reconnect();
                             }
-                        } catch (TaskCanceledException) {
+                        } catch (OperationCanceledException) {
                             // swallow this, it's fine
                         }
                     });
@@ -133,7 +132,6 @@ namespace VTS.Core {
                             _logger.LogError($"[{_url}] - Socket error...");
                             _logger.LogError($"'{e.Message}', {e}");
                             _onError(e);
-                            // TODO: try to connect again in x seconds
                             try {
                                 await Task.Delay(5000, token);
                                 if (_attemptReconnect) {

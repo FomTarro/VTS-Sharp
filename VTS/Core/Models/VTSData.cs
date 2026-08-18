@@ -5,7 +5,7 @@ namespace VTS.Core {
 	#region Common
 
 	[System.Serializable]
-	public abstract class VTSMessageData {
+	public class VTSMessageData {
 		public string apiName = "VTubeStudioPublicAPI";
 		public long timestamp;
 		public string apiVersion = "1.0";
@@ -1595,7 +1595,6 @@ namespace VTS.Core {
 
 		[System.Serializable]
 		public class Data {
-			// TODO: some of these values are enums
 			public string itemInstanceID;
 			public bool frontOn = true;
 			public bool backOn = true;
@@ -1605,7 +1604,6 @@ namespace VTS.Core {
 			public string splitAt;
 			public string withinModelOrderFront;
 			public string withinModelOrderBack;
-
 		}
 	}
 
@@ -2430,12 +2428,10 @@ namespace VTS.Core {
 	[System.Serializable]
 	public class ArtMeshTrackedOutlinePoints {
 		public float[] points;
-		public Pair[] ToCoordinates()
-		{
-			Pair[] coords = new Pair[points.Length/2];	
-			for(int i = 0; i < coords.Length; i ++)
-			{
-				coords[i] = new Pair(points[i], points[i+1]);
+		public Pair[] ToCoordinates() {
+			Pair[] coords = new Pair[points.Length / 2];
+			for (int i = 0; i < coords.Length; i++) {
+				coords[i] = new Pair(points[i], points[i + 1]);
 			}
 			return coords;
 		}

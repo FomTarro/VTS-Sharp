@@ -54,10 +54,14 @@ namespace VTS.Core {
 		}
 
 		public void Tick(float timeDelta) {
-			ProcessResponses();
-			CheckPorts();
-			UpdatePortDiscoveryTimeout(timeDelta);
-			this._ws?.Tick(timeDelta);
+			try {
+				ProcessResponses();
+				CheckPorts();
+				UpdatePortDiscoveryTimeout(timeDelta);
+				this._ws?.Tick(timeDelta);
+			} catch (Exception e) {
+				this._logger.LogError($"Error in WebSocket tick: {e}");
+			}
 		}
 
 		public void Dispose() {
