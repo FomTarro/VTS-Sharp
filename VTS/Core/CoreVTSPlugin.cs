@@ -1349,10 +1349,10 @@ namespace VTS.Core {
 				case VTSItemMotionCurve.OVERSHOOT: return "overshoot";
 				case VTSItemMotionCurve.ZIP: return "zip";
 
-				// We define default case using loval variable, so it won't be merged with LINEAR case in IL code.
-				// If default case and LINEAR case will be merged - branch-predictor for jump-table will yield worse results.
-				// Making sure that defaul state is different from any other state ensures switch-case's branch is predictable.
-				// Predictable branch takes 4-5 instructions - unpredictable branches 12-15+ instructions (depending on source).
+				// We define default case using a local variable, so in IL code, default case won't be merged with LINEAR case.
+				// If default case and LINEAR case are merged - jump-table's branch-predictor will struggle to predict the right state.
+				// Making sure that the default state is different from any other state ensures that the jump-table's branch is always predictable.
+				// Predictable branch takes 4-5 instructions - unpredictable branches 12-15+ instructions (depending on cited source).
 				default: result = "linear"; break;
             }
 			return result;
